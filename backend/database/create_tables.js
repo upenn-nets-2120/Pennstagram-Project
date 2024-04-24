@@ -16,7 +16,7 @@ import {
   notificationsCreateTable,
   requestsCreateTable,
   users2postsCreateTable
-} from './tables/index.js';
+} from './tables/create_all_tables.js';
 
 const db = dbaccess.get_db_connection();
 

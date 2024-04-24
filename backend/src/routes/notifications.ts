@@ -3,16 +3,16 @@ import config from '../../database/config.json';
 import db from '../../database/db_access.js';
 
 
-export const posts = express.Router();
+export const notifications = express.Router();
 
-//fetch all posts
-posts.get('/fetch', async (req: Request, res: Response) => {
-    const posts = await db.send_sql('SELECT * FROM posts');
-    res.json(posts);
+//fetch all notifications
+notifications.get('/fetch', async (req: Request, res: Response) => {
+    const notifications = await db.send_sql('SELECT * FROM notifications');
+    res.json(notifications);
 });
 
 //create a new post
-posts.post('/new', async (req: Request, res: Response) => {
+notifications.post('/new', async (req: Request, res: Response) => {
     const {caption, hashtag, image, postVisibility} = req.body;
     const username = req.session.username;
 
@@ -29,12 +29,12 @@ posts.post('/new', async (req: Request, res: Response) => {
      
      const newPost = {caption, hashtag, image, postVisibility, username};
      newPost.username = username; //add username to be associate with the newPost
-     await db.send_sql('INSERT INTO posts SET ?', newPost);
+     await db.send_sql('INSERT INTO notifications SET ?', newPost);
     res.status(200).json({message: 'post created successfully'});
 });
 
 //update a post
-posts.put('/:postID/update', async (req: Request, res: Response) => {
+notifications.put('/:postID/update', async (req: Request, res: Response) => {
     const {postID} = req.params;
     const {caption, hashtag, image, postVisibility} = req.body;
     const username = req.session.username;
@@ -46,7 +46,7 @@ posts.put('/:postID/update', async (req: Request, res: Response) => {
     }
 
     //get the post from the database
-    const post = await db.send_sql('SELECT * FROM posts WHERE postID = ?', postID);
+    const post = await db.send_sql('SELECT * FROM notifications WHERE postID = ?', postID);
 
     //check if the post exists and if the username matches
     if (!post || post.username !== username) {
@@ -54,29 +54,29 @@ posts.put('/:postID/update', async (req: Request, res: Response) => {
         return;
     }  
     const updatedPost = {caption, hashtag, image, postVisibility};
-    await db.send_sql('UPDATE posts SET ? WHERE postID = ?', [updatedPost, postID]); //SET caption, hashtag to some new value
+    await db.send_sql('UPDATE notifications SET ? WHERE postID = ?', [updatedPost, postID]); //SET caption, hashtag to some new value
     res.status(200).json({ message: 'post updated successfully' });
 });
 
 //delete a post
-posts.delete('/:postID/delete', async (req: Request, res: Response) => {
+notifications.delete('/:postID/delete', async (req: Request, res: Response) => {
     const {postID} = req.params;
     const username = req.session.username;
 
     //get the post from the database
-    const post = await db.send_sql('SELECT * FROM posts WHERE postID = ?', postID);
+    const post = await db.send_sql('SELECT * FROM notifications WHERE postID = ?', postID);
 
     //check if the post exists and if the username matches
     if (!post || post.username !== username) {
         res.status(403).json({ error: 'post does not exist or not your post  to delete'});
         return;
     }   
-    await db.send_sql('DELETE FROM posts WHERE postID = ?', postID);
+    await db.send_sql('DELETE FROM notifications WHERE postID = ?', postID);
     res.status(200).json({ message: 'post deleted successfully' });
 });
 
 //like a post
-posts.post('/:postID/like', async (req: Request, res: Response) => {
+notifications.post('/:postID/like', async (req: Request, res: Response) => {
     const {postID} = req.params; //postID
     const userID = req.body.userID; //userID of the user who likes the post?
     //insert a new like into the likes table
@@ -85,7 +85,7 @@ posts.post('/:postID/like', async (req: Request, res: Response) => {
 });
 
 //comment on a post
-posts.post('/:postID/comments', async (req: Request, res: Response) => {
+notifications.post('/:postID/comments', async (req: Request, res: Response) => {
     const {postID} = req.params;
     const comment = req.body.comment;
     const username = req.session.username;
@@ -97,7 +97,7 @@ posts.post('/:postID/comments', async (req: Request, res: Response) => {
     }
 
     //get the post from the database
-    const post = await db.send_sql('SELECT * FROM posts WHERE postID = ?', postID);
+    const post = await db.send_sql('SELECT * FROM notifications WHERE postID = ?', postID);
 
     //check if the actually post exists
     if (!post) {
@@ -110,3 +110,5 @@ posts.post('/:postID/comments', async (req: Request, res: Response) => {
     await db.send_sql('INSERT INTO comments SET ?', newComment);
     res.status(200).json({message: 'comment posted successfully'});
 });
+
+// NEED TO FINISH CHANGING ANUSHKA's STARTER CODE TO FIT NOTIFICAITONS

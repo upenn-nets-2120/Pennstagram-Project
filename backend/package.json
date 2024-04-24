@@ -5,8 +5,8 @@
   "main": "index.js",
   "scripts": {
     "build": "tsc",
-    "start": "node dist/index.js",
-    "create_tables": "node database/index.js"
+    "start": "node src/index.ts",
+    "create_tables": "node database/create_tables.js"
   },
   "keywords": [],
   "author": "",
@@ -14,6 +14,7 @@
   "devDependencies": {
     "@types/express": "^4.17.21",
     "@types/node": "^20.12.7",
+    "tsx": "^4.7.2",
     "typescript": "^5.4.5"
   },
   "dependencies": {
