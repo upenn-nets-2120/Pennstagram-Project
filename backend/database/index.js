@@ -1,18 +1,5 @@
-import dbaccess, { get_db_connection } from './db_access';
-import { serverPort } from '../config.json';
-require('dotenv').config();
-
-// function sendQueryOrCommand(db, query, params = []) {
-//   return new Promise((resolve, reject) => {
-//     db.query(query, params, (err, results) => {
-//       if (err) {
-//         reject(err);
-//       } else {
-//         resolve(results);
-//       }
-//     });
-//   });
-// }
+// import { get_db_connection } from './db_access';
+import dbaccess from './db_access.js';
 
 import { 
   usersCreateTable,
@@ -29,9 +16,9 @@ import {
   notificationsCreateTable,
   requestsCreateTable,
   users2postsCreateTable
-} from './tables';
+} from './tables/index.js';
 
-
+const db = dbaccess.get_db_connection();
 
 const create_tables = async (db) => {
   return await Promise.all([
@@ -52,8 +39,12 @@ const create_tables = async (db) => {
   ]);
 }
 
-const db = get_db_connection();
-const result = create_tables(dbaccess);
-console.log('Tables created');
+var result = create_tables(dbaccess).then(() => {
+  console.log('Tables created');
+  dbaccess.close_db();
+});
+
+// const result = create_tables(dbaccess);
+// console.log('Tables created');
 //db.close_db();
 // dbaccess.close_db();
