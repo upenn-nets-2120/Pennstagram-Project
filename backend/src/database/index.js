@@ -1,4 +1,3 @@
-// import { get_db_connection } from './db_access';
 import dbaccess from './db_access.js';
 
 import { 
@@ -16,9 +15,9 @@ import {
   notificationsCreateTable,
   requestsCreateTable,
   users2postsCreateTable
-} from './tables/create_all_tables.js';
+} from './tables/create_tables_exports.js';
 
-const db = dbaccess.get_db_connection();
+dbaccess.get_db_connection();
 
 const create_tables = async (db) => {
   return await Promise.all([
@@ -43,8 +42,3 @@ var result = create_tables(dbaccess).then(() => {
   console.log('Tables created');
   dbaccess.close_db();
 });
-
-// const result = create_tables(dbaccess);
-// console.log('Tables created');
-//db.close_db();
-// dbaccess.close_db();

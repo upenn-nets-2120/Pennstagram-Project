@@ -1,1 +1,1 @@
-run `npx tsx src/index.ts`
+run `npm start`

@@ -1,10 +1,11 @@
 import express from 'express';
-import { posts } from './posts';
-import { notifications } from './notifications';
+import postsRoutes from './posts.js';
+
+// import notifications from './notifications.js';
 
 const routes = express.Router();
 
-routes.use(posts, notifications);
+routes.use('/posts', postsRoutes);
 
 export default routes;
 // src/routes/routes gather all the routes & imports individual route files and aggregates them into a single router using express.Router()

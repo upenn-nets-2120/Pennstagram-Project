@@ -4,19 +4,13 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "build": "tsc",
-    "start": "node src/index.ts",
+    "start": "node index.js",
     "create_tables": "node database/create_tables.js"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "@types/express": "^4.17.21",
-    "@types/express-session": "^1.18.0",
-    "@types/node": "^20.12.7",
-    "tsx": "^4.7.2",
-    "typescript": "^5.4.5"
   },
   "dependencies": {
     "dotenv": "^16.4.5",

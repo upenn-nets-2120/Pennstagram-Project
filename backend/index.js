@@ -1,15 +1,10 @@
 import express from 'express';
-import session from "express-session";
-import routes from './routes/routes';
+import routes from './src/routes/router.js';
 
 const app = express();
 const PORT = 3000;
 
 app.use(express.json());
-
-app.use(session({
-  secret: "some secret text"
-}))
 
 // routes
 app.use('/', routes);
@@ -18,5 +13,3 @@ app.use('/', routes);
 app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);
 });
-
-//index.ts sets up the Express server, imports express, configures routes, and starts the server
