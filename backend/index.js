@@ -1,14 +1,13 @@
 import express from 'express';
+import routes from './src/routes/router.js';
 
 const app = express();
 const PORT = 3000;
 
 app.use(express.json());
 
-// Simple GET route
-app.get('/', (req, res) => {
-  res.send('Hello, Express!');
-});
+// routes
+app.use('/', routes);
 
 // Start the server
 app.listen(PORT, () => {

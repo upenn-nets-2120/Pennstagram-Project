@@ -1,6 +1,5 @@
-import { createConnection } from 'mysql';
-import { database } from '../config.json';
-import { env } from 'process';
+import mysql from 'mysql';
+import config from './config.json' assert { type: "json" };
 
 var the_db = null;
 
@@ -39,12 +38,13 @@ async function get_db_connection() {
         return the_db;
     }
 
-    dbconfig = database;
-    dbconfig.user = env.RDS_USER;
-    dbconfig.password = env.RDS_PWD;
-    the_db = createConnection(dbconfig);
+    let dbconfig = config.database;
+    // dbconfig.user = process.env.RDS_USER;
+    // dbconfig.password = process.env.RDS_PWD;
+    console.log(dbconfig);
+    the_db = mysql.createConnection(dbconfig);
 
-        // Connect to MySQL
+    // Connect to MySQL
     return new Promise(function(resolve, reject) {
         the_db.connect(err => {
             if (err) 

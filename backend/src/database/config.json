@@ -2,7 +2,9 @@
   "database": {
     "host": "localhost",
     "port": "3306",
-    "database": "DBNAME"
+    "database": "go7-db",
+    "user": "admin",
+    "password": "rds-password"
   },
   "serverPort": "8080"
 }
