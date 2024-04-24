@@ -2,12 +2,11 @@ import express, { Request, Response } from 'express';
 import config from '../../database/config.json';
 import db from '../../database/db_access.js';
 
-
 export const posts = express.Router();
 
 //fetch all posts
 posts.get('/fetch', async (req: Request, res: Response) => {
-    const posts = await db.send_sql('SELECT * FROM posts');
+    const posts = await db.send_sql('SELECT * FROM posts;');
     res.json(posts);
 });
 

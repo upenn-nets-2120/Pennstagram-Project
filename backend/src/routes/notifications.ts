@@ -12,7 +12,7 @@ notifications.get('/fetch', async (req: Request, res: Response) => {
 });
 
 //create a new post
-notifications.post('/new', async (req: Request, res: Response) => {
+notifications.post('/new', async (req, res) => {
     const {caption, hashtag, image, postVisibility} = req.body;
     const username = req.session.username;
 
