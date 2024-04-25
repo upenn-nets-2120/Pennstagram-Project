@@ -2,7 +2,7 @@ const postsCreateTable = async (db) => {
     const query = `
         CREATE TABLE IF NOT EXISTS posts (
             postID INT AUTO_INCREMENT PRIMARY KEY,
-            nconstID VARCHAR(10),
+            userID VARCHAR(10),
             image BLOB,
             caption VARCHAR(255),
             hashtag VARCHAR(255),
