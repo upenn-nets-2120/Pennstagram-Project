@@ -1,12 +1,20 @@
 import express from 'express';
 import db from '../database/db_access.js';
+import {createPost, updatePost, deletePost, likePost, commentPost} from '../dbOperations/posts_dbOperations.js';
 
 const posts = express.Router();
+
+//TODO: check Logged In --> use helper funtion and return true (should return when user is logged in)
 
 //fetch all posts
 posts.get('/fetch', async (req, res) => {
     const posts = await db.send_sql('SELECT * FROM posts;');
-    res.json(posts);
+    try {
+        const posts = await db.send_sql(sql);
+        res.status(200).json(posts);
+    } catch (error) {
+        res.status(500).json({error: 'Error querying database'});
+    }
 });
 
 //create a new post
@@ -25,15 +33,29 @@ posts.post('/new', async (req, res) => {
         return;
      }
      
-     const newPost = {caption, hashtag, image, postVisibility, username};
-     newPost.username = username; //add username to be associate with the newPost
-     await db.send_sql('INSERT INTO posts SET ?', newPost);
-    res.status(200).json({message: 'post created successfully'});
+     const post_json = {
+        username: username,
+        source_site: 'g07', // replace with your team number
+        post_uuid_within_site: postID, // replace with the postID of the new post
+        post_text: caption,
+        content_type: 'BLOB' // replace with the content type of the image
+    };
+
+    const newPost = {username, caption, hashtag, image, postVisibility, post_json: JSON.stringify(post_json)};
+    //const newPostParams = [caption, hashtag, image, postVisibility, username];
+    //const sql = 'INSERT INTO posts (caption, hashtag, image, postVisibility, nconstID) VALUES (?, ?, ?, ?, ?)'; 
+    try {
+        await createPost(newPost);
+        //await db.send_sql(sql, newPostParams);
+        res.status(201).json({message: 'Post created'});
+    } catch (error) {
+        res.status(500).json({error: 'Error querying database'});
+    }
 });
 
 //update a post
-posts.put('/:postID/update', async (req, res) => {
-    const {postID} = req.params;
+posts.put('/update', async (req, res) => {
+    const {postID, post_json} = req.params;
     const {caption, hashtag, image, postVisibility} = req.body;
     const username = req.session.username;
 
@@ -44,20 +66,23 @@ posts.put('/:postID/update', async (req, res) => {
     }
 
     //get the post from the database
-    const post = await db.send_sql('SELECT * FROM posts WHERE postID = ?', postID);
+    const post = await db.send_sql('SELECT 1 FROM posts WHERE postID = ?', postID);
 
     //check if the post exists and if the username matches
     if (!post || post.username !== username) {
-        res.status(403).json({ error: 'post does not exist or not your post  to delete'});
+        res.status(403).json({ error: 'post does not exist or it is not your post  to delete'});
         return;
     }  
-    const updatedPost = {caption, hashtag, image, postVisibility};
-    await db.send_sql('UPDATE posts SET ? WHERE postID = ?', [updatedPost, postID]); //SET caption, hashtag to some new value
-    res.status(200).json({ message: 'post updated successfully' });
+    try {
+        await updatePost(postID, username, caption, hashtag, image, postVisibility, post_json);
+        res.status(200).json({message: 'Post updated'});
+    } catch (error) {
+        res.status(500).json({error: 'Error querying database'});
+    }
 });
 
 //delete a post
-posts.delete('/:postID/delete', async (req, res) => {
+posts.delete('/delete', async (req, res) => {
     const {postID} = req.params;
     const username = req.session.username;
 
@@ -66,26 +91,39 @@ posts.delete('/:postID/delete', async (req, res) => {
 
     //check if the post exists and if the username matches
     if (!post || post.username !== username) {
-        res.status(403).json({ error: 'post does not exist or not your post  to delete'});
+        res.status(403).json({ error: 'post does not exist or not your post to delete'});
         return;
     }   
-    await db.send_sql('DELETE FROM posts WHERE postID = ?', postID);
-    res.status(200).json({ message: 'post deleted successfully' });
+    //const sql = 'DELETE FROM posts WHERE postID = ?'; 
+    try {
+        //await db.send_sql(sql, postID);
+        await deletePost(postID);
+        res.status(200).json({message: 'Post deleted.'});
+    } catch (error) {
+        res.status(500).json({error: 'Error querying database.'});
+    }
 });
 
 //like a post
-posts.post('/:postID/like', async (req, res) => {
+posts.post('/like', async (req, res) => {
     const {postID} = req.params; //postID
     const userID = req.body.userID; //userID of the user who likes the post?
     //insert a new like into the likes table
-    await db.send_sql('INSERT INTO likes SET postID = ?, liker = ?', [postID, userID]);
+    //const sql = 'INSERT INTO likes (postID, liker) VALUES (?, ?)'; 
+    try {
+        //await db.send_sql(sql, [postID, userID]);
+        await likePost(postID, userID);
+        res.status(200).json({message: 'Post liked.'});
+    } catch (error) {
+        res.status(500).json({error: 'Error querying database.'});
+    }
     res.status(200).json({ message: 'post liked successfully' });
 });
 
 //comment on a post
-posts.post('/:postID/comments', async (req, res) => {
+posts.post('/comments', async (req, res) => {
     const {postID} = req.params;
-    const comment = req.body.comment;
+    const {comment, parentCommentID} = req.body;
     const username = req.session.username;
 
     //check if comment is gievn
@@ -94,7 +132,6 @@ posts.post('/:postID/comments', async (req, res) => {
         return;
     }
 
-    //get the post from the database
     const post = await db.send_sql('SELECT * FROM posts WHERE postID = ?', postID);
 
     //check if the actually post exists
@@ -103,10 +140,15 @@ posts.post('/:postID/comments', async (req, res) => {
         return;
     }
 
-    //insert the new comment into the database
-    const newComment = { postID, username, comment };
-    await db.send_sql('INSERT INTO comments SET ?', newComment);
-    res.status(200).json({message: 'comment posted successfully'});
+    //const newCommentParams = [postID, username, comment, (parentCommentID || null)];
+    //const sql = 'INSERT INTO comments (postID, username, comment, parentCommentID) VALUES (?, ?, ?, ?)'; 
+    try {
+        await commentPost(postID, username, comment, parentCommentID);
+        //await db.send_sql(sql, newCommentParams);
+        res.status(200).json({message: 'Comment posted.'});
+    } catch (error) {
+        res.status(500).json({error: 'Error querying database.'});
+    }
 });
 
 export default posts;
