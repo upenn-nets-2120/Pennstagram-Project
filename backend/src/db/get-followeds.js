@@ -1,3 +1,5 @@
+import db from '../../database/db_access';
+
 const getFollowedsFromUser = async (userID) => {
     const sql = `
         SELECT
