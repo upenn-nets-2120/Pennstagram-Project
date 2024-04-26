@@ -11,34 +11,34 @@ export const createPost = async (newPost) => {
 
 export const updatePost = async (postID, caption, hashtag, image, postVisibility, post_json) => {
     if (caption) {
-        await db.send_sql('UPDATE posts caption = ? WHERE postID = ?', [caption, postID]);
+        return await db.send_sql('UPDATE posts caption = ? WHERE postID = ?', [caption, postID]);
     }
     if (hashtag) {
-        await db.send_sql('UPDATE posts hashtag = ? WHERE postID = ?', [hashtag, postID]);
+        return await db.send_sql('UPDATE posts hashtag = ? WHERE postID = ?', [hashtag, postID]);
     }
     if (image) {
-        await db.send_sql('UPDATE posts image = ? WHERE postID = ?', [image, postID]);
+        return await db.send_sql('UPDATE posts image = ? WHERE postID = ?', [image, postID]);
     }
     if (postVisibility) {
-        await db.send_sql('UPDATE posts postVisibility = ? WHERE postID = ?', [postVisibility, postID]);
+        return await db.send_sql('UPDATE posts postVisibility = ? WHERE postID = ?', [postVisibility, postID]);
     }
     if (post_json) {
-        await db.send_sql('UPDATE posts post_json = ? WHERE postID = ?', [JSON.stringify(post_json), postID]);
+        return await db.send_sql('UPDATE posts post_json = ? WHERE postID = ?', [JSON.stringify(post_json), postID]);
     }
 };
 
 export const deletePost = async (postID) => {
     const query = `DELETE FROM posts WHERE postID = ?`;
-    await db.send_sql(query, postID);
+    return await db.send_sql(query, postID);
 }
 
 export const likePost = async (postID, userID) => {
     const query = `INSERT INTO likes (postID, liker) VALUES (?, ?)`;
-    await db.send_sql(query, [postID, userID]);
+    return await db.send_sql(query, [postID, userID]);
 }
 
 export const commentPost = async (postID, username, comment, parentCommentID) => {
     const newCommentParams = [postID, username, comment, (parentCommentID || null)];
     const sql = 'INSERT INTO comments (postID, username, comment, parentCommentID) VALUES (?, ?, ?, ?)'; 
-    await db.send_sql(sql, newCommentParams);
+    return await db.send_sql(sql, newCommentParams);
 }
