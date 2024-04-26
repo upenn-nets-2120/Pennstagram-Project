@@ -5,6 +5,7 @@ import {createPost, updatePost, deletePost, likePost, commentPost} from '../dbOp
 const posts = express.Router();
 
 //TODO: check Logged In --> use helper funtion and return true (should return when user is logged in)
+//"testing if this goes through"
 
 //fetch all posts
 posts.get('/fetch', async (req, res) => {
