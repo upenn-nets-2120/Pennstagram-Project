@@ -12,3 +12,4 @@ export { default as friendsCreateTable } from './friends-create-table.js';
 export { default as notificationsCreateTable } from './notifications-create-table.js';
 export { default as requestsCreateTable } from './requests-create-table.js';
 export { default as users2postsCreateTable } from './users2posts-create-table.js';
+export { default as users2chatsCreateTable } from './users2chats-create-table.js';

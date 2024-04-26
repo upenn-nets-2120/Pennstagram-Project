@@ -5,7 +5,6 @@ const messagesCreateTable = async (db) => {
             userID INT,
             groupID INT,
             timeStamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            chatOrder INT,
             FOREIGN KEY (userID) REFERENCES users(userID)
         );
     `;

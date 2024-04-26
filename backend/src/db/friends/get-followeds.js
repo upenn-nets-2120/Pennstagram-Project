@@ -1,4 +1,4 @@
-import db from '../../database/db_access';
+import db from '../../../database/db_access';
 
 const getFollowedsFromUser = async (userID) => {
     const sql = `
