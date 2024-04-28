@@ -3,7 +3,7 @@ import db from '../../database/db_access';
 const deleteRecommendation = async (userID, recommended) => {
     const sql = `
         DELETE FROM
-            users
+            recommendations
         WHERE
             userID = '${userID}'
         AND

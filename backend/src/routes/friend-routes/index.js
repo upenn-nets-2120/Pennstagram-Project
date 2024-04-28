@@ -10,7 +10,10 @@ import {
     addRequest,
     deleteFriend,
     deleteRecommendation,
-    deleteRequest
+    deleteRequest,
+    addNotification,
+    deleteNotification,
+    getNotificationsFromUser,
 } from '../../db/index.js'
 
 const routes = express.Router();
@@ -104,7 +107,7 @@ routes.post('/removeRequest/:userID/:requester', async (req, res) => {
         return;
     }
 
-    await removeRequest(requester, userID);
+    await deleteRequest(requester, userID);
 
     res.status(200).json({message: 'something'});
 });

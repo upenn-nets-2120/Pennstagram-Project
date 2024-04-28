@@ -5,11 +5,11 @@ const getRecommendationsFromUser = async (userID) => {
         SELECT
             *
         FROM
-            friends
+            recommendations
         JOIN
-            users ON friends.follower = users.userID
+            users ON recommendations.userID = users.userID
         WHERE
-            friends.followed = '${userID}'
+            recommendations.recommended = '${userID}'
     ;`;
 
     return await db.send_sql(sql);

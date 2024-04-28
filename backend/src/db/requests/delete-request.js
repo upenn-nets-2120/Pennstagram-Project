@@ -3,7 +3,7 @@ import db from '../../database/db_access';
 const deleteRequest = async (userID, requesting) => {
     const sql = `
         DELETE FROM
-            users
+            requests
         WHERE
             userID = '${userID}'
         AND
