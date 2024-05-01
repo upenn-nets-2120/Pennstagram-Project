@@ -37,8 +37,8 @@ export const likePost = async (postID, userID) => {
     return await db.send_sql(query, [postID, userID]);
 }
 
-export const commentPost = async (postID, username, comment, parentCommentID) => {
-    const newCommentParams = [postID, username, comment, (parentCommentID || null)];
-    const sql = 'INSERT INTO comments (postID, username, comment, parentCommentID) VALUES (?, ?, ?, ?)'; 
+export const commentPost = async (postID, userID, comment, parentCommentID) => {
+    const newCommentParams = [postID, userID, comment, (parentCommentID || null)];
+    const sql = 'INSERT INTO comments (postID, userID, comment, parentCommentID) VALUES (?, ?, ?, ?)'; 
     return await db.send_sql(sql, newCommentParams);
 }

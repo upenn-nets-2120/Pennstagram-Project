@@ -11,7 +11,7 @@ import {
     deleteFriend,
     deleteRecommendation,
     deleteRequest
-} from '../../db/index.js'
+} from '../../dbOperations/index.js'
 
 const routes = express.Router();
 

@@ -10,12 +10,11 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "devDependencies": {
-  },
   "dependencies": {
     "dotenv": "^16.4.5",
     "express": "^4.19.2",
     "express-session": "^1.18.0",
+    "kafkajs": "^2.2.4",
     "mysql": "^2.18.1"
   },
   "type": "module"
