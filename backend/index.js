@@ -1,5 +1,5 @@
 import express from 'express';
-import routes from './src/routes/router.js';
+import routes from './src/routes/router';
 
 const app = express();
 const PORT = 3000;

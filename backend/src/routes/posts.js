@@ -1,5 +1,5 @@
 import express from 'express';
-import db from '../database/db_access.js';
+import db from '../database/db_access';
 
 const posts = express.Router();
 
