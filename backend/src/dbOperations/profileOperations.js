@@ -77,33 +77,47 @@ const modifyInterestedHashtag = async (username, hashtag, operation) => {
     let results1;
     let results2;
 
-    if (operations === 1) { // we're adding
+    if (operation === 1) { // we're adding
         const insertHashtagQuery = `INSERT INTO hashtags (phrase)
                                     SELECT ?
                                     WHERE NOT EXISTS (SELECT 1 FROM hashtags WHERE phrase = ?)`;
-        results1 = await db.send_sql(insertHashtagQuery, [hashtagPhrase, hashtagPhrase]);
+        results1 = await db.send_sql(insertHashtagQuery, [hashtag, hashtag]);
 
         // Add the hashtag to the user's list of interested hashtags
         const addUserHashtagQuery = `INSERT INTO users2hashtags (userID, hashtagID)
                                      SELECT (SELECT userID FROM users WHERE username = ?), (SELECT hashtagID FROM hashtags WHERE phrase = ?)
                                      WHERE NOT EXISTS (
                                      SELECT 1 FROM users2hashtags WHERE userID = (SELECT userID FROM users WHERE username = ?) AND hashtagID = (SELECT hashtagID FROM hashtags WHERE phrase = ?);)`;
-        results2 = await db.send_sql(addUserHashtagQuery, [username, hashtagPhrase, username, hashtagPhrase]);
+        results2 = await db.send_sql(addUserHashtagQuery, [username, hashtag, username, hashtag]);
 
     } else { // we're deleting
         const deleteUserHashtagQuery = `DELETE FROM users2hashtags
                                         WHERE userID = (SELECT userID FROM users WHERE username = ?)
                                             AND hashtagID = (SELECT hashtagID FROM hashtags WHERE phrase = ?);`;
-        results1 = await db.send_sql(deleteUserHashtagQuery, [username, hashtagPhrase]);
+        results1 = await db.send_sql(deleteUserHashtagQuery, [username, hashtag]);
 
         // Delete hashtag if it's no longer linked to any posts or users
         const deleteHashtagQuery = `DELETE FROM hashtags
                                     WHERE hashtagID = (SELECT hashtagID FROM hashtags WHERE phrase = ?)
                                     AND NOT EXISTS (SELECT 1 FROM users2hashtags WHERE hashtagID = (SELECT hashtagID FROM hashtags WHERE phrase = ?))
                                     AND NOT EXISTS (SELECT 1 FROM posts2hashtags WHERE hashtagID = (SELECT hashtagID FROM hashtags WHERE phrase = ?));`;
-        results2 = await db.send_sql(deleteHashtagQuery, [hashtagPhrase, hashtagPhrase, hashtagPhrase]);
+        results2 = await db.send_sql(deleteHashtagQuery, [hashtag, hashtag, hashtag]);
     }
     return [results1, results2];
+};
+
+const addNotification = async (username, content, type) => {
+
+    // Step 1: Retrieve the userID for the given username
+    const userResult = await getOwnUser(username);
+    const userID = userResult[0].userID;
+
+    // Step 2: Insert the notification into the notifications table
+    const notificationQuery = `
+        INSERT INTO notifications (userID, type, content)
+        VALUES (?, ?, ?)`;
+    const result = await db.send_sql(notificationQuery, [userID, type, content]);
+    return result;
 };
 
 export default {
@@ -113,4 +127,5 @@ export default {
     getOwnHashtags,
     getPopularHashtags,
     modifyInterestedHashtag,
+    addNotification,
 };

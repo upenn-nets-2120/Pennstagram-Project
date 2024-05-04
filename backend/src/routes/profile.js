@@ -99,7 +99,7 @@ profileUpdates.put('/updateProfile', async (req, res) => {
 });
 
 // allows user to add OR remove a specified hashtag (through use of req.query, i.e. '.../updateHashtags?operation=<insert 1 or 2 here>)
-profileUpdates.put('/updateHashtags', async (req, res) => {
+profileUpdates.post('/updateHashtags', async (req, res) => {
 
     try {
         const username = req.body.username;
@@ -119,7 +119,20 @@ profileUpdates.put('/updateHashtags', async (req, res) => {
     }
 });
 
-// make another endpoint function that allows the user to change embedding? see how this functionality should be implemen
-// (CAN BE MODIFIED LATER TO INCORPORATE CHANGING ACTOR EMBE)
+// creates a notification entry in the notificaitons database to store a persistent notificaiton of a new chat, request, etc.
+profileUpdates.post('/addNotification', async (req, res) => {
+
+    try {
+        const username = req.body.username;
+        const content = req.body.content;
+        const type = req.body.type;
+
+        const result = await profileOperations.addNotification(username, content, type);
+        return res.status(200).send.json({message: `Hashtags for ${username} changed successfully`, result: result});
+    } catch (error) {
+        console.error('Failed to update user profile:', error);
+        res.status(500).send('Internal Server Error');
+    }
+});
 
 export default profileUpdates;
