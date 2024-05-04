@@ -1,8 +1,7 @@
 // database operations corresponding to profileUpdates.js backend routes
-import db from '../database/db_access';
+import db from '../database/db_access.js';
 
 const getOwnUser = async (username) => {
-
     const query = `SELECT userID, username, firstName, lastName, emailID, userProfilePic, userScore, userVisibility, actors
                    FROM users 
                    WHERE username = ?`;
@@ -11,7 +10,6 @@ const getOwnUser = async (username) => {
 }
 
 const getOtherUser = async (username) => {
-
     const query = `SELECT username, userProfilePic,
                    FROM users 
                    WHERE username = ?;`;
@@ -19,7 +17,7 @@ const getOtherUser = async (username) => {
     return result;
 }
 
-const modifyUser = async (newUsername, newEmail, newUsername) => {
+const modifyUser = async (newUsername, newEmail, newPassword) => {
 
     let updates = [];
     let params =[];
@@ -28,11 +26,11 @@ const modifyUser = async (newUsername, newEmail, newUsername) => {
         updates.push('username = ?');
         params.push(newUsername);
     }
-    if (newUsername) {
+    if (newEmail) {
         updates.push('emailID = ?');
         params.push(newEmail);
     }
-    if (newUsername) { // Assuming password is already hashed (salted) before reaching here
+    if (newPassword) { // Assuming password is already hashed (salted) before reaching here
         updates.push('salted_password = ?');
         params.push(newPassword);
     }
@@ -48,8 +46,71 @@ const modifyUser = async (newUsername, newEmail, newUsername) => {
     return result;
 }
 
-module.exports = {
+const getOwnHashtags = async (username) => {
+    const hashtagQuery = `SELECT h.hashtagID
+                          FROM users u
+                          JOIN users2hashtags h ON u.userID = h.userID
+                          WHERE u.username = ?`;
+    const results = await db.send_sql(hashtagQuery, [username]);
+    return results;
+};
+
+const getPopularHashtags = async () => {
+    const popularityQuery = `SELECT h.phrase, SUM(total.count) AS popularity
+                             FROM (
+                                SELECT hashtagID, COUNT(*) AS count
+                                FROM posts2hashtags
+                                GROUP BY hashtagID
+                                UNION ALL
+                                SELECT hashtagID, COUNT(*) AS count
+                                FROM users2hashtags
+                                GROUP BY hashtagID
+                             ) AS total
+                             JOIN hashtags h ON h.hashtagID = total.hashtagID
+                             GROUP BY total.hashtagID
+                             ORDER BY popularity DESC;`
+    const results = await db.send_sql(popularityQuery);
+    return results;
+};
+
+const modifyInterestedHashtag = async (username, hashtag, operation) => {
+    let results1;
+    let results2;
+
+    if (operations === 1) { // we're adding
+        const insertHashtagQuery = `INSERT INTO hashtags (phrase)
+                                    SELECT ?
+                                    WHERE NOT EXISTS (SELECT 1 FROM hashtags WHERE phrase = ?)`;
+        results1 = await db.send_sql(insertHashtagQuery, [hashtagPhrase, hashtagPhrase]);
+
+        // Add the hashtag to the user's list of interested hashtags
+        const addUserHashtagQuery = `INSERT INTO users2hashtags (userID, hashtagID)
+                                     SELECT (SELECT userID FROM users WHERE username = ?), (SELECT hashtagID FROM hashtags WHERE phrase = ?)
+                                     WHERE NOT EXISTS (
+                                     SELECT 1 FROM users2hashtags WHERE userID = (SELECT userID FROM users WHERE username = ?) AND hashtagID = (SELECT hashtagID FROM hashtags WHERE phrase = ?);)`;
+        results2 = await db.send_sql(addUserHashtagQuery, [username, hashtagPhrase, username, hashtagPhrase]);
+
+    } else { // we're deleting
+        const deleteUserHashtagQuery = `DELETE FROM users2hashtags
+                                        WHERE userID = (SELECT userID FROM users WHERE username = ?)
+                                            AND hashtagID = (SELECT hashtagID FROM hashtags WHERE phrase = ?);`;
+        results1 = await db.send_sql(deleteUserHashtagQuery, [username, hashtagPhrase]);
+
+        // Delete hashtag if it's no longer linked to any posts or users
+        const deleteHashtagQuery = `DELETE FROM hashtags
+                                    WHERE hashtagID = (SELECT hashtagID FROM hashtags WHERE phrase = ?)
+                                    AND NOT EXISTS (SELECT 1 FROM users2hashtags WHERE hashtagID = (SELECT hashtagID FROM hashtags WHERE phrase = ?))
+                                    AND NOT EXISTS (SELECT 1 FROM posts2hashtags WHERE hashtagID = (SELECT hashtagID FROM hashtags WHERE phrase = ?));`;
+        results2 = await db.send_sql(deleteHashtagQuery, [hashtagPhrase, hashtagPhrase, hashtagPhrase]);
+    }
+    return [results1, results2];
+};
+
+export default {
     getOwnUser,
     getOtherUser,
     modifyUser,
+    getOwnHashtags,
+    getPopularHashtags,
+    modifyInterestedHashtag,
 };
