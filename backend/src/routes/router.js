@@ -1,5 +1,6 @@
 import express from 'express';
 import postsRoutes from './posts.js';
+import friendRoutes from './friend-routes/index.js';
 import profileRoutes from './profile.js';
 import searchRoutes from './search.js';
 
@@ -8,6 +9,7 @@ import searchRoutes from './search.js';
 const routes = express.Router();
 
 routes.use('/posts', postsRoutes);
+routes.use('/friends', friendRoutes);
 routes.use('/profile', profileRoutes);
 routes.use('/search', searchRoutes);
 

@@ -15,9 +15,9 @@ import {
   notificationsCreateTable,
   requestsCreateTable,
   users2postsCreateTable,
+  users2chatsCreateTable,
   actorsCreateTable,
   users2actorsCreateTable,
-  actorsLoadTable
 } from './tables/create_tables_exports.js';
 
 dbaccess.get_db_connection();
@@ -38,9 +38,9 @@ const create_tables = async (db) => {
     notificationsCreateTable(db),
     requestsCreateTable(db),
     users2postsCreateTable(db),
+    users2chatsCreateTable(db),
     actorsCreateTable(db),
-    users2actorsCreateTable(db),
-    // actorsLoadTable(db)
+    users2actorsCreateTable(db)
   ]);
 }
 
