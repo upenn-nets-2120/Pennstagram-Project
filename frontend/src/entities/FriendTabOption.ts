@@ -1,0 +1,1 @@
+export type FriendTabOption = 'Following' | 'Followed By' | 'Recommended';
