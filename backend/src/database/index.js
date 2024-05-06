@@ -14,7 +14,10 @@ import {
   friendsCreateTable,
   notificationsCreateTable,
   requestsCreateTable,
-  users2postsCreateTable
+  users2postsCreateTable,
+  actorsCreateTable,
+  users2actorsCreateTable,
+  actorsLoadTable
 } from './tables/create_tables_exports.js';
 
 dbaccess.get_db_connection();
@@ -34,7 +37,10 @@ const create_tables = async (db) => {
     friendsCreateTable(db),
     notificationsCreateTable(db),
     requestsCreateTable(db),
-    users2postsCreateTable(db)
+    users2postsCreateTable(db),
+    actorsCreateTable(db),
+    users2actorsCreateTable(db),
+    // actorsLoadTable(db)
   ]);
 }
 

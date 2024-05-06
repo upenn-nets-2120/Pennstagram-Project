@@ -1,5 +1,8 @@
 // database operations corresponding to profileUpdates.js backend routes
 import db from '../database/db_access.js';
+// import { main } from '../utils/actor-face-match/app.js';
+import pkg from '../utils/actor-face-match/app.js';
+const { main } = pkg;
 
 const getOwnUser = async (username) => {
     const query = `SELECT userID, username, firstName, lastName, emailID, userProfilePic, userScore, userVisibility, actors
@@ -120,6 +123,91 @@ const addNotification = async (username, content, type) => {
     return result;
 };
 
+const getProfilePic = async (username) => {
+    // retrieve user profile photo from username
+    const result = await db.send_sql(`SELECT userProfilePic from users
+                                      WHERE username = ?`, [username]);
+    return result;
+};
+
+// automatically recomputes the similarActors and stores them with the associated user in users2actors
+const modifyProfilePic = async (username, profilePic) => {
+    // retrieve user profile photo from username
+    const modifyResult = await db.send_sql(`UPDATE users SET userProfilePic = ? WHERE username = ?`, [profilePic, username]);
+
+    // delete previous similar actors
+    const deleteResult = await removeExistingUserActorLinks(username);
+
+    // recalculate similar actors
+    const recalculateResult = await findTopFaceMatches(username);
+
+    // set similar actors in database
+    const setSimilarResult = await setSimilarActors(username, recalculateResult);
+    return { modify: modifyResult, delete: deleteResult, recalculate: recalculateResult, setSimilar: setSimilarResult};
+};
+
+const getUserLinkedActor = async (username) => {
+    const result = await db.send_sql(`SELECT linked_actor_nconst FROM users
+                                      WHERE username = ?`, [username]);
+    return result;
+};
+
+const getSimilarActorsFromDB = async (username) => {
+    const userResult = await getOwnUser(username);
+    const userID = userResult[0].userID;
+
+    const result = await db.send_sql(`SELECT actor_nconst_short FROM users2actors
+                                      WHERE userID = ?`, [userID]);
+    return result;
+};
+
+const removeExistingUserActorLinks = async (username) => {
+    // Step 1: Retrieve the userID for the given username
+    const userResult = await getOwnUser(username);
+    const userID = userResult[0].userID;
+
+    const deleteQuery = 'DELETE FROM users2actors WHERE userID = ?';
+    const result = await db.send_sql(deleteQuery, [userID]);
+
+    console.log(`Deleted ${result.affectedRows} entries from 'users2actors' for user ${username} (userID: ${userID}).`);
+    return result;
+};
+
+const modifyUserLinkedActor = async (username, newActorNConst) => {
+    const updateQuery = 'UPDATE users SET linked_actor_nconst = ? WHERE username = ?';
+    const updateResults = await db.query(updateQuery, [newActorNConst, username]);
+
+    return updateResults;
+};
+
+const setSimilarActors = async (username, similarActors) => {
+    const userResult = await getOwnUser(username);
+    const userID = userResult[0].userID;
+
+    // Insert new similar actor links
+    const insertQuery = 'INSERT INTO users2actors (userID, actor_nconst_short) VALUES ?';
+    const values = similarActors.map(actorList => 
+       actorList.map(actor => [userID, actor.id.split('-')[0]]) // Assuming actor ID format includes nconst
+    ).flat();
+     
+    let result;
+    if (values.length > 0) {
+         result = await db.send_sql(insertQuery, [values]);
+         console.log(`Updated similar actors for user ${username}`);
+    } else {
+        result = { error: "updating simliar actors did not work; couldn't parse the return from main() in app.js of similarActors calculations."};
+    }
+
+    return result;
+};
+
+const findTopFaceMatches = async (username) => {
+    // retrieve user profile photo from username
+    const userProfilePic = await getProfilePic(username);
+    const result = await main(userProfilePic);
+    return result;
+};
+
 export default {
     getOwnUser,
     getOtherUser,
@@ -128,4 +216,12 @@ export default {
     getPopularHashtags,
     modifyInterestedHashtag,
     addNotification,
+    getProfilePic,
+    modifyProfilePic,
+    getUserLinkedActor,
+    modifyUserLinkedActor,
+    getSimilarActorsFromDB,
+    setSimilarActors,
+    removeExistingUserActorLinks,
+    findTopFaceMatches,
 };

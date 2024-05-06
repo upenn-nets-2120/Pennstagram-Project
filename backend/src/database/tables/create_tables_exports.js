@@ -12,3 +12,6 @@ export { default as friendsCreateTable } from './friends-create-table.js';
 export { default as notificationsCreateTable } from './notifications-create-table.js';
 export { default as requestsCreateTable } from './requests-create-table.js';
 export { default as users2postsCreateTable } from './users2posts-create-table.js';
+export { default as users2actorsCreateTable } from './users2actors-create-table.js';
+export { default as actorsCreateTable } from './actors-create-table.js';
+export { default as actorsLoadTable } from './actors-load-table.js';
