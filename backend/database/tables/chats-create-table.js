@@ -2,9 +2,9 @@ const chatsCreateTable = async (db) => {
     const query = `
         CREATE TABLE IF NOT EXISTS chats (
             chatID INT AUTO_INCREMENT PRIMARY KEY,
-            chatName VARCHAR(255),
-            chatDescription VARCHAR(255),
-            chatProfilePic BLOB,
+            name VARCHAR(255),
+            description VARCHAR(255),
+            profilePic BLOB,
             onlyAdmins BOOLEAN
         );
     `;
