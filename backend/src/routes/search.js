@@ -1,5 +1,5 @@
 import express from 'express';
-import searchOperations from '../dbOperations/searchOperations';
+import searchOperations from '../dbOperations/searchOperations.js';
 
 const search = express.Router();
 

@@ -1,15 +1,10 @@
 import express from 'express';
 import routes from './src/routes/router.js';
-import session from 'express-session';
 
 const app = express();
-const PORT = 5050;
+const PORT = 3000;
 
-// get dat middleware
 app.use(express.json());
-app.use(session({
-  secret: 'nets2120_insecure', saveUninitialized: true, cookie: { httpOnly: false }, resave: true
-}));
 
 // routes
 app.use('/', routes);

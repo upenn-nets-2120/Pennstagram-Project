@@ -1,5 +1,5 @@
 export { default as getFollowedsFromUser } from './friends/get-followeds';
-export { default as getFollowers } from './friends/get-followers';
+export { default as getFollowersFromUser } from './friends/get-followers';
 export { default as getRequesting } from './requests/get-requesting';
 export { default as getRequesters } from './requests/get-requesters';
 export { default as getRecommendations } from './recommendations/get-recommendations';
@@ -24,3 +24,13 @@ export { default as deleteUsers2chat } from './users2chats/delete-user2chat';
 export { default as addNotification } from './notifications/add-notification';
 export { default as deleteNotification } from './notifications/delete-notification';
 export { default as getNotificationsFromUser } from './notifications/get-notifications';
+export { default as addUser } from './registration/add-user';
+export { default as getUser } from './registration/get-user';
+export { default as updateProfilePhoto } from './registration/update-profile-photo';
+export { default as getTopHashtags } from './registration/get-top-hashtags';
+export { default as addUserHashtags } from './registration/add-user-hashtags';
+
+
+
+
+
