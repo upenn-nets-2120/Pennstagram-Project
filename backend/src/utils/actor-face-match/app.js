@@ -55,7 +55,7 @@ async function initializeFaceModels() {
   console.log("Initializing FaceAPI...");
 
   await tf.ready();
-  await faceapi.nets.ssdMobilenetv1.loadFromDisk('./');
+  await faceapi.nets.ssdMobilenetv1.loadFromDisk('../');
   optionsSSDMobileNet = new faceapi.SsdMobilenetv1Options({ minConfidence: 0.5, maxResults: 1 });
   await faceapi.nets.faceLandmark68Net.loadFromDisk('model');
   await faceapi.nets.faceRecognitionNet.loadFromDisk('model');

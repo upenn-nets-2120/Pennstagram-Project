@@ -1,4 +1,4 @@
-import db from '../../../database/db_access.js';
+import db from '../../../database/db_access';
 
 const addChat = async (name, description, profilePic, onlyAdmins) => {
     const sql = `
