@@ -1,7 +1,9 @@
 import { useEffect, useState } from 'react';
 import './styles.css';
 import { User } from '../../entities/User';
-import { getFriends } from '../../hooks/get-friends';
+import { getFollowed } from '../../hooks/get-followed';
+import { getFollowing } from '../../hooks/get-following';
+import { getRecommended } from '../../hooks/get-recommended';
 import FriendsRow from '../FriendsRow';
 
 interface FriendsRowsProps {
@@ -9,23 +11,39 @@ interface FriendsRowsProps {
 }
   
 const FriendsRows: React.FC<FriendsRowsProps> = ({ tab }) => {
-    const [friends, setFriends] = useState<User[]>([]);
+    const [following, setFollowing] = useState<User[]>([]);
+    const [followed, setFollowed] = useState<User[]>([]);
+    const [recommended, setRecommended] = useState<User[]>([]);
 
     useEffect(() => {
-        const runner = async () => {
-            setFriends(await getFriends(11));
+        const init = async () => {
+            setFollowing(await getFollowing(11));
+            setFollowed(await getFollowed(11));
+            setRecommended(await getRecommended(11));
         }
 
-        runner();
+        init();
     }, []);
 
     return (
         <div className='friendsRowsContainer'>
-            {friends.map((friend, index) => (
-                <FriendsRow key={index} user={friend} />
-            ))}
+            {tab === 'Followed By' && (
+                followed.map((user, index) => (
+                    <FriendsRow key={index} user={user} />
+                ))
+            )}
+            {tab === 'Following' && (
+                following.map((user, index) => (
+                    <FriendsRow key={index} user={user} />
+                ))
+            )}
+            {tab === 'Recommended' && (
+                recommended.map((user, index) => (
+                    <FriendsRow key={index} user={user} />
+                ))
+            )}
         </div>
     )
 };
   
-  export default FriendsRows;
+export default FriendsRows;

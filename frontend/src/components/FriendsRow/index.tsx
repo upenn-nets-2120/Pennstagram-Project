@@ -4,7 +4,7 @@ import { User } from '../../entities/User';
 import defaultProfilePic from '../../assets/defaultProfilePic.png'
 
 interface FriendsRowProps {
-  user: User;
+    user: User;
 }
 
 const FriendsRow: React.FC<FriendsRowProps> = ({ user }) => {
