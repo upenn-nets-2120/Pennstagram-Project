@@ -16,7 +16,7 @@ import {
   requestsCreateTable,
   users2postsCreateTable,
   users2chatsCreateTable
-} from './tables/index';
+} from './tables/index.js';
 
 dbaccess.get_db_connection();
 

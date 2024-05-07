@@ -9,7 +9,7 @@ const getTopHashtags = async (limit) => {
         LIMIT ${limit}
     ;`;
 
-    return await db.query(sql);
+    return await db.send_sql(sql);
 }
 
 export default getTopHashtags;

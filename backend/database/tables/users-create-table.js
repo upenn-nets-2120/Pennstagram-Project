@@ -8,6 +8,8 @@ const usersCreateTable = async (db) => {
             salted_password VARCHAR(255),
             emailID VARCHAR(255),
             actors VARCHAR(255),
+            birthday VARCHAR(255),
+            affiliation VARCHAR(255),
             inviters INT,
             userProfilePic BLOB,
             userScore INT,

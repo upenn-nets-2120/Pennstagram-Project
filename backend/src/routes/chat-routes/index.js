@@ -17,9 +17,9 @@ import {
     getNotificationsFromUser,
 } from '../../db/index.js'
 
-const routes = express.Router();
+const chats = express.Router();
 
-routes.post('/chat/create', async (req, res) => {
+chats.post('/chat/create', async (req, res) => {
     const chatName = req.body.chatName;
     const description = req.body.description;
     const profilePic = req.body.profilePic;
@@ -40,7 +40,7 @@ routes.post('/chat/create', async (req, res) => {
     res.status(200).json(data);
 });
 
-routes.post('/chat/delete', async (req, res) => {
+chats.post('/chat/delete', async (req, res) => {
     const chatName = req.body.chatName;
     const description = req.body.description;
     const profilePic = req.body.profilePic;
@@ -61,7 +61,7 @@ routes.post('/chat/delete', async (req, res) => {
     res.status(200).json(data);
 });
 
-routes.post('/chat/add-user/:userID', async (req, res) => {
+chats.post('/chat/add-user/:userID', async (req, res) => {
     const userID = req.params.userID;
     const chatID = req.body.chatID;
     const isAdmin = req.body.isAdmin;
@@ -80,7 +80,7 @@ routes.post('/chat/add-user/:userID', async (req, res) => {
     res.status(200).json(data);
 });
 
-routes.post('/chat/delete-user/:userID', async (req, res) => {
+chats.post('/chat/delete-user/:userID', async (req, res) => {
     const userID = req.params.userID;
     const chatID = req.body.chatID;
 
@@ -97,7 +97,7 @@ routes.post('/chat/delete-user/:userID', async (req, res) => {
     res.status(200).json(data);
 });
 
-routes.post('/chat/edit-name', async (req, res) => {
+chats.post('/chat/edit-name', async (req, res) => {
     const chatID = req.body.chatID;
     const name = req.body.name;
 
@@ -114,7 +114,7 @@ routes.post('/chat/edit-name', async (req, res) => {
     res.status(200).json(data);
 });
 
-routes.post('/chat/edit-description', async (req, res) => {
+chats.post('/chat/edit-description', async (req, res) => {
     const chatID = req.body.chatID;
     const description = req.body.description;
 
@@ -131,7 +131,7 @@ routes.post('/chat/edit-description', async (req, res) => {
     res.status(200).json(data);
 });
 
-routes.post('/chat/edit-profile-pic', async (req, res) => {
+chats.post('/chat/edit-profile-pic', async (req, res) => {
     const chatID = req.body.chatID;
     const profilePic = req.body.profilePic;
 
@@ -148,7 +148,7 @@ routes.post('/chat/edit-profile-pic', async (req, res) => {
     res.status(200).json(data);
 });
 
-routes.post('/chat/edit-only-admin', async (req, res) => {
+chats.post('/chat/edit-only-admin', async (req, res) => {
     const chatID = req.body.chatID;
     const onlyAdmin = req.body.onlyAdmin;
 
@@ -165,7 +165,7 @@ routes.post('/chat/edit-only-admin', async (req, res) => {
     res.status(200).json(data);
 });
 
-routes.post('/chat/edit-only-admin', async (req, res) => {
+chats.post('/chat/edit-only-admin', async (req, res) => {
     const chatID = req.body.chatID;
     const onlyAdmin = req.body.onlyAdmin;
 
@@ -182,7 +182,7 @@ routes.post('/chat/edit-only-admin', async (req, res) => {
     res.status(200).json(data);
 });
 
-routes.post('/chat/send-message/:userID', async (req, res) => {
+chats.post('/chat/send-message/:userID', async (req, res) => {
     const userID = req.params.userID;
     const chatID = req.body.chatID;
     const content = req.body.content;
@@ -201,7 +201,7 @@ routes.post('/chat/send-message/:userID', async (req, res) => {
     res.status(200).json(data);
 });
 
-routes.post('/chat/delete-message/:messageID', async (req, res) => {
+chats.post('/chat/delete-message/:messageID', async (req, res) => {
     const messageID = req.params.messageID;
 
     if (
@@ -218,7 +218,7 @@ routes.post('/chat/delete-message/:messageID', async (req, res) => {
     res.status(200).json(data);
 });
 
-routes.get('/chat/:chatID', async (req, res) => {
+chats.get('/chat/:chatID', async (req, res) => {
     const chatID = req.params.chatID;
 
     if (
@@ -233,7 +233,7 @@ routes.get('/chat/:chatID', async (req, res) => {
     res.status(200).json(data);
 });
 
-routes.get('/chat/get/:userID', async (req, res) => {
+chats.get('/chat/get/:userID', async (req, res) => {
     const userID = req.params.userID;
 
     if (
@@ -248,4 +248,4 @@ routes.get('/chat/get/:userID', async (req, res) => {
     res.status(200).json(data);
 });
 
-export default routes;
+export default chats;

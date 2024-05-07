@@ -5,9 +5,9 @@ import {
     getNotificationsFromUser,
 } from '../../db/index.js'
 
-const routes = express.Router();
+const notification = express.Router();
 
-routes.post('/notifications/add/:userID', async (req, res) => {
+notification.post('/notifications/add/:userID', async (req, res) => {
     const userID = req.params.userID;
     const type = req.body.chatName;
     const content = req.body.description;
@@ -26,7 +26,7 @@ routes.post('/notifications/add/:userID', async (req, res) => {
     res.status(200).json(data);
 });
 
-routes.post('/notifications/delete/:notificationsID', async (req, res) => {
+notification.post('/notifications/delete/:notificationsID', async (req, res) => {
     const notificationsID = req.params.notificationsID;
 
     if (
@@ -41,7 +41,7 @@ routes.post('/notifications/delete/:notificationsID', async (req, res) => {
     res.status(200).json(data);
 });
 
-routes.get('/notifications/get/:userID', async (req, res) => {
+notification.get('/notifications/get/:userID', async (req, res) => {
     const userID = req.params.userID;
 
     if (
@@ -56,4 +56,4 @@ routes.get('/notifications/get/:userID', async (req, res) => {
     res.status(200).json(data);
 });
 
-export default routes;
+export default notification;

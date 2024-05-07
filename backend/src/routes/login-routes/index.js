@@ -1,13 +1,10 @@
 import express from 'express';
-import {
-    
-} from '../../db/index.js'
+import db from '../../../database/db_access.js';
+import authUtils from '../../utils/authUtils.js';
 
-const app = express.Router();
-const bcrypt = require('bcrypt'); 
+const login = express.Router();
 
-
-app.post('/login', async (req, res) => {
+login.post('/', async (req, res) => {
     const { username, password } = req.body;
 
     if (!username || !password) {
@@ -15,32 +12,34 @@ app.post('/login', async (req, res) => {
     }
 
     try {
-        const userQuery = `SELECT user_id, hashed_password FROM users WHERE username = '${username}'`;
-        const userResult = await db.send_sql(userQuery);
+        const userQuery = `SELECT userID, salted_password FROM users WHERE username = '${username}'`;
+        const userResults = await db.send_sql(userQuery);
 
-        if (userResult.length === 0) {
+        if (userResults.length === 0) {
             return res.status(401).json({error: 'Username and/or password are invalid.'});
         }
-        console.log(userResult);
-        const user = userResult[0];
+        const user = userResults[0];
+        console.log("stored password:", user.salted_password);
 
-        bcrypt.compare(password, user.hashed_password, (err, isMatch) => {
+        // Compare the input password with the stored hashed password
+        authUtils.comparePassword(password, user.salted_password, (err, isMatch) => {
             if (err) {
-                return res.status(500).json({error: 'Error querying database'});
+                console.error('Error comparing passwords:', err);
+                return res.status(500).json({error: 'Error during password validation'});
             }
 
             if (isMatch) {
-                req.session.user_id = user.user_id; 
-                res.status(200).json({username: username});
+                req.session.username = username;
+                return res.status(200).json({ username: username });
             } else {
-                res.status(401).json({error: 'Username and/or password are invalid.'});
+                return res.status(401).json({ error: 'Username and/or password are invalid.' });
             }
         });
+
     } catch (error) {
         console.error('Error logging in user:', error);
         return res.status(500).json({error: 'Error querying database'});
     }
-
 });
 
-
+export default login;
