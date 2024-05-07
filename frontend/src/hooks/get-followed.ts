@@ -1,6 +1,6 @@
 import { User } from "../entities/User";
 
-export const getFriends = async (userID: number): Promise<User[]> => {
+export const getFollowed = async (userID: number): Promise<User[]> => {
     const u1 = {
         userID,
         firstName: 'josh',
