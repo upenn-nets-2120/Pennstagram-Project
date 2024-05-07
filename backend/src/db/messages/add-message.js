@@ -1,4 +1,4 @@
-import db from '../../../database/db_access';
+import db from '../../../database/db_access.js';
 
 const addMessage = async (userID, chatID, content) => {
     const sql = `
