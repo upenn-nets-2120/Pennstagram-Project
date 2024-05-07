@@ -1,6 +1,5 @@
 // database operations corresponding to profileUpdates.js backend routes
-import db from '../database/db_access.js';
-// import { main } from '../utils/actor-face-match/app.js';
+import db from '../../database/db_access.js';
 import pkg from '../utils/actor-face-match/app.js';
 const { main } = pkg;
 

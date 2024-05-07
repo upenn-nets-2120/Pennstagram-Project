@@ -4,6 +4,7 @@ import { Routes, Navigate } from 'react-router';
 import {
    HOME_PATH,
    FRIENDS_PATH,
+   PROFILE_PATH,
 } from './paths';
 import {
    FriendsPage
@@ -16,6 +17,7 @@ const Router: React.FC = () => {
          <Routes>
             <Route path={HOME_PATH} element={/*<HomePage />*/<div /> } />
             <Route path={FRIENDS_PATH} element={ <FriendsPage /> } />
+            <Route path={PROFILE_PATH} element={ /* <ProfilePage /> */ <div />} />
             <Route path="/" element={<Navigate replace to={HOME_PATH} />} />
          </Routes>
       </BrowserRouter>

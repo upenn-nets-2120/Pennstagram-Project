@@ -1,7 +1,7 @@
 import express from 'express';
 import {
-    getFolloweds,
-    getFollowers,
+    getFollowedsFromUser,
+    getFollowersFromUser,
     getRequesters,
     getRequesting,
     getRecommendations,
@@ -26,7 +26,7 @@ routes.get('/followers/:userID', async (req, res) => {
         return;
     }
 
-    const data = await getFollowers(userID);
+    const data = await getFollowersFromUser(userID);
 
     res.status(200).json(data);
 });
@@ -39,7 +39,7 @@ routes.get('/followeds/:userID', async (req, res) => {
         return;
     }
 
-    const data = await getFolloweds(userID);
+    const data = await getFollowedsFromUser(userID);
 
     res.status(200).json(data);
 });
