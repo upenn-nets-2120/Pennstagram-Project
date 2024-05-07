@@ -39,6 +39,8 @@ async function get_db_connection() {
     }
 
     let dbconfig = config.database;
+    // dbconfig.user = process.env.RDS_USER;
+    // dbconfig.password = process.env.RDS_PWD;
     console.log(dbconfig);
     the_db = mysql.createConnection(dbconfig);
 
@@ -65,7 +67,7 @@ async function get_db_connection() {
 async function send_sql(sql, params = []) {
     const dbo = await get_db_connection();
     return new Promise((resolve, reject)=> {
-            dbo.query(sql, params, (error, results) =>{
+            dbo.query(sql,  (error, results)=>{
             if(error){
                 return reject(error);
             }
