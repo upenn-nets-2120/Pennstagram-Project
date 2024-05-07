@@ -1,4 +1,4 @@
-import db from '../../database/db_access';
+import db from '../../../database/db_access.js';
 
 const addUserHashtags = async (username, hashtags) => {
     const sql = `
@@ -9,4 +9,4 @@ const addUserHashtags = async (username, hashtags) => {
     return await db.insert_items(sql);
 }
 
-export { addUserHashtags };
+export default addUserHashtags;

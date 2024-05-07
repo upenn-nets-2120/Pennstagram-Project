@@ -1,4 +1,4 @@
-import db from '../../database/db_access';
+import db from '../../../database/db_access.js';
 
 const getTopHashtags = async (limit) => {
     const sql = `
@@ -12,4 +12,4 @@ const getTopHashtags = async (limit) => {
     return await db.query(sql);
 }
 
-export { getTopHashtags };
+export default getTopHashtags;

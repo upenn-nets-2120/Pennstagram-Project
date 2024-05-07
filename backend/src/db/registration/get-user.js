@@ -1,4 +1,4 @@
-import db from '../../database/db_access';
+import db from '../../../database/db_access.js';
 
 const getUser = async (username, email) => {
     const sql = `
@@ -10,4 +10,4 @@ const getUser = async (username, email) => {
     return await db.query(sql);
 }
 
-export { getUser };
+export default getUser ;

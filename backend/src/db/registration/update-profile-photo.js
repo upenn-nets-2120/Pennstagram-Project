@@ -1,4 +1,4 @@
-import db from '../../database/db_access';
+import db from '../../../database/db_access.js';
 
 const updateProfilePhoto = async (username, profilePhoto) => {
     const sql = `
@@ -11,4 +11,4 @@ const updateProfilePhoto = async (username, profilePhoto) => {
 }
 
 
-export { updateProfilePhoto };
+export default updateProfilePhoto;

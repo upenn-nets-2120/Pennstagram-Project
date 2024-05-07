@@ -1,7 +1,7 @@
 import express from 'express';
 import {
-    getFolloweds,
-    getFollowers,
+    getFollowedsFromUser,
+    getFollowersFromUser,
     getRequesters,
     getRequesting,
     getRecommendations,

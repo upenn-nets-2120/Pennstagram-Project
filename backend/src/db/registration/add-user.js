@@ -1,5 +1,5 @@
-import db from '../../database/db_access';
-const helper = require('../../utils/route_helper');
+import db from '../../../database/db_access.js';
+import helper from '../../utils/authUtils.js';
 
 
 const addUser = async ({ username, password, email, affiliation, birthday }) => {
@@ -16,4 +16,4 @@ const addUser = async ({ username, password, email, affiliation, birthday }) => 
 }
 
 
-export { addUser };
+export default  addUser;
