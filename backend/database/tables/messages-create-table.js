@@ -3,10 +3,11 @@ const messagesCreateTable = async (db) => {
         CREATE TABLE IF NOT EXISTS messages (
             messageID INT AUTO_INCREMENT PRIMARY KEY,
             userID INT,
-            groupID INT,
+            chatID INT,
             timeStamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             content VARCHAR(255), 
-            FOREIGN KEY (userID) REFERENCES users(userID)
+            FOREIGN KEY (userID) REFERENCES users(userID),
+            FOREIGN KEY (chatID) REFERENCES chats(chatID)
         );
     `;
   
