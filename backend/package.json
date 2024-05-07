@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "node index.js",
-    "create_tables": "node src/database/index.js"
+    "create_tables": "node database/index.js"
   },
   "keywords": [],
   "author": "",

@@ -1,43 +1,37 @@
-// modified FROM HW4
-
 import bcrypt from 'bcrypt';
 
 const encryptPassword = (password, callback) => {
     const saltRounds = 10;
     bcrypt.hash(password, saltRounds, function(err, hash) {
         if (err) {
-            callback(err, null); // Pass the error to the callback
+            callback(err, null);
             return;
         }
-        callback(null, hash); // Pass null for error and hash if successful
+        callback(null, hash);
+    });
+};
+
+const comparePassword = (password, hash, callback) => {
+    bcrypt.compare(password, hash, function(err, isMatch) {
+        if (err) {
+            callback(err, false);
+            return;
+        }
+        callback(null, isMatch);
     });
 };
 
 const isLoggedIn = (str) => {
-    if (str == null)
-        return false;
-    for (var i = 0; i < str.length; i++) {
-        if (!/[A-Za-z0-9 \.\?,_]/.test(str[i])) {
-            return false;
-        }
-    }
-    return true;
+    return str != null && /^[A-Za-z0-9 \.\?,_]+$/.test(str);
 };
 
 const isOK = (str) => {
-    if (str == null)
-        return false;
-    for (var i = 0; i < str.length; i++) {
-        if (!/[A-Za-z0-9 \.\?,_]/.test(str[i])) {
-            return false;
-        }
-    }
-    return true;
+    return str != null && /^[A-Za-z0-9 \.\?,_]+$/.test(str);
 };
 
 export default {
     encryptPassword,
+    comparePassword,
     isOK,
-    isLoggedIn,
+    isLoggedIn
 };
-

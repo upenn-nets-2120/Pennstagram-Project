@@ -16,9 +16,9 @@ import {
     getNotificationsFromUser,
 } from '../../db/index.js'
 
-const routes = express.Router();
+const friends = express.Router();
 
-routes.get('/followers/:userID', async (req, res) => {
+friends.get('/followers/:userID', async (req, res) => {
     const userID = req.params.userID;
 
     if (!userID || userID == null) {
@@ -31,7 +31,7 @@ routes.get('/followers/:userID', async (req, res) => {
     res.status(200).json(data);
 });
 
-routes.get('/followeds/:userID', async (req, res) => {
+friends.get('/followeds/:userID', async (req, res) => {
     const userID = req.params.userID;
 
     if (!userID || userID == null) {
@@ -44,7 +44,7 @@ routes.get('/followeds/:userID', async (req, res) => {
     res.status(200).json(data);
 });
 
-routes.get('/recommendations/:userID', async (req, res) => {
+friends.get('/recommendations/:userID', async (req, res) => {
     const userID = req.params.userID;
 
     if (!userID || userID == null) {
@@ -57,7 +57,7 @@ routes.get('/recommendations/:userID', async (req, res) => {
     res.status(200).json(data);
 });
 
-routes.get('/requesters/:userID', async (req, res) => {
+friends.get('/requesters/:userID', async (req, res) => {
     const userID = req.params.userID;
 
     if (!userID || userID == null) {
@@ -70,7 +70,7 @@ routes.get('/requesters/:userID', async (req, res) => {
     res.status(200).json(data);
 });
 
-routes.get('/requesting/:userID', async (req, res) => {
+friends.get('/requesting/:userID', async (req, res) => {
     const userID = req.params.userID;
 
     if (!userID || userID == null) {
@@ -83,7 +83,7 @@ routes.get('/requesting/:userID', async (req, res) => {
     res.status(200).json(data);
 });
 
-routes.post('/acceptRequest/:userID/:requester', async (req, res) => {
+friends.post('/acceptRequest/:userID/:requester', async (req, res) => {
     const userID = req.params.userID;
     const requester = req.params.requester;
 
@@ -98,7 +98,7 @@ routes.post('/acceptRequest/:userID/:requester', async (req, res) => {
     res.status(200).json({message: 'something'});
 });
 
-routes.post('/removeRequest/:userID/:requester', async (req, res) => {
+friends.post('/removeRequest/:userID/:requester', async (req, res) => {
     const userID = req.params.userID;
     const requester = req.params.requester;
 
@@ -112,7 +112,7 @@ routes.post('/removeRequest/:userID/:requester', async (req, res) => {
     res.status(200).json({message: 'something'});
 });
 
-routes.post('/addRequest/:userID/:requested', async (req, res) => {
+friends.post('/addRequest/:userID/:requested', async (req, res) => {
     const userID = req.params.userID;
     const requested = req.params.requested;
 
@@ -126,7 +126,7 @@ routes.post('/addRequest/:userID/:requested', async (req, res) => {
     res.status(200).json({message: 'something'});
 });
 
-routes.post('/removeFriend/:userID/:friend', async (req, res) => {
+friends.post('/removeFriend/:userID/:friend', async (req, res) => {
     const userID = req.params.userID;
     const friend = req.params.friend;
 
@@ -140,7 +140,7 @@ routes.post('/removeFriend/:userID/:friend', async (req, res) => {
     res.status(200).json({message: 'something'});
 });
 
-routes.post('/addFriend/:userID/:friend', async (req, res) => {
+friends.post('/addFriend/:userID/:friend', async (req, res) => {
     const userID = req.params.userID;
     const friend = req.params.friend;
 
@@ -154,7 +154,7 @@ routes.post('/addFriend/:userID/:friend', async (req, res) => {
     res.status(200).json({message: 'something'});
 });
 
-routes.post('/retractRequest/:userID/:requested', async (req, res) => {
+friends.post('/retractRequest/:userID/:requested', async (req, res) => {
     const userID = req.params.userID;
     const requested = req.params.requested;
 
@@ -168,7 +168,7 @@ routes.post('/retractRequest/:userID/:requested', async (req, res) => {
     res.status(200).json({message: 'something'});
 });
 
-routes.post('/removeRecommendations/:userID/:recommendation', async (req, res) => {
+friends.post('/removeRecommendations/:userID/:recommendation', async (req, res) => {
     const userID = req.params.userID;
     const recommendation = req.params.recommendation;
 
@@ -182,4 +182,4 @@ routes.post('/removeRecommendations/:userID/:recommendation', async (req, res) =
     res.status(200).json({message: 'something'});
 });
 
-export default routes;
+export default friends;
