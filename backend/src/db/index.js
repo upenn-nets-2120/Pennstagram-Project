@@ -1,5 +1,5 @@
 export { default as getFollowedsFromUser } from './friends/get-followeds';
-export { default as getFollowers } from './friends/get-followers';
+export { default as getFollowersFromUser } from './friends/get-followers';
 export { default as getRequesting } from './requests/get-requesting';
 export { default as getRequesters } from './requests/get-requesters';
 export { default as getRecommendations } from './recommendations/get-recommendations';
