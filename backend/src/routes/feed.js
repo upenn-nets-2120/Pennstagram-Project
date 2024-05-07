@@ -1,6 +1,8 @@
 import express from 'express';
 import { Kafka } from 'kafkajs';
 import config from './config.json';
+import { fetchTopHashtags } from './dbOperations/posts_dbOperations'; // Adjust according to actual path
+
 
 const app = express();
 const kafka = new Kafka({
@@ -33,9 +35,14 @@ const runConsumers = async () => {
     await federatedConsumer.subscribe({ topic: 'FederatedPosts', fromBeginning: true });
     console.log(`Following topic 'FederatedPosts'`);
 
+    //connect and subscribe to the UserHashtags consumer
+    await hashtagConsumer.connect();
+    await hashtagConsumer.subscribe({ topic: 'UserHashtags', fromBeginning: true });
+    console.log(`Following topic 'UserHashtags'`);
+
     //twitter consumer
     await twitterConsumer.run({
-        eachMessage: async ({ topic, partition, message }) => {
+        eachMessage: async ({ topic, partition, message }) => { //ask Ives what partition
             console.log(`Received from ${topic}: ${message.value.toString()}`);
             kafkaMessages.twitter.push({
                 value: message.value.toString(),
@@ -50,6 +57,16 @@ const runConsumers = async () => {
             kafkaMessages.federated.push({
                 value: message.value.toString(),
             });
+        },
+    });
+
+    //user hashtags
+    await hashtagConsumer.run({
+        eachMessage: async ({ topic, partition, message }) => {
+            console.log(`Received message from ${topic}: ${message.value.toString()}`);
+            const userID = parseInt(message.value.toString());
+            const hashtags = await fetchUserHashtags(userID);
+            console.log(`User ${userID} is interested in hashtags: ${hashtags.join(", ")}`);
         },
     });
 };

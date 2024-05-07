@@ -5,9 +5,20 @@ export const createPost = async (newPost) => {
         INSERT INTO posts (image, caption, hashtag, postVisibility, post_json)
         VALUES (?, ?, ?, ?, ?)
     `;
-    return db.send_sql(query, [newPost.image, newPost.caption, newPost.hashtag, newPost.postVisibility, JSON.stringify(newPost.post_json)]);
+    const postID = await db.send_sql(query, [newPost.image, newPost.caption, newPost.hashtag, newPost.postVisibility, JSON.stringify(newPost.post_json)]);
+    if (newPost.hashtag) {
+        await linkHashtagsToPost(newPost.hashtag, postId);
+    }
+    return postID;
     //return the ID of new post?
 };
+
+const linkHashtagsToPost = async (hashtags, postId) => {
+    const query = `INSERT INTO posts2hashtags (postID, hashtag) VALUES (?, ?)`;
+    hashtags.forEach(async (hashtag) => {
+        await db.send_sql(query, [postId, hashtag]);
+    });
+}; 
 
 export const updatePost = async (postID, caption, hashtag, image, postVisibility, post_json) => {
     if (caption) {
@@ -38,7 +49,39 @@ export const likePost = async (postID, userID) => {
 }
 
 export const commentPost = async (postID, userID, comment, parentCommentID) => {
-    const newCommentParams = [postID, userID, comment, (parentCommentID || null)];
+    //const newCommentParams = [postID, userID, comment, (parentCommentID || null)];
     const sql = 'INSERT INTO comments (postID, userID, comment, parentCommentID) VALUES (?, ?, ?, ?)'; 
-    return await db.send_sql(sql, newCommentParams);
+    const commentId = await db.send_sql(sql, [postID, userID, comment, parentCommentID || null]);
+    if (comment.includes('#')) {
+        const extractedHashtags = extractHashtags(comment);
+        linkHashtagsToPost(extractedHashtags, postID);
+    }
+    return commentId;
+};
+
+function extractHashtags(text) {
+    return text.match(/#\w+/g) || [];
 }
+
+//signle hashtage in each hashtag column, multiple hashtags of interest per user in user_hashtags
+export const fetchPostsForUser = async (userID) => {
+    const query = `
+        SELECT p.* FROM posts p
+        JOIN recommendations r ON p.postID = r.recommendedID
+        WHERE r.userID = ?
+        ORDER BY p.timeStamp DESC;
+    `;
+    return await db.send_sql(query, [userID]);
+};
+
+//count how many times each hashtage is in the posts2hashtags table and limit to top 10
+export const fetchTopHashtags = async () => {
+    const query = `
+        SELECT hashtag, COUNT(*) as usageCount
+        FROM posts2hashtags
+        GROUP BY hashtag
+        ORDER BY usageCount DESC
+        LIMIT 10;
+    `;
+    return await db.send_sql(query);
+};
