@@ -1,9 +1,9 @@
-import FriendsBody from "../../components/FriendsBody";
+// import FriendsBody from "../../components/FriendsBody";
 
 const ChatPage: React.FC = () => {
   return (
     <div>
-      <FriendsBody />
+      {/* <FriendsBody /> */}
     </div>
   )
 };

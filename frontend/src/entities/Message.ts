@@ -6,4 +6,5 @@ export interface Message {
     user: User;
     chat: Chat;
     timestamp: Date;
+    content: string;
 }

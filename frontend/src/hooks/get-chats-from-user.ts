@@ -17,6 +17,7 @@ export const getChatsFromUser = async (user: User): Promise<Chat[]> => {
         profilePic: '',
         onlyAdmins: false
     }
+    
     const c3 = {
         chatID: 1234,
         name: 'chat one',
