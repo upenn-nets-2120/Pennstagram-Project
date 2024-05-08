@@ -162,14 +162,4 @@ posts.get('/fetch/:userID', async (req, res) => {
     }
 });
 
-//fetch the top 10 hashtags
-posts.get('/topHashtags', async (req, res) => {
-    try {
-        const hashtags = await fetchTopHashtags();
-        res.status(200).json(hashtags);
-    } catch (error) {
-        res.status(500).json({ error: 'Error fetching top hashtags' });
-    }
-});
-
 export default posts;
