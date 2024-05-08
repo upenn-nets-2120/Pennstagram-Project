@@ -4,7 +4,7 @@ import config from './config.json';
 
 const app = express();
 const kafka = new Kafka({
-    clientId: 'my-feed-app',
+    clientId: 'kafka-app',
     brokers: config.bootstrapServers
 });
 
@@ -37,12 +37,6 @@ const runConsumers = async () => {
     //await consumer.subscribe({ topic: config.kafka.federatedTopic, fromBeginning: true });
     console.log(`Following topic 'FederatedPosts'`);
     //console.log(`Following topics '${config.kafka.twitterTopic}' and '${config.kafka.federatedTopic}'`);
-
-
-    /*//connect and subscribe to the UserHashtags consumer
-    await hashtagConsumer.connect();
-    await hashtagConsumer.subscribe({ topic: 'UserHashtags', fromBeginning: true });
-    console.log(`Following topic 'UserHashtags'`);*/
 
     //twitter consumer
     await twitterConsumer.run({
@@ -81,16 +75,6 @@ const runConsumers = async () => {
         },
     });
     */
-
-    /*//user hashtags
-    await hashtagConsumer.run({
-        eachMessage: async ({ topic, partition, message }) => {
-            console.log(`Received message from ${topic}: ${message.value.toString()}`);
-            const userID = parseInt(message.value.toString());
-            const hashtags = await fetchTopHashtags(userID);
-            console.log(`User ${userID} is interested in hashtags: ${hashtags.join(", ")}`);
-        },
-    });*/
 };
 
 runConsumers().catch(error => console.error('Error in running consumers:', error));
