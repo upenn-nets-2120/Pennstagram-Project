@@ -4,7 +4,7 @@ const postsCreateTable = async (db) => {
             postID INT AUTO_INCREMENT PRIMARY KEY,
             userID VARCHAR(10),
             image BLOB,
-            caption VARCHAR(255),
+            caption TEXT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
             hashtag VARCHAR(255),
             timeStamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             postVisibility ENUM('followers', 'everyone', 'private'),
