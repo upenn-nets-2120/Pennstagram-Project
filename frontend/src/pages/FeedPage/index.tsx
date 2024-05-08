@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
-import styled, { css } from 'styled-components';
-import localImage from '/frontend/src/assets/sunset.jpeg'; 
+import styled from 'styled-components';
+import localImage from '../../assets/sunset.jpeg';
+//import localImage from '../assets/sunset.jpeg';
+//import localImage from '/frontend/src/assets/sunset.jpeg'; 
 
 const FeedContainer = styled.div`
   width: 80%;
@@ -37,16 +39,16 @@ const InteractionContainer = styled.div`
   justify-content: space-between;
 `;
 
-const Button = styled.button`
+const Button = styled.button.attrs<{ active?: boolean }>(props => ({
+  active: props.active,
+}))`
   padding: 5px 10px;
   border-radius: 5px;
   border: none;
   cursor: pointer;
 
-  ${props => props.active && css`
-    background-color: #0056b3;
-    color: white;
-  `}
+  background-color: ${props => props.active ? 'red' : 'initial'};
+  color: ${props => props.active ? 'white' : 'initial'};
 
   &:hover {
     background-color: #007bff;

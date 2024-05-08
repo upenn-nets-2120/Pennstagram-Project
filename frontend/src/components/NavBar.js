@@ -10,6 +10,7 @@ const NavBar = () => {
                 <li><Link to="/friends">Add/Remove Friends</Link></li>
                 <li><Link to="/chat">Chat</Link></li>
                 <li><Link to="/search">Search</Link></li>
+                <li><Link to="/feed">Feed</Link></li>
             </ul>
         </nav>
     );
