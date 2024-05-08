@@ -1,18 +1,17 @@
 import styled from 'styled-components';
 
-export const RowStyled = styled.div`
+interface RowStyledProps {
+    height?: string;
+    color?: string; // Making color an optional parameter
+}
+
+export const RowStyled = styled.div<RowStyledProps>`
     display: flex;
     flex-direction: row;
-    border-radius: 2px;
-    padding: 10px; /* Simplify padding */
-    align-items: center; /* Align items to the center */
-    justify-content: space-between; /* Push the follow button to the end */
+    align-items: center;
+    justify-content: space-between;
+    height: ${({ height }) => height || '100%'};
+    width: 100%;
+    background-color: ${({ color }) => color || 'transparent'};
     box-sizing: border-box;
-    background-color: ${({ theme }) => theme.quaternaryColor};
-    border: 1px solid ${({ theme }) => theme.lineColor};
-    transition: background-color 0.3s ease;
-
-    &:hover {
-        background-image: linear-gradient(to right, ${({ theme }) => theme.tertiaryColor}, ${({ theme }) => theme.tertiaryColor});
-    }
 `;

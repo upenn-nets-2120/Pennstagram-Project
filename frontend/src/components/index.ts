@@ -1,3 +1,4 @@
+export { default as Page } from './Page';
 export { default as Main } from './Main';
 export { default as NavBar } from './NavBar';
 export { default as Content } from './Content';
@@ -5,6 +6,10 @@ export { default as Tabs } from './Tabs';
 export { default as Tab } from './Tab';
 export { default as Rows } from './Rows';
 export { default as Row } from './Row';
+export { default as Column } from './Column';
 export { default as ProfilePic } from './ProfilePic';
 export { default as RowName } from './RowName';
 export { default as UserActionButton } from './UserActionButton';
+export { default as Highlightable } from './Highlightable';
+export { default as Scrollable } from './Scrollable';
+export { default as LinkContainer } from './LinkContainer';

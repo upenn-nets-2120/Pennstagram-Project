@@ -1,0 +1,1 @@
+export const headerSize = 7; //unit = vw
