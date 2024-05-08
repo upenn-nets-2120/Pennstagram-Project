@@ -1,6 +1,6 @@
 import express from 'express';
-import db from '../database/db_access.js';
-import {createPost, updatePost, deletePost, likePost, commentPost, fetchPostsForUser, addRecommendation, removeRecommendation} from '../dbOperations/posts_dbOperations.js';
+import db from '../../database/db_access.js';
+import {createPost, updatePost, deletePost, likePost, commentPost, fetchPostsForUser} from '../dbOperations/posts_dbOperations.js';
 
 const posts = express.Router();
 
@@ -8,7 +8,7 @@ const posts = express.Router();
 //"testing if this goes through"
 
 //fetch all posts
-posts.get('/fetch', async (req, res) => {
+posts.get('/fetchAllPosts', async (req, res) => {
     const posts = await db.send_sql('SELECT * FROM posts;');
     try {
         const posts = await db.send_sql(sql);
@@ -19,7 +19,7 @@ posts.get('/fetch', async (req, res) => {
 });
 
 //create a new post
-posts.post('/new', async (req, res) => {
+posts.post('/newPost', async (req, res) => {
     const {caption, hashtag, image, postVisibility} = req.body;
     const userID = req.session.userID;
 
@@ -55,7 +55,7 @@ posts.post('/new', async (req, res) => {
 });
 
 //update a post
-posts.put('/update', async (req, res) => {
+posts.put('/updatePost', async (req, res) => {
     const {postID, post_json} = req.params;
     const {caption, hashtag, image, postVisibility} = req.body;
     const userID = req.session.userID;
@@ -83,7 +83,7 @@ posts.put('/update', async (req, res) => {
 });
 
 //delete a post
-posts.delete('/delete', async (req, res) => {
+posts.delete('/deletePost', async (req, res) => {
     const {postID} = req.params;
     const userID = req.session.userID;
 
@@ -106,7 +106,7 @@ posts.delete('/delete', async (req, res) => {
 });
 
 //like a post
-posts.post('/like', async (req, res) => {
+posts.post('/likePost', async (req, res) => {
     const {postID} = req.params; //postID
     const userID = req.body.userID; //userID of the user who likes the post?
     //insert a new like into the likes table
@@ -122,7 +122,7 @@ posts.post('/like', async (req, res) => {
 });
 
 //comment on a post
-posts.post('/comments', async (req, res) => {
+posts.post('/commentPost', async (req, res) => {
     const {postID} = req.params;
     const {comment, parentCommentID} = req.body;
     const userID = req.session.userID;
@@ -153,7 +153,7 @@ posts.post('/comments', async (req, res) => {
 });
 
 //fetch posts recommended for a user
-posts.get('/fetch/:userID', async (req, res) => {
+posts.get('/fetchPosts', async (req, res) => {
     try {
         const posts = await fetchPostsForUser(req.params.userID);
         res.status(200).json(posts);

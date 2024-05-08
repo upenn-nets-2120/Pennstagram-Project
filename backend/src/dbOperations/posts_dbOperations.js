@@ -1,4 +1,4 @@
-import db from '../database/db_access.js'; 
+import db from '../../database/db_access.js';
 
 const linkHashtagsToPost = async (hashtags, postId) => {
     const insertHashtagQuery = `INSERT IGNORE INTO hashtags (hashtag) VALUES (?)`;
