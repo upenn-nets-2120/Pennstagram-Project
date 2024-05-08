@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useContext } from 'react';
+import { ThemeContext } from '../../providers/ThemeProvider';
 import { TabsStyled } from './styled';
 
 interface TabsProps {
@@ -6,8 +7,10 @@ interface TabsProps {
 }
 
 const Tabs: React.FC<TabsProps> = ({ children }) => {
+    const { theme } = useContext(ThemeContext);
+
     return (
-        <TabsStyled>
+        <TabsStyled theme={theme}>
             {children}
         </TabsStyled>
     );
