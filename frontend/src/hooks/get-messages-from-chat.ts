@@ -2,7 +2,7 @@ import { Message } from "../entities/Message";
 import { Chat } from "../entities/Chat";
 import { User } from "../entities/User";
 
-export const getMessagesFromChat = async (chat: Chat): Promise<Message[]> => {
+export const getMessagesFromChat = async (chatID: string): Promise<Message[]> => {
     const u1 = {
         userID: 1234,
         firstName: 'j',

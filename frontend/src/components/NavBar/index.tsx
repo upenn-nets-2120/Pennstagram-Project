@@ -1,5 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
+import { headerSize } from '../../constants/headerSize';
 
 const TopBar = styled.nav`
     background-color: #f8f9fa;
@@ -8,6 +9,7 @@ const TopBar = styled.nav`
     justify-content: space-between;
     align-items: center;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    height: ${headerSize}vh;
 `;
 
 const NavLinks = styled.ul`
@@ -43,17 +45,19 @@ const LoginButton = styled.a`
 
 const NavBar: React.FC = () => {
     return (
-        <TopBar>
-            {/* Navigation Links */}
-            <NavLinks>
-                <li><a href="/">Home</a></li>
-                <li><a href="/about">About</a></li>
-                <li><a href="/contact">Contact</a></li>
-            </NavLinks>
+        <header>
+            <TopBar>
+                {/* Navigation Links */}
+                <NavLinks>
+                    <li><a href="/">Home</a></li>
+                    <li><a href="/about">About</a></li>
+                    <li><a href="/contact">Contact</a></li>
+                </NavLinks>
 
-            {/* Login Button */}
-            <LoginButton href="/login">Login</LoginButton>
-        </TopBar>
+                {/* Login Button */}
+                <LoginButton href="/login">Login</LoginButton>
+            </TopBar>
+        </header>
     );
 };
 
