@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { NavBar, Main } from '../../components';
 import styled from 'styled-components';
+import { UserContext } from '../../providers/UserProvider';
 
 
 const AnchorButton = styled.a`
@@ -19,6 +20,8 @@ const AnchorButton = styled.a`
 `;
 
 const HomePage: React.FC = () => {
+    const { user, login, logout } = useContext(UserContext);
+
     return (
         <div>
             {/* Title */}
