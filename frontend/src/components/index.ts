@@ -6,3 +6,5 @@ export { default as Tab } from './Tab';
 export { default as Rows } from './Rows';
 export { default as Row } from './Row';
 export { default as ProfilePic } from './ProfilePic';
+export { default as RowName } from './RowName';
+export { default as UserActionButton } from './UserActionButton';

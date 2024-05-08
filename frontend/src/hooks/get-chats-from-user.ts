@@ -4,7 +4,7 @@ import { Chat } from "../entities/Chat";
 export const getChatsFromUser = async (user: User): Promise<Chat[]> => {
     const c1 = {
         chatID: 1234,
-        name: 'chat one',
+        name: 'chat numba tree',
         description: 'this is a chat for all the cool people',
         profilePic: '',
         onlyAdmins: false
@@ -20,7 +20,7 @@ export const getChatsFromUser = async (user: User): Promise<Chat[]> => {
     
     const c3 = {
         chatID: 1234,
-        name: 'chat one',
+        name: 'chat two',
         description: 'this is a chat for all the cool people',
         profilePic: '',
         onlyAdmins: false
