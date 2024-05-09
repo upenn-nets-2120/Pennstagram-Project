@@ -14,7 +14,7 @@ import {
     addNotification,
     deleteNotification,
     getNotificationsFromUser,
-} from '../../db/index.js'
+} from '../../db-operations/index.js';
 
 const friends = express.Router();
 
@@ -26,7 +26,7 @@ friends.get('/followers/:userID', async (req, res) => {
         return;
     }
 
-    const data = await getFollowers(userID);
+    const data = await getFollowersFromUser(userID);
 
     res.status(200).json(data);
 });
@@ -39,7 +39,9 @@ friends.get('/followeds/:userID', async (req, res) => {
         return;
     }
 
-    const data = await getFolloweds(userID);
+    console.log(";laskjdf;laksjd");
+    const data = await getFollowedsFromUser(userID);
+    console.log(data);
 
     res.status(200).json(data);
 });

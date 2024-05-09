@@ -4,13 +4,14 @@ import {
     addUser,
     updateProfilePhoto,
     addUserHashtags,
-    getTopHashtags,
-} from '../../db/index.js'
+    getTopHashtagsSem,
+    checkUsernameValid
+} from '../../db-operations/index.js';
 import authUtils from '../../utils/authUtils.js';
 
 const register = express.Router();
 
-register.post('/signup', async (req, res) => {
+register.post('/', async (req, res) => {
     const { username, password, email, affiliation, birthday } = req.body;
 
     if (!username || !password || !email || !affiliation || !birthday) {
@@ -22,8 +23,8 @@ register.post('/signup', async (req, res) => {
     }
 
     try {
-        const userExists = await getUser(username, email);
-        if (userExists.length > 0) {
+        const usernameValid = await checkUsernameValid(username);
+        if (!usernameValid) {
             return res.status(409).json({ error: 'Username or email already exists' });
         }
     } catch (error) {
@@ -32,19 +33,23 @@ register.post('/signup', async (req, res) => {
     }
 
     // SALT AND HASH THE PASSWORD
-    const encryptedPassword = await new Promise((resolve, reject) => {
-        authUtils.encryptPassword(password, (err, hash) => {
-            if (err) {
-                reject(err);
-            } else {
-                resolve(hash);
-            }
+    let encryptedPassword;
+    try {
+        encryptedPassword = await new Promise((resolve, reject) => {
+            authUtils.encryptPassword(password, (err, hash) => {
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve(hash);
+                }
+            });
         });
-    });
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({ error: 'error with salting and hashing the password' });
+    }
 
-    console.log("nonencrypted password:", password);
-    console.log("encrypted password:", encryptedPassword);
-
+    // add the user to the database if we got here
     try {
         await addUser(username, encryptedPassword, email, affiliation, birthday);
     } catch (error) {
@@ -74,13 +79,17 @@ register.post('/upload-profile-photo', async (req, res) => {
 register.post('/select-hashtags', async (req, res) => {
     const { username, hashtags } = req.body;
 
+    if (!authUtils.isOK(username) || !authUtils.isOK(hashtags)) {
+        return res.status(403).json({error: 'One or more of your inputs is potentially an SQL injection attack.'})
+    }
+
     if (!hashtags || hashtags.length === 0) {
         return res.status(400).json({ error: 'At least one hashtag must be selected' });
     }
 
     try {
         await addUserHashtags(username, hashtags);
-        const popularHashtags = await getTopHashtags(10);
+        const popularHashtags = await getTopHashtagsSem(10);
         res.status(200).json({ message: 'Hashtags added successfully', popularHashtags });
     } catch (error) {
         return res.status(500).json({ error: 'Error adding hashtags' });
