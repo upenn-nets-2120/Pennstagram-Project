@@ -1,4 +1,4 @@
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { Column, Main, NavBar, ProfilePic, Row, Scrollable, Page, LinkContainer } from "../../components";
 import { useContext, useEffect, useState } from "react";
 import { getChatsFromUser } from "../../hooks/get-chats-from-user";
@@ -10,10 +10,12 @@ import { ChatTitleContainer } from "./components/ChatTitleContainer";
 import { ChatRowContainer } from "./components/ChatRowContainer";
 import { Message } from "../../entities/Message";
 import { getMessagesFromChat } from "../../hooks/get-messages-from-chat";
+import CreateChat from "./components/CreateChat";
 
 const ChatPage: React.FC = () => {
     const { chatID } = useParams();
     const { theme } = useContext(ThemeContext);
+    const navigate = useNavigate();
     
     const [chats, setChats] = useState<Chat[]>([]);
     const [messages, setMessages] = useState<Message[]>([]);
@@ -37,6 +39,10 @@ const ChatPage: React.FC = () => {
 
         init();
     }, [chatID]);
+
+    const handleCreateChat = () => {
+        navigate("/chat/create");
+    };
 
     return (
         <Page>
@@ -65,7 +71,11 @@ const ChatPage: React.FC = () => {
                         </Row>
                     </Column>
                     <Column width='70%'>
-                        {chatID ? (
+                        {chatID === "create" ? (
+                            <CreateChat />
+                        ) : chatID === undefined ? (
+                            <button onClick={handleCreateChat}>Create Chat</button>
+                        ) : (
                             <>
                                 <h1>Display chat information here</h1>
                                 <h1>{chatID}</h1>
@@ -75,12 +85,12 @@ const ChatPage: React.FC = () => {
                                     </div>
                                 ))}
                             </>
-                        ) : null}
+                        )}
                     </Column>
                 </Row>
             </Main>
         </Page>
-    )
+    );
 };
 
 export default ChatPage;
