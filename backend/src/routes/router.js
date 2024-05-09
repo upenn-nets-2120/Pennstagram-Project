@@ -1,14 +1,12 @@
 import express from 'express';
-import postsRoutes from './posts.js';
+import postsRoutes from './posts-routes/index.js';
 import friendRoutes from './friend-routes/index.js';
 import registrationRoutes from './registration-routes/index.js';
 import notificationRoutes from './notification-routes/index.js';
 import chatRoutes from './chat-routes/index.js';
 import loginRoutes from './login-routes/index.js';
-import profileRoutes from './profile.js';
-import searchRoutes from './search.js';
-
-// import notifications from './notifications.js';
+import profileRoutes from './profile-routes/index.js';
+import searchRoutes from './search-routes/index.js';
 
 const routes = express.Router();
 

@@ -3,7 +3,6 @@ export const REGISTER_PATH = '/register';
 export const LOGIN_PATH = '/login';
 export const FEED_PATH = '/:username/feed';
 export const FRIENDS_PATH = '/friends';
-export const USER_CHATS_PATH = '/chats';
 export const CHAT_PATH = '/chat/:chatID?';
 
 export type RouterPathsMap = {
@@ -24,10 +23,6 @@ export type RouterPathsMap = {
         queryParams: undefined;
     };
     [FRIENDS_PATH]: {
-        urlParams: undefined;
-        queryParams: undefined;
-    };
-    [USER_CHATS_PATH]: {
         urlParams: undefined;
         queryParams: undefined;
     };

@@ -1,0 +1,18 @@
+{
+  "database": {
+    "host": "localhost",
+    "port": "3306",
+    "database": "go7-db",
+    "user": "admin",
+    "password": "rds-password"
+  },
+  "serverPort": "8080",
+  "kafka": {
+    "groupIdTwitter": "twitter-group",
+    "groupIdFederated": "federated-group",
+    "bootstrapServers": ["localhost:9092"],
+    "twitterTopic": "Twitter-Kafka",
+    "federatedTopic": "FederatedPosts",
+    "port": 4567
+  }
+}

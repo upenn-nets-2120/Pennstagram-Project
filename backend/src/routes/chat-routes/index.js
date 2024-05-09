@@ -15,32 +15,37 @@ import {
     addNotification,
     deleteNotification,
     getNotificationsFromUser,
-} from '../../db/index.js'
+} from  '../../db-operations/index.js';
 
 const chats = express.Router();
 
-chats.post('/chat/create', async (req, res) => {
-    const chatName = req.body.chatName;
-    const description = req.body.description;
-    const profilePic = req.body.profilePic;
-    const onlyAdmins = req.body.onlyAdmins;
+chats.post('/create/:userID', async (req, res) => {
+    const userID = req.params.userID;
+    const { chatName, description, profilePic, onlyAdmins, users } = req.body;
 
-    if (
-        !chatName || chatName == null ||
-        !description || description == null ||
-        !profilePic || profilePic == null ||
-        !onlyAdmins || onlyAdmins == null
-    ) {
-        res.status(400).json({ error: 'bad input' });
+    if (!userID || !chatName || !description || !profilePic || !users || onlyAdmins == null) {
+        res.status(400).json({ error: 'Bad input' });
         return;
     }
 
-    const data = await addChat(chatName, description, profilePic, onlyAdmins);
+    try {
+        const result = await addChat(chatName, description, profilePic, onlyAdmins);
+        console.log(result);
+        const chatID = result.insertId;
 
-    res.status(200).json(data);
+        await addUsers2chat(userID, chatID, true);
+        for (const user of users) {
+            await addUsers2chat(user, chatID, false);
+        }
+
+        res.status(200).json({ chatID: chatID });
+    } catch (error) {
+        console.error('Error creating chat:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
 });
 
-chats.post('/chat/delete', async (req, res) => {
+chats.post('/delete', async (req, res) => {
     const chatName = req.body.chatName;
     const description = req.body.description;
     const profilePic = req.body.profilePic;
@@ -61,7 +66,7 @@ chats.post('/chat/delete', async (req, res) => {
     res.status(200).json(data);
 });
 
-chats.post('/chat/add-user/:userID', async (req, res) => {
+chats.post('/add-user/:userID', async (req, res) => {
     const userID = req.params.userID;
     const chatID = req.body.chatID;
     const isAdmin = req.body.isAdmin;
@@ -80,7 +85,7 @@ chats.post('/chat/add-user/:userID', async (req, res) => {
     res.status(200).json(data);
 });
 
-chats.post('/chat/delete-user/:userID', async (req, res) => {
+chats.post('/delete-user/:userID', async (req, res) => {
     const userID = req.params.userID;
     const chatID = req.body.chatID;
 
@@ -97,7 +102,7 @@ chats.post('/chat/delete-user/:userID', async (req, res) => {
     res.status(200).json(data);
 });
 
-chats.post('/chat/edit-name', async (req, res) => {
+chats.post('/edit-name', async (req, res) => {
     const chatID = req.body.chatID;
     const name = req.body.name;
 
@@ -114,7 +119,7 @@ chats.post('/chat/edit-name', async (req, res) => {
     res.status(200).json(data);
 });
 
-chats.post('/chat/edit-description', async (req, res) => {
+chats.post('/edit-description', async (req, res) => {
     const chatID = req.body.chatID;
     const description = req.body.description;
 
@@ -131,7 +136,7 @@ chats.post('/chat/edit-description', async (req, res) => {
     res.status(200).json(data);
 });
 
-chats.post('/chat/edit-profile-pic', async (req, res) => {
+chats.post('/edit-profile-pic', async (req, res) => {
     const chatID = req.body.chatID;
     const profilePic = req.body.profilePic;
 
@@ -148,7 +153,7 @@ chats.post('/chat/edit-profile-pic', async (req, res) => {
     res.status(200).json(data);
 });
 
-chats.post('/chat/edit-only-admin', async (req, res) => {
+chats.post('/edit-only-admin', async (req, res) => {
     const chatID = req.body.chatID;
     const onlyAdmin = req.body.onlyAdmin;
 
@@ -165,7 +170,7 @@ chats.post('/chat/edit-only-admin', async (req, res) => {
     res.status(200).json(data);
 });
 
-chats.post('/chat/edit-only-admin', async (req, res) => {
+chats.post('/edit-only-admin', async (req, res) => {
     const chatID = req.body.chatID;
     const onlyAdmin = req.body.onlyAdmin;
 
@@ -182,7 +187,7 @@ chats.post('/chat/edit-only-admin', async (req, res) => {
     res.status(200).json(data);
 });
 
-chats.post('/chat/send-message/:userID', async (req, res) => {
+chats.post('/send-message/:userID', async (req, res) => {
     const userID = req.params.userID;
     const chatID = req.body.chatID;
     const content = req.body.content;
@@ -201,7 +206,7 @@ chats.post('/chat/send-message/:userID', async (req, res) => {
     res.status(200).json(data);
 });
 
-chats.post('/chat/delete-message/:messageID', async (req, res) => {
+chats.post('/delete-message/:messageID', async (req, res) => {
     const messageID = req.params.messageID;
 
     if (
@@ -218,7 +223,7 @@ chats.post('/chat/delete-message/:messageID', async (req, res) => {
     res.status(200).json(data);
 });
 
-chats.get('/chat/:chatID', async (req, res) => {
+chats.get('/:chatID', async (req, res) => {
     const chatID = req.params.chatID;
 
     if (
@@ -233,7 +238,7 @@ chats.get('/chat/:chatID', async (req, res) => {
     res.status(200).json(data);
 });
 
-chats.get('/chat/get/:userID', async (req, res) => {
+chats.get('/get/:userID', async (req, res) => {
     const userID = req.params.userID;
 
     if (
