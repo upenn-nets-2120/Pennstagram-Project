@@ -25,10 +25,10 @@ function extractHashtags(text) {
 
 export const createPost = async (newPost) => {
     const query = `
-        INSERT INTO posts (image, caption, postVisibility, post_json)
-        VALUES (?, ?, ?, ?, ?)
+        INSERT INTO posts (userID, image, caption, postVisibility, post_json)
+        VALUES (?, ?, ?, ?, ?, ?)
     `;
-    const postID = await db.send_sql(query, [newPost.image, newPost.caption, newPost.hashtag, newPost.postVisibility, JSON.stringify(newPost.post_json)]);
+    const postID = await db.send_sql(query, [userID, newPost.image, newPost.caption, newPost.hashtag, newPost.postVisibility, JSON.stringify(newPost.post_json)]);
     
     //check if hashtag propery exists
     let hashtags = newPost.hashtag ? newPost.hashtag.split(' ') : [];
@@ -69,7 +69,7 @@ export const createPost = async (newPost) => {
     }
 };*/
 
-export const updatePost = async (postID, caption, hashtag, image, postVisibility, post_json) => {
+export const updatePost = async (postID, userID, caption, hashtag, image, postVisibility, post_json) => {
     const updates = [];
     const values = [];
 
@@ -108,11 +108,11 @@ export const updatePost = async (postID, caption, hashtag, image, postVisibility
 };
 
 export const deletePost = async (postID) => {
-    const query = `DELETE FROM posts WHERE postID = ?`;
+    const query = `DELETE FROM posts WHERE postID = ? AND userID = ?`;
     return await db.send_sql(query, postID);
 }
 
-export const likePost = async (postID, userID) => {
+export const likePost = async (postID, username) => {
     const query = `INSERT INTO likes (postID, liker) VALUES (?, ?)`;
     return await db.send_sql(query, [postID, userID]);
 }
@@ -132,17 +132,17 @@ export const commentPost = async (postID, userID, comment, parentCommentID) => {
 //signle hashtage in each hashtag column, multiple hashtags of interest per user in user_hashtags
 export const fetchPostsForUser = async (userID) => {
     const query = `
-        SELECT p.*, pr.rank as postRank, ur.rank as userRank
-        FROM posts p
-        JOIN ranks pr ON p.postID = pr.id AND pr.type = 'post'
-        JOIN users u ON p.userID = u.userID
-        JOIN ranks ur ON u.userID = ur.id AND ur.type = 'user'
-        WHERE p.userID IN (
-            SELECT friendID FROM friends WHERE userID = ?
-        ) OR p.hashtag IN (
-            SELECT hashtag FROM user_hashtags WHERE userID = ?
-        )
-        ORDER BY postRank DESC, userRank DESC, p.timeStamp DESC;
+    SELECT p.*, pr.rank as postRank, ur.rank as userRank, u.username
+    FROM posts p
+    JOIN ranks pr ON p.postID = pr.id AND pr.type = 'post'
+    JOIN users u ON p.userID = u.userID
+    JOIN ranks ur ON u.userID = ur.id AND ur.type = 'user'
+    WHERE p.userID IN (
+        SELECT friendID FROM friends WHERE userID = ?
+    ) OR p.hashtag IN (
+        SELECT hashtag FROM user_hashtags WHERE userID = ?
+    )
+    ORDER BY postRank DESC, userRank DESC, p.timeStamp DESC;
     `;
     return await db.send_sql(query, [userID, userID]);
 };
