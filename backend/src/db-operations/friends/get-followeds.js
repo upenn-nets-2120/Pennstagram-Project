@@ -9,7 +9,7 @@ const getFollowedsFromUser = async (userID) => {
         JOIN
             users ON friends.followed = users.userID
         LEFT JOIN
-            friends2 friends2 ON friends.followed = friends2.follower AND friends.follower = friends2.followed
+            friends friends2 ON friends.followed = friends2.follower AND friends.follower = friends2.followed
         WHERE
             friends.follower = '${userID}'
     ;`;

@@ -19,25 +19,30 @@ import {
 
 const chats = express.Router();
 
-chats.post('/create', async (req, res) => {
-    const chatName = req.body.chatName;
-    const description = req.body.description;
-    const profilePic = req.body.profilePic;
-    const onlyAdmins = req.body.onlyAdmins;
+chats.post('/create/:userID', async (req, res) => {
+    const userID = req.params.userID;
+    const { chatName, description, profilePic, onlyAdmins, users } = req.body;
 
-    if (
-        !chatName || chatName == null ||
-        !description || description == null ||
-        !profilePic || profilePic == null ||
-        !onlyAdmins || onlyAdmins == null
-    ) {
-        res.status(400).json({ error: 'bad input' });
+    if (!userID || !chatName || !description || !profilePic || !users || onlyAdmins == null) {
+        res.status(400).json({ error: 'Bad input' });
         return;
     }
 
-    const data = await addChat(chatName, description, profilePic, onlyAdmins);
+    try {
+        const result = await addChat(chatName, description, profilePic, onlyAdmins);
+        console.log(result);
+        const chatID = result.insertId;
 
-    res.status(200).json(data);
+        await addUsers2chat(userID, chatID, true);
+        for (const user of users) {
+            await addUsers2chat(user, chatID, false);
+        }
+
+        res.status(200).json({ chatID: chatID });
+    } catch (error) {
+        console.error('Error creating chat:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
 });
 
 chats.post('/delete', async (req, res) => {

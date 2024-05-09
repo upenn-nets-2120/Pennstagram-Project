@@ -5,7 +5,7 @@ const addFriend = async (follower, followed) => {
         INSERT INTO
             friends (follower, followed)
         VALUES 
-            (${follower}', '${followed}')
+            ('${follower}', '${followed}')
     ;`;
 
     return await db.insert_items(sql);
