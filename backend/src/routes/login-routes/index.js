@@ -1,5 +1,5 @@
 import express from 'express';
-import db from '../../../database/db_access.js';
+import db from '../../db-setup/db_access.js';
 import authUtils from '../../utils/authUtils.js';
 
 const login = express.Router();
