@@ -3,7 +3,7 @@ import db from '../../../database/db_access.js';
 const updateProfilePhoto = async (username, profilePhoto) => {
     const sql = `
         UPDATE users
-        SET profilePhoto = '${profilePhoto}'
+        SET userProfilePic = '${profilePhoto}'
         WHERE username = '${username}'
     ;`;
 

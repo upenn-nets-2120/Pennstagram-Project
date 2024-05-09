@@ -1,5 +1,8 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
+import config from '../../config.json';
+import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 
 const RegisterContainer = styled.div`
     display: flex;
@@ -45,20 +48,18 @@ const SubmitButton = styled.button`
     }
 `;
 
-const FeedbackMessage = styled.div`
-    margin-top: 15px;
-    color: green;
-`;
-
 const RegisterPage: React.FC = () => {
+    const rootURL = config.serverRootURL;
+    const navigate = useNavigate(); 
+
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
+    const [confirmPassword, setConfirmPassword] = useState('');
     const [email, setEmail] = useState('');
     const [affiliation, setAffiliation] = useState('');
     const [birthday, setBirthday] = useState('');
     const [profilePic, setProfilePic] = useState<File | null>(null);
     const [hashtags, setHashtags] = useState<string[]>([]);
-    const [showFeedback, setShowFeedback] = useState(false);
 
     const handleProfilePicChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.files && e.target.files.length > 0) {
@@ -71,13 +72,55 @@ const RegisterPage: React.FC = () => {
         setHashtags(selected);
     };
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (username && password && profilePic) {
-            setShowFeedback(true);
+        if (username && password && confirmPassword && email && affiliation && birthday && hashtags && profilePic) {
+            if (password !== confirmPassword) {
+                alert('Passwords do not match');
+                return;
+            }
+            try {
+                console.log(`${config.serverRootURL}/registration`)
+                const response1 = await axios.post(`${rootURL}/registration`, {
+                    username: username,
+                    password: password,
+                    email: email,
+                    affiliation: affiliation,
+                    birthday: birthday,
+                  });
+                console.log(response1.status);
+                console.log(response1);
+
+                // const response2 = await axios.post(`${rootURL}/registration/upload-profile-photo`, {
+                //     username: username,
+                //     profilePic: profilePic,
+                //   });
+
+                // console.log(response2.status);
+                // console.log(response2);
+
+                const response3 = await axios.post(`${rootURL}/registration/select-hashtags`, {
+                    userID: response1,
+                    hashtags: hashtags,
+                  });
+
+                console.log(response3.status);
+                console.log(response3);
+                if ((response1.status === 200) && (response3.status === 200)) {
+                    navigate('/${username}/feed'); 
+                } else {
+                    alert('Registration failed'); 
+                }
+            } catch (error) {
+                alert('Registration failed: ' + error); 
+            }
         } else {
-            alert('Please enter both a username, a password, and upload a profile picture.');
+            alert('One or more required fields are missing.');
         }
+
+        
+
+
     };
 
     return (
@@ -95,6 +138,12 @@ const RegisterPage: React.FC = () => {
                     placeholder="Password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
+                />
+                <InputField
+                    type="password"
+                    placeholder="Confirm Password"
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
                 />
                 <InputField
                     type="email"
@@ -124,21 +173,16 @@ const RegisterPage: React.FC = () => {
                 {/* Hashtag Selection */}
                 <label>Hashtags of Interest</label>
                 <SelectField multiple onChange={handleHashtagChange}>
-                    <option value="technology">Technology</option>
-                    <option value="music">Music</option>
-                    <option value="travel">Travel</option>
-                    <option value="fitness">Fitness</option>
-                    <option value="gaming">Gaming</option>
-                    <option value="food">Food</option>
+                    <option value="#technology">Technology</option>
+                    <option value="#music">Music</option>
+                    <option value="#travel">Travel</option>
+                    <option value="#fitness">Fitness</option>
+                    <option value="#gaming">Gaming</option>
+                    <option value="#food">Food</option>
                 </SelectField>
                 <SubmitButton type="submit">Submit</SubmitButton>
             </RegisterForm>
 
-            {showFeedback && (
-                <FeedbackMessage>
-                    Registration successful!
-                </FeedbackMessage>
-            )}
         </RegisterContainer>
     );
 };

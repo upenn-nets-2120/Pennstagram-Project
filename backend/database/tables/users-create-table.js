@@ -11,7 +11,7 @@ const usersCreateTable = async (db) => {
             birthday VARCHAR(255),
             affiliation VARCHAR(255),
             inviters INT,
-            userProfilePic BLOB,
+            userProfilePic VARCHAR(255),
             userScore INT,
             userVisibility ENUM('public', 'private'),
             sessionToken VARCHAR(255)

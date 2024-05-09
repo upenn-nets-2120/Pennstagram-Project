@@ -1,5 +1,8 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
+import config from '../../config.json';
+import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 
 const LoginContainer = styled.div`
     display: flex;
@@ -39,28 +42,37 @@ const SubmitButton = styled.button`
     }
 `;
 
-const FeedbackMessage = styled.div`
-    margin-top: 15px;
-    color: green;
-`;
 
 const LoginPage: React.FC = () => {
+    const rootURL = config.serverRootURL;
+    const navigate = useNavigate(); 
+
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
-    const [showFeedback, setShowFeedback] = useState(false);
 
-    const handleSubmit = (e: React.FormEvent) => {
-        e.preventDefault();
-        if (username && password) {
-            setShowFeedback(true);
-        } else {
-            alert('Please enter both a username and a password.');
-        }
-    };
+    const handleLogin = async () => {
+        try {
+          const response = await axios.post(`${rootURL}/login`, {
+            username: username,
+            password: password
+          });
+
+          console.log(response.status);
+          console.log(response);
+          if (response.status === 200) {
+            console.log('success!')
+            navigate(`/${username}/feed`); 
+          } else {
+            alert('Log in failed'); 
+          }
+        } catch (error) {
+          alert('Log in failed: ' + error);
+        }  
+      };
 
     return (
         <LoginContainer>
-            <LoginForm onSubmit={handleSubmit}>
+            <LoginForm onSubmit={handleLogin}>
                 <h2>Login</h2>
                 <InputField
                     type="text"
@@ -74,14 +86,8 @@ const LoginPage: React.FC = () => {
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                 />
-                <SubmitButton type="submit">Submit</SubmitButton>
+                <SubmitButton type="submit" onClick={handleLogin}>Submit</SubmitButton>
             </LoginForm>
-
-            {showFeedback && (
-                <FeedbackMessage>
-                    Login successful! Now proceed to the <a href="/feed">Feed</a> page.
-                </FeedbackMessage>
-            )}
         </LoginContainer>
     );
 };

@@ -97,7 +97,7 @@ async function create_tables(query, params = []) {
  * @returns The number of rows inserted
  */
 async function insert_items(query, params = []) {
-    result = await send_sql(query, params);
+    const result = await send_sql(query, params);
 
     return result.affectedRows;
 }

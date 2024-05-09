@@ -10,7 +10,7 @@ import authUtils from '../../utils/authUtils.js';
 
 const register = express.Router();
 
-register.post('/signup', async (req, res) => {
+register.post('/', async (req, res) => {
     const { username, password, email, affiliation, birthday } = req.body;
 
     if (!username || !password || !email || !affiliation || !birthday) {
@@ -45,14 +45,16 @@ register.post('/signup', async (req, res) => {
     console.log("nonencrypted password:", password);
     console.log("encrypted password:", encryptedPassword);
 
+    let result; 
     try {
-        await addUser(username, encryptedPassword, email, affiliation, birthday);
+        result = await addUser(username, encryptedPassword, email, affiliation, birthday);
     } catch (error) {
         console.log(error);
         return res.status(500).json({ error: 'Error adding user to database' });
     }
 
-    return res.status(201).json({ message: 'Account created successfully' });
+    
+    return res.status(201).json({ message: 'Account created successfully' , result: result});;
 });
 
 register.post('/upload-profile-photo', async (req, res) => {
