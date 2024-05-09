@@ -11,7 +11,7 @@ export const postCreateChat = async (
     users: number[]
 ) => {
     try {
-        const response = await axios.post(`${backend_url}chat/chat/create/${user.userID}`, {
+        const response = await axios.post(`${backend_url}/chat/create/${user.userID}`, {
             chatName,
             description,
             profilePic,

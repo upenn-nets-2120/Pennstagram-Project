@@ -4,7 +4,7 @@ import { backend_url } from '../constants/backendURL';
 
 export const getFollowing = async (userID: number): Promise<User[]> => {
     try {
-        const response = await axios.get(`${backend_url}friends/followeds/${userID}`);
+        const response = await axios.get(`${backend_url}/friends/followeds/${userID}`);
         const users: User[] = response.data.map((follower: any) => ({
             userID: follower.userID,
             username: follower.username,
