@@ -1,32 +1,30 @@
 import db from '../../db-setup/db_access.js';
 
-const modifyUser = async (newUsername, newEmail, newPassword) => {
+const modifyUser = async (username, newUsername, newEmail, newPassword) => {
+    // Use an array to build up the SET clause of the query
+    const updates = [];
 
-    let updates = [];
-    let params =[];
-
+    // Check for each parameter and construct the appropriate part of the query
     if (newUsername) {
-        updates.push('username = ?');
-        params.push(newUsername);
+        updates.push(`username = '${newUsername}'`);
     }
     if (newEmail) {
-        updates.push('emailID = ?');
-        params.push(newEmail);
+        updates.push(`emailID = '${newEmail}'`);
     }
     if (newPassword) { // Assuming password is already hashed (salted) before reaching here
-        updates.push('salted_password = ?');
-        params.push(newPassword);
+        updates.push(`salted_password = '${newPassword}'`);
     }
 
+    // If no updates are specified, return an error message
     if (updates.length === 0) {
-        return res.status(400).send('No updates provided');
+        return { status: 400, message: 'No updates provided' };
     }
 
-    const updateQuery = `UPDATE users SET ${updates.join(', ')} WHERE username = ?`;
-    params.push(username); // Ensure the last parameter is the username for the WHERE clause
+    // Use string interpolation to construct the final query
+    const updateQuery = `UPDATE users SET ${updates.join(', ')} WHERE username = '${username}'`;
 
-    const result = await db.send_sql(updateQuery, params);
+    const result = await db.send_sql(updateQuery);
     return result;
-}
+};
 
 export default modifyUser;

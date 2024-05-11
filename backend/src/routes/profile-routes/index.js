@@ -8,7 +8,7 @@ import express from 'express';
 import {
     checkUsernameValid,
     getUser,
-    getOwnHashtags,
+    getUserHashtags,
     getTopHashtagsAlain,
     getProfilePic,
     getSimilarActors,
@@ -32,64 +32,91 @@ profile.get('/fetchProfile', async (req, res) => {
         if (!username) {
             return res.status(401).json({ error: 'User is not yet authenticated' });
         }
+
+        if (!desiredUsername) {
+            return res.status(403).json({ error: 'no input for desiredUsername recieved' });
+        }
         
         if (!authUtils.isOK(desiredUsername)) {
-            return res.status(403).json({error: 'One or more of your inputs is potentially an SQL injection attack.'})
+            return res.status(403).json({ error: 'One or more of your inputs is potentially an SQL injection attack.' });
         }
 
         // CAN CHANGE LATER: if the querying user trying to fetch their OWN profile, the request will return their current hashtags
         let userProfileData;
+        let userProfilePicData;
         let userHashtagData;
         let mostPopularHashtagData;
         
-        if (username === desiredUsername) {
-            userProfileData = await getUser(username);
-            userHashtagData = await getOwnHashtags(username);
-            mostPopularHashtagData = await getTopHashtagsAlain(username);
-            userProfilePicData = await getProfilePic(username);
-        } else {
-            userProfileData = await getUser(desiredUsername);
-            userProfilePicData = await getProfilePic(desiredUsername);
-        }
+        userProfileData = await getUser(username);
+        userHashtagData = await getUserHashtags(username);
+        mostPopularHashtagData = await getTopHashtagsAlain(username);
+        userProfilePicData = await getProfilePic(username);
 
-        if (userProfileData.length === 0) {
+        if (!userProfileData) {
             return res.status(404).json({ error: 'User profile data not found.' });
         }
 
-        // if userProfileData found but no HashtagData found, return no HashtagData
-        if (userHashtagData.length === 0) {
-            return res.status(200).json({ userProfileData: user[0] });
+        let returnObject = { userProfile: userProfileData[0], mostPopularHashtags: mostPopularHashtagData };
+
+        if (userHashtagData) {
+            returnObject['userHashtags'] = userHashtagData[0];
+        } 
+        
+        if (userProfilePicData) {
+            returnObject['userProfilePic'] = userProfilePicData[0].userProfilePic;
         }
 
-        // otherwise return both data
-        return res.status(200).json({ userProfile: userProfileData[0], userHashtags: userHashtagData[0], mostPopularHashtags: mostPopularHashtagData[0], userProfilePic: userProfilePicData[0] });
+        return res.status(200).json(returnObject);
     } catch (error) {
         console.error('Failed to fetch user profile:', error);
-        return res.status(500).json({ error: 'Internal Server Error' });
+        res.status(500).json({ error: `Internal Server ${error}` });;
     }
 });
 
 // used for changing the user's username, password, or email 
-profile.put('/updateProfile', async (req, res) => {
+profile.put('/modifyProfile', async (req, res) => {
     try {
-        const username = req.body.username;
-        const newUsername = req.body.newUsername;
-        const newEmail = req.body.newEmail
-        const newPassword = req.body.newPassword;
-        let salted_password;
-        
-        if (!authUtils.isOK(username) || !authUtils.isOK(newUsername) || !authUtils.isOK(newEmail) || !authUtils.isOK(newPassword)) {
-            return res.status(403).json({error: 'One or more of your inputs is potentially an SQL injection attack.'})
-        }
+        const { username, newUsername, newEmail, newPassword } = req.body;
+        let new_salted_password;
+
+        if (!username) {
+            return res.status(403).json({ error: 'bro did not provide the username of the user to be updated' });
+        } 
 
         // Verify the user's original username for security reasons
         if (!req.session || req.session.username !== username) {
-            return res.status(401).json({ error: 'Unauthorized request: this username is not is'} );
+            return res.status(401).json({ error: 'Unauthorized request: this user is not authenticated or does not have permission to modify this profile.'} );
         }
 
-        if (newPassword) { // salt the password
-            salted_password = await new Promise((resolve, reject) => {
-                authUtils.encryptPassword(password, (err, hash) => {
+        // check to see that any updates were provided
+        if (!newUsername && !newEmail && !newPassword) {
+            return res.status(400).json({ error: 'No updates provided'} );
+        }
+
+        if (newUsername) {
+            if (!authUtils.isOK(newUsername)) {
+                return res.status(403).json({error: 'your new username is potentially an SQL injection attack.'})
+            }
+            // check that the new username is valid
+            if (!checkUsernameValid(newUsername)) {
+                return res.status(409).json({ error: 'Username or email already exists' });
+            }
+        }
+
+        if (newEmail) {
+            if (!authUtils.isOK(newEmail)) {
+                return res.status(403).json({error: 'your new email is potentially an SQL injection attack.'})
+            }
+        }
+
+        if (newPassword) {
+            if (!authUtils.isOK(newPassword)) {
+                return res.status(403).json({error: 'your new password is potentially an SQL injection attack.'})
+            }
+
+            // salt the password
+            new_salted_password = await new Promise((resolve, reject) => {
+                authUtils.encryptPassword(newPassword, (err, hash) => {
                     if (err) {
                         reject(err);
                     } else {
@@ -99,48 +126,37 @@ profile.put('/updateProfile', async (req, res) => {
             });
         }
 
-        // check to see that any updates were provided
-        if (!newUsername && !newEmail && !newPassword) {
-            return res.status(400).json({ error: 'No updates provided'} );
-        }
-
-        // check that the new username is valid
-        if (!checkUsernameValid(newUsername)) {
-            return res.status(409).json({ error: 'Username or email already exists' });
-        }
-
-        const result = await modifyUser(newUsername, newEmail, salted_password);
+        const result = await modifyUser(username, newUsername, newEmail, new_salted_password);
         req.session.username = newUsername || username; // Update session if username was changed
 
-        return res.status(200).json({ message: 'Profile updated successfully' });
+        return res.status(200).json({ message: 'Profile updated successfully', result: result });
     } catch (error) {
         console.error('Failed to update user profile:', error);
-        res.status(500).json({ error: 'Internal Server Error' });
+        res.status(500).json({ error: `Internal Server ${error}` });
     }
 });
 
-// allows user to add OR remove a specified hashtag (through use of req.query, i.e. '.../updateHashtags?operation=<insert 1 or 2 here>)
-profile.post('/updateHashtags', async (req, res) => {
+// allows user to add OR remove a specified hashtag (through use of req.query, i.e. '.../updateHashtags?operation=<insert 1 or 0 here>)
+// 1 = adding, 0 = removing
+profile.put('/modifyHashtags', async (req, res) => {
 
     try {
-        const username = req.body.username;
-        const operation = req.query.operation; // 1 for add, 0 for remove
-        const targetHashtag = req.body.targetHashtag; // hashtag to be added or removed
+        const { username, operation, targetHashtag } = req.body;
 
         if (!authUtils.isOK(username) || !authUtils.isOK(operation) || !authUtils.isOK(targetHashtag)) {
-            return res.status(403).json({error: 'One or more of your inputs is potentially an SQL injection attack.'})
+            return res.status(403).json({error: 'You forgot an input OR: one or more of your inputs is potentially an SQL injection attack.'})
         }
 
         // Verify the user's original username for security reasons
         if (!req.session || req.session.username !== username) {
-            return res.status(401).json({ error: 'Unauthorized request: this username is not is'} );
+            return res.status(401).json({ error: 'Unauthorized request: this user is not authenticated or does not have permission to modify this profile.' });
         }
 
         const result = await modifyUserHashtag(username, targetHashtag, operation);
         return res.status(200).json({ message: `Hashtags for ${username} changed successfully`, result: result });
     } catch (error) {
         console.error('Failed to update user hashtags:', error);
-        res.status(500).json({ error: 'Internal Server Error' });
+        res.status(500).json({ error: `Internal Server ${error}` });
     }
 });
 
@@ -150,7 +166,7 @@ profile.get('/fetchSimilarActors', async (req, res) => {
 
         // Verify the user's original username for security reasons
         if (!req.session || req.session.username !== username) {
-            return res.status(401).json({ error: 'Unauthorized request: this username is not is'} );
+            return res.status(401).json({ error: 'Unauthorized request: this user is not authenticated or does not have permission to modify this profile.' });
         }
 
         if (!authUtils.isOK(username)) {
@@ -161,22 +177,21 @@ profile.get('/fetchSimilarActors', async (req, res) => {
         return res.status(200).json({ message: `Top 5 similar actors for ${username} have been calculated.`, result: result});   
     } catch (error) {
         console.error('Failed fetch similar actors:', error);
-        res.status(500).json({ error: 'Internal Server Error' });
+        res.status(500).json({ error: `Internal Server ${error}` });
     }
 });
 
 profile.put('/modifyLinkedActor', async (req, res) => {
     try {
-        const username = req.body.username;
-        const newActorNConst = req.body.newActorNConst;
+        const { username, newActorNConst } = req.body;
 
         // Verify the user's original username for security reasons
         if (!req.session || req.session.username !== username) {
-            return res.status(401).json({ error: 'Unauthorized request: this username is not is'} );
+            return res.status(401).json({ error: 'Unauthorized request: this user is not authenticated or does not have permission to modify this profile.' });
         }
 
         if (!authUtils.isOK(username) || !authUtils.isOK(newActorNConst)) {
-            return res.status(403).json({error: 'One or more of your inputs is potentially an SQL injection attack.'})
+            return res.status(403).json({error: 'You forgot an input OR: one or more of your inputs is potentially an SQL injection attack.'})
         }
 
         const result = await modifyLinkedActor(username, newActorNConst);
@@ -184,7 +199,7 @@ profile.put('/modifyLinkedActor', async (req, res) => {
         return res.status(200).json({ message: `Linked actor for ${username} has been changed to ${newActorNConst}.`, result: result});   
     } catch (error) {
         console.error('Failed to modify linked actor:', error);
-        return res.status(500).json({ error: 'Internal Server Error' });
+        res.status(500).json({ error: `Internal Server ${error}` });
     }
 });
 
@@ -195,7 +210,7 @@ profile.put('/modifyProfilePic', async (req, res) => {
 
         // Verify the user's original username for security reasons
         if (!req.session || req.session.username !== username) {
-            return res.status(401).json({ error: 'Unauthorized request: this username is not is'} );
+            return res.status(401).json({ error: 'Unauthorized request: this user is not authenticated or does not have permission to modify this profile.' });
         }
 
         if (!authUtils.isOK(username) || !authUtils.isOK(profilePic)) {
@@ -207,7 +222,7 @@ profile.put('/modifyProfilePic', async (req, res) => {
         return res.status(200).json({ message: `Profile pic successfully modified`, result: modifyResult});   
     } catch (error) {
         console.error('Failed to modify user profile pic', error);
-        res.status(500).json({ error: 'Internal Server Error' });
+        res.status(500).json({ error: `Internal Server ${error}` });
     }
 });
 

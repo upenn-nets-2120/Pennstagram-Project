@@ -1,11 +1,18 @@
 import express from 'express';
 import db from '../../db-setup/db_access.js';
-import {createPost, updatePost, deletePost, likePost, commentPost, fetchPostsForUser} from '../../db-operations/posts/posts_dbOperations.js';
+import {
+    createPost,
+    updatePost,
+    deletePost,
+    likePost,
+    commentPost,
+    fetchPostsForUser
+} from '../../db-operations/index.js';
 
 const posts = express.Router();
 
-//TODO: check Logged In --> use helper funtion and return true (should return when user is logged in)
-//"testing if this goes through"
+// TODO: check Logged In --> use helper funtion and return true (should return when user is logged in)
+// "testing if this goes through"
 
 //fetch all posts
 posts.get('/fetchAllPosts', async (req, res) => {
@@ -21,7 +28,7 @@ posts.get('/fetchAllPosts', async (req, res) => {
 //create a new post
 posts.post('/newPost', async (req, res) => {
     const {caption, hashtag, image, postVisibility} = req.body;
-    const userID = req.session.userID;
+    const userID = req.session.userID; // USE req.session.username INSTEAD
 
     //check if at least one of caption, hashtag, or image is provided
     if (!(caption || hashtag || image)) {
@@ -58,7 +65,7 @@ posts.post('/newPost', async (req, res) => {
 posts.put('/updatePost', async (req, res) => {
     const {postID, post_json} = req.params;
     const {caption, hashtag, image, postVisibility} = req.body;
-    const userID = req.session.userID;
+    const userID = req.session.userID; // USE req.session.username INSTEAD
 
     //check if at least one of caption, hashtag, image, or visibility is provided
     if (!(caption || hashtag || image || postVisibility)) {
@@ -85,7 +92,7 @@ posts.put('/updatePost', async (req, res) => {
 //delete a post
 posts.delete('/deletePost', async (req, res) => {
     const {postID} = req.params;
-    const userID = req.session.userID;
+    const userID = req.session.userID; // USE req.session.username INSTEAD
 
     //get the post from the database
     const post = await db.send_sql('SELECT * FROM posts WHERE postID = ?', postID);
@@ -108,7 +115,7 @@ posts.delete('/deletePost', async (req, res) => {
 //like a post
 posts.post('/likePost', async (req, res) => {
     const {postID} = req.params; //postID
-    const userID = req.body.userID; //userID of the user who likes the post?
+    const userID = req.body.userID; //userID of the user who likes the post? // USE req.session.username INSTEAD
     //insert a new like into the likes table
     //const sql = 'INSERT INTO likes (postID, liker) VALUES (?, ?)'; 
     try {
@@ -125,7 +132,7 @@ posts.post('/likePost', async (req, res) => {
 posts.post('/commentPost', async (req, res) => {
     const {postID} = req.params;
     const {comment, parentCommentID} = req.body;
-    const userID = req.session.userID;
+    const userID = req.session.userID; // USE req.session.username INSTEAD
 
     //check if comment is gievn
     if (!comment) {
