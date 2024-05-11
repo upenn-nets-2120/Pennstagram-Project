@@ -3,7 +3,7 @@ import {
     addNotification,
     deleteNotification,
     getNotificationsFromUser,
-} from '../../db/index.js'
+} from '../../db-operations/index.js';
 
 const notification = express.Router();
 
