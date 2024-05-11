@@ -5,9 +5,11 @@ import {
 } from '../index.js';
 
 const createPost = async (newPost) => {
+    try {
+    console.log("Creating post with data: ", newPost);
     const query = `
         INSERT INTO posts (image, caption, postVisibility, post_json)
-        VALUES (?, ?, ?, ?)
+        VALUES ("${newPost.image}", "${newPost.caption}", "${newPost.postVisibility}", "${JSON.stringify(newPost.post_json)}")
     `;
     const result = await db.send_sql(query, [newPost.image, newPost.caption, newPost.postVisibility, JSON.stringify(newPost.post_json)]);
     const postID = result.insertId;
@@ -25,6 +27,10 @@ const createPost = async (newPost) => {
     }
     return postID;*/
     //return the ID of new post?
+    } catch (error) {
+        console.error("Error in createPost: ", error);
+        throw error;
+    }
 };
 
 export default createPost;

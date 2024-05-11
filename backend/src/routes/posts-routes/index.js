@@ -8,6 +8,7 @@ import {
     commentPost,
     fetchPostsForUser
 } from '../../db-operations/index.js';
+import authUtils from '../../utils/authUtils.js';
 
 const posts = express.Router();
 
@@ -16,6 +17,15 @@ const posts = express.Router();
 
 //fetch all posts
 posts.get('/fetchAllPosts', async (req, res) => {
+    if (!authUtils.isOK(username)) {
+        return res.status(403).json({error: 'You forgot an input OR: one or more of your inputs is potentially an SQL injection attack.'})
+    }
+
+    // Verify the user's original username for security reasons
+    if (!req.session || req.session.username !== username) {
+        return res.status(401).json({ error: 'Unauthorized request: this user is not authenticated or does not have permission to modify this profile.' });
+    }
+
     const posts = await db.send_sql('SELECT * FROM posts;');
     try {
         const posts = await db.send_sql(sql);
@@ -28,13 +38,30 @@ posts.get('/fetchAllPosts', async (req, res) => {
 //create a new post
 posts.post('/newPost', async (req, res) => {
     const {caption, hashtag, image, postVisibility} = req.body;
-    const userID = req.session.userID; // USE req.session.username INSTEAD
+    const username = req.session.username; // USE req.session.username INSTEAD
+
+    console.log("Caption: ", caption);
+
+    try {
+        if (authUtils.isOK(caption)) {
+            console.log("checked is okay");
+        }
+        if (!authUtils.isOK(caption)) {
+            console.log("caption is not okay");
+        }
+    } catch (error) {
+        console.error("Error in isOK function: ", error); // Log any error from the isOK function
+    }
 
     //check if at least one of caption, hashtag, or image is provided
-    if (!(caption || hashtag || image)) {
-        res.status(400).json({error: 'at least one of caption, hashtag, or image must be provided'});
-        return;
+    if (!((authUtils.isOK(caption) || authUtils.isOK(hashtag) || authUtils.isOK(image)))) {
+        return res.status(400).json({error: 'at least one of caption, hashtag, or image must be provided OR one or more of your inputs is potentially an SQL injection attack'});
     }
+    // Verify the user's original username for security reasons
+    if (!req.session || req.session.username !== username) {
+        return res.status(401).json({ error: 'Unauthorized request: this user is not authenticated or does not have permission to modify this profile.' });
+    }
+
     //check if postVisibility is provided
     if (!postVisibility) {
         res.status(400).json({error: 'postVisibility is required'});
@@ -42,24 +69,37 @@ posts.post('/newPost', async (req, res) => {
      }
      
      const post_json = {
-        username: userID,
-        source_site: 'g07', // replace with your team number
-        post_uuid_within_site: postID, // replace with the postID of the new post
+        username: username,
+        source_site: 'g07',
+        post_uuid_within_site: null, // replace with the postID of the new post
         post_text: caption,
-        content_type: 'BLOB' // replace with the content type of the image
+        content_type: 'BLOB'
     };
 
-    const newPost = {userID, caption, hashtag, image, postVisibility, post_json: JSON.stringify(post_json)};
+    const newPost = {username, caption, hashtag, image, postVisibility, post_json: JSON.stringify(post_json)};
     //const newPostParams = [caption, hashtag, image, postVisibility, userID];
     //const sql = 'INSERT INTO posts (caption, hashtag, image, postVisibility, nconstID) VALUES (?, ?, ?, ?, ?)'; 
     try {
-        await createPost(newPost);
+        //await createPost(newPost);
         //await db.send_sql(sql, newPostParams);
-        res.status(201).json({message: 'Post created'});
+        const postID = await createPost(newPost);
+        post_json.post_uuid_within_site = postID;
+        newPost.post_json = JSON.stringify(post_json);
+        await updatePostJson(postID, newPost.post_json);        
+        res.status(201).json({message: 'Post created', postID: postID});
     } catch (error) {
-        res.status(500).json({error: 'Error querying database'});
+        res.status(500).json({error: 'Error querying database', details: error.message});
     }
 });
+
+const updatePostJson = async (postID, post_json) => {
+    const query = `
+        UPDATE posts
+        SET post_json = ?
+        WHERE postID = ?
+    `;
+    await db.send_sql(query, [post_json, postID]);
+};
 
 //update a post
 posts.put('/updatePost', async (req, res) => {
