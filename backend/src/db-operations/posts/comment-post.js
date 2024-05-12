@@ -4,10 +4,9 @@ import {
     extractHashtags
 } from '../index.js';
 
-const commentPost = async (postID, userID, comment, parentCommentID) => {
-    //const newCommentParams = [postID, userID, comment, (parentCommentID || null)];
-    const query = 'INSERT INTO comments (postID, userID, comment, parentCommentID) VALUES (?, ?, ?, ?)';
-    const result = await db.send_sql(query, [postID, userID, comment, parentCommentID || null]);
+const commentPost = async (postID, userID, content, parentCommentID) => {
+    const query = `INSERT INTO comments (postID, userID, content, parentCommentID) VALUES (${postID}, ${userID}, '${comment}', ${parentCommentID || 'NULL'})`;
+    const result = await db.send_sql(query);
     const commentID = result.insertId;
 
     if (comment.includes('#')) {

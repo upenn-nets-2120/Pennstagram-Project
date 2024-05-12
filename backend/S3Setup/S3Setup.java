@@ -42,6 +42,7 @@ public class S3Setup {
 
             /* TODO: Establish S3 URL */
             String s3Url = "https://" + s3Bucket + ".s3." + Config.AWS_REGION + ".amazonaws.com/" + id;
+            //s3://
 
             // Upload to S3 
             uploadToS3(embeddingStr, s3Bucket, id);
