@@ -13,3 +13,4 @@ export { default as notificationsCreateTable } from './notifications-create-tabl
 export { default as requestsCreateTable } from './requests-create-table.js';
 export { default as users2postsCreateTable } from './users2posts-create-table.js';
 export { default as users2chatsCreateTable } from './users2chats-create-table.js';
+export { default as users2actorsCreateTable } from './users2actors-create-table.js';

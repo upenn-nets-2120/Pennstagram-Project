@@ -17,7 +17,7 @@ public class Config {
      */
     public static String SOCIAL_NET_PATH = "src/main/java/edu/upenn/cis/nets2120/hw3/simple-example.txt";
     //"s3a://penn-cis545-files/movie_friends.txt";
-    //"src/main/java/edu/upenn/cis/nets2120/hw3/simple-example.txt"
+
 
     public static String LOCAL_SPARK = "local[*]";
 

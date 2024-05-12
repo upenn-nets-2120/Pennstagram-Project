@@ -1,1 +1,1 @@
-export const backend_url = 'http://localhost:5050'
+export const backend_url = 'http://localhost:8080'
