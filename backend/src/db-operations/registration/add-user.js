@@ -6,7 +6,7 @@ const addUser = async (username, password, email, affiliation, birthday) => {
     const sql = `INSERT INTO users (username, salted_password, emailID, affiliation, birthday)
                  VALUES ('${username}', '${password}', '${email}', '${affiliation}', '${birthday}')`;
 
-    return await db.send_sql(sql);
+    return await db.insert_items(sql);
 }
 
 

@@ -12,7 +12,7 @@ import authUtils from '../../utils/authUtils.js';
 const register = express.Router();
 
 register.post('/', async (req, res) => {
-    const { username, password, email, affiliation, birthday } = req.body;
+    const { username, password, email, affiliation, birthday, profilePhoto, hashtags } = req.body;
 
     if (!username || !password || !email || !affiliation || !birthday) {
         return res.status(400).json({ error: 'All fields are required' });
@@ -56,12 +56,7 @@ register.post('/', async (req, res) => {
         console.log(error);
         return res.status(500).json({ error: 'Error adding user to database' });
     }
-
-    return res.status(201).json({ message: 'Account created successfully' });
-});
-
-register.post('/upload-profile-photo', async (req, res) => {
-    const { username, profilePhoto } = req.body;
+    console.log('Account created');
 
     if (!profilePhoto) {
         return res.status(400).json({ error: 'Profile photo is required' });
@@ -72,12 +67,7 @@ register.post('/upload-profile-photo', async (req, res) => {
     } catch (error) {
         return res.status(500).json({ error: 'Error updating profile photo' });
     }
-
-    return res.status(200).json({ message: 'Profile photo updated successfully' });
-});
-
-register.post('/select-hashtags', async (req, res) => {
-    const { username, hashtags } = req.body;
+    console.log('Profile photo updated successfully');
 
     if (!authUtils.isOK(username) || !authUtils.isOK(hashtags)) {
         return res.status(403).json({error: 'One or more of your inputs is potentially an SQL injection attack.'})
@@ -89,12 +79,27 @@ register.post('/select-hashtags', async (req, res) => {
 
     try {
         await addUserHashtags(username, hashtags);
-        const popularHashtags = await getTopHashtagsSem(10);
-        res.status(200).json({ message: 'Hashtags added successfully', popularHashtags });
     } catch (error) {
         return res.status(500).json({ error: 'Error adding hashtags' });
     }
+
+    return res.status(201).json({ message: 'Account created successfully' });
 });
+
+register.get('/select-hashtags', async (req, res) => {
+    let popularHashtags
+    try {
+        popularHashtags = await getTopHashtagsSem(10);
+        res.status(200).json({ message: 'Got Top Hashtags', popularHashtags });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ error: 'Error getting hashtags' });
+    }
+
+    return popularHashtags;
+});
+
+
 
 export default register;
 
