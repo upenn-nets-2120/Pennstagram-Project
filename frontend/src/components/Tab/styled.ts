@@ -5,6 +5,7 @@ interface TabStyledProps {
 }
 
 export const TabStyled = styled.div<TabStyledProps>`
+    height: 100%;
     flex: 1;
     display: flex;
     align-items: center;

@@ -63,6 +63,7 @@ const RegisterPage: React.FC = () => {
     const [confirmPassword, setConfirmPassword] = useState('');
     const [email, setEmail] = useState('');
     const [affiliation, setAffiliation] = useState('');
+    const [visibility, setVisibility] = useState('public');
     const [birthday, setBirthday] = useState('');
     const [profilePhoto, setProfilePhoto] = useState<File | null>(null);
     const [hashtags, setHashtags] = useState<HashtagOption[]>([]);
@@ -115,17 +116,46 @@ const RegisterPage: React.FC = () => {
         fetchHashtags();
     }, []);
 
-    const handleHashtagChange = (newSelected: MultiValue<HashtagOption>) => {
-        const newSelectedHashtags = Array.from(newSelected);
+    // const handleHashtagChange = (newSelected: MultiValue<HashtagOption>) => {
+    //     const newSelectedHashtags = Array.from(newSelected);
     
+    //     setSelectedHashtags(newSelectedHashtags);
+    
+    //     // Create a Set for the selected IDs to filter out from available hashtags
+    //     const selectedIds = new Set(newSelectedHashtags.map((h) => h.value));
+    
+    //     // Filter out selected hashtags from the original list
+    //     setHashtags(hashtags.filter((h) => !selectedIds.has(h.value)));
+    // };
+
+    const handleHashtagChange = (newSelected: MultiValue<HashtagOption>, actionMeta: ActionMeta<HashtagOption>) => {
+        // Convert the readonly MultiValue array to a mutable array before setting state
+        const newSelectedHashtags = [...newSelected];
         setSelectedHashtags(newSelectedHashtags);
     
-        // Create a Set for the selected IDs to filter out from available hashtags
-        const selectedIds = new Set(newSelectedHashtags.map((h) => h.value));
+        switch (actionMeta.action) {
+            case 'select-option':
+                if (actionMeta.option) {
+                    setHashtags((prevHashtags) => prevHashtags.filter((option) => option.value !== actionMeta.option!.value));
+                }
+                break;
     
-        // Filter out selected hashtags from the original list
-        setHashtags(hashtags.filter((h) => !selectedIds.has(h.value)));
+            case 'remove-value':
+            case 'pop-value':
+                if (actionMeta.removedValue) {
+                    // Add back the removed hashtag to the list of available options
+                    setHashtags((prevHashtags) => [...prevHashtags, actionMeta.removedValue].sort((a, b) => a.value - b.value));
+                }
+                break;
+    
+            default:
+                // Handle other actions if necessary
+                break;
+        }
     };
+    
+    
+    
     
 
     // const handleHashtagChange = (selectedOptions: MultiValue<HashtagOption, true>, actionMeta: ActionMeta<HashtagOption>) => {
@@ -157,6 +187,7 @@ const RegisterPage: React.FC = () => {
                     birthday: birthday,
                     profilePhoto: profilePhoto,
                     hashtags: selectedHashtags,
+                    userVisibility: visibility,
                   });
                 console.log(response.status);
                 console.log(response);
@@ -257,6 +288,14 @@ const RegisterPage: React.FC = () => {
                     accept="image/*"
                     onChange={handleProfilePicChange}
                 />
+                <label>Account Visibility</label>
+                <SelectField
+                    value={visibility}
+                    onChange={(e) => setVisibility(e.target.value)}
+                    >
+                    <option value="public">Public</option>
+                    <option value="private">Private</option>
+                </SelectField>
                 {/* Hashtag Selection */}
                 <label>Hashtags of Interest</label>
                 <Select
