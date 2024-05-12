@@ -1,31 +1,23 @@
-import { User } from "../entities/User";
+import axios from 'axios';
 import { Chat } from "../entities/Chat";
+import { backend_url } from '../constants/backendURL';
+import { User } from '../entities/User';
 
 export const getChatsFromUser = async (user: User): Promise<Chat[]> => {
-    const c1 = {
-        chatID: 1234,
-        name: 'chat numba tree',
-        description: 'this is a chat for all the cool people',
-        profilePic: '',
-        onlyAdmins: false
-    }
+    try {
+        const response = await axios.get(`${backend_url}/chat/get/${user.userID}`);
 
-    const c2 = {
-        chatID: 1244,
-        name: 'chat one',
-        description: 'this is a chat for all the cool people',
-        profilePic: '',
-        onlyAdmins: false
-    }
-    
-    const c3 = {
-        chatID: 1234,
-        name: 'chat two',
-        description: 'this is a chat for all the cool people',
-        profilePic: '',
-        onlyAdmins: false
-    }
+        const chats: Chat[] = response.data.map((chat: any) => ({
+            chatID: chat.chatID,
+            name: chat.name,
+            description: chat.description,
+            profilePic: chat.profilePic || '',
+            onlyAdmins: chat.onlyAdmins,
+        }));
 
-
-    return [c1, c2, c3, c2, c3, c3, c1]
+        return chats;
+    } catch (error) {
+        console.error('Error fetching chats from user:', error);
+        return [];
+    }
 };

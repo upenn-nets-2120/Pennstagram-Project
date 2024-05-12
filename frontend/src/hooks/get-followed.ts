@@ -2,7 +2,7 @@ import { User } from "../entities/User";
 
 export const getFollowed = async (userID: number): Promise<User[]> => {
     const u1 = {
-        userID,
+        userID: 1,
         firstName: 'josh',
         lastName: 'weissman',
         profilePic: '',

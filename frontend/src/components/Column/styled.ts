@@ -2,6 +2,7 @@ import styled from 'styled-components';
 
 interface ColumnStyledProps {
     width?: string;
+    color?: string;
 }
 
 export const ColumnStyled = styled.div<ColumnStyledProps>`
@@ -12,4 +13,5 @@ export const ColumnStyled = styled.div<ColumnStyledProps>`
     width: ${({ width }) => width || '100%'};
     height: 100%;
     box-sizing: border-box;
+    background-color: ${({ color }) => color || 'transparent'};
 `;

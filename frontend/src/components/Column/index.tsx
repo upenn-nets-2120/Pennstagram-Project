@@ -5,13 +5,14 @@ import { ThemeContext } from '../../providers/ThemeProvider';
 interface ColumnProps {
     children: React.ReactNode;
     width?: string;
+    color?: string;
 }
 
-const Column: React.FC<ColumnProps> = ({ children, width }) => {
+const Column: React.FC<ColumnProps> = ({ children, width, color }) => {
     const { theme } = useContext(ThemeContext);
 
     return (
-        <ColumnStyled theme={theme} width={width}>
+        <ColumnStyled theme={theme} width={width} color={color}>
             {children}
         </ColumnStyled>
     );

@@ -201,9 +201,9 @@ chats.post('/send-message/:userID', async (req, res) => {
         return;
     }
 
-    const data = await addMessage(userID, chatID, content);
+    await addMessage(userID, chatID, content);
 
-    res.status(200).json(data);
+    res.status(200).json({message: 'success'});
 });
 
 chats.post('/delete-message/:messageID', async (req, res) => {

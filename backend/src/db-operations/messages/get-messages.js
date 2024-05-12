@@ -6,6 +6,8 @@ const getMessagesFromChat = async (chatID) => {
             *
         FROM
             messages
+        JOIN
+            users ON messages.userID = users.userID
         WHERE
             chatID = ${chatID}
         ORDER BY
