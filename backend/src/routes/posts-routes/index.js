@@ -37,7 +37,7 @@ posts.get('/fetchAllPosts', async (req, res) => {
             GROUP BY p.postID
             ORDER BY p.timeStamp DESC;
         `;
-        console.log("query" + query);
+        console.log("query", query);
         const posts = await db.send_sql(query);
         res.status(200).json(posts);
     } catch (error) {
