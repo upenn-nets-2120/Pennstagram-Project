@@ -2,7 +2,7 @@
 import {
     getUser
 } from '../index.js';
-import pkg from '../../utils/actor-face-match/app.js';
+import pkg from '../../utils/actor-face-match/index.js';
 const { main } = pkg;
 
 const calculateFaceMatches = async (username) => {

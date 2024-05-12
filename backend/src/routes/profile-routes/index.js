@@ -16,7 +16,7 @@ import {
     modifyUserHashtag,
     modifyProfilePic,
     modifyLinkedActor
-} from '../../rds-operations/index.js';
+} from '../../db-operations/index.js';
 import authUtils from '../../utils/authUtils.js';
 
 const profile = express.Router();
