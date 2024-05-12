@@ -40,23 +40,12 @@ posts.post('/newPost', async (req, res) => {
     const {caption, hashtag, image, postVisibility} = req.body;
     const username = req.session.username; // USE req.session.username INSTEAD
 
-    try {
-        if (authUtils.isOK(caption)) {
-            console.log("checked is okay");
-        }
-        if (!authUtils.isOK(caption)) {
-            console.log("caption is not okay");
-        }
-    } catch (error) {
-        console.error("Error in isOK function: ", error); // Log any error from the isOK function
-    }
-
     //check if at least one of caption, hashtag, or image is provided
     if (!((authUtils.isOK(caption) || authUtils.isOK(hashtag) || authUtils.isOK(image)))) {
         return res.status(400).json({error: 'at least one of caption, hashtag, or image must be provided OR one or more of your inputs is potentially an SQL injection attack'});
     }
     // Verify the user's original username for security reasons
-    if (!req.session || req.session.username !== username) {
+    if (!req.session || req.session.username !== username || req.session.username == null) {
         return res.status(401).json({ error: 'Unauthorized request: this user is not authenticated or does not have permission to modify this profile.' });
     }
 
@@ -101,37 +90,42 @@ posts.post('/newPost', async (req, res) => {
     }
 });*/
 
-const updatePostJson = async (postID, post_json) => {
-    const query = `
-        UPDATE posts
-        SET post_json = ?
-        WHERE postID = ?
-    `;
-    await db.send_sql(query, [post_json, postID]);
-};
+// const updatePostJson = async (postID, post_json) => {
+//     const query = `
+//         UPDATE posts
+//         SET post_json = ?
+//         WHERE postID = ?
+//     `;
+//     await db.send_sql(query, [post_json, postID]);
+// };
 
 //update a post
 posts.put('/updatePost', async (req, res) => {
-    const {postID, post_json} = req.params;
+    const {postID} = req.params;
     const {caption, hashtag, image, postVisibility} = req.body;
-    const userID = req.session.userID; // USE req.session.username INSTEAD
+    const username = req.session.username; // USE req.session.username INSTEAD
+    console.log("postID " + postID);
 
-    //check if at least one of caption, hashtag, image, or visibility is provided
-    if (!(caption || hashtag || image || postVisibility)) {
-        res.status(400).json({error: 'at least one of following must be prvoided: caption, hashtag, image, or visibility must be provided'});
-        return;
+
+    //check if at least one of caption, hashtag, or image is provided
+    if (!((authUtils.isOK(caption) || authUtils.isOK(hashtag) || authUtils.isOK(image)) || authUtils.isOK(postVisibility))) {
+        return res.status(400).json({error: 'at least one of caption, hashtag, or image must be provided OR one or more of your inputs is potentially an SQL injection attack'});
+    }
+    // Verify the user's original username for security reasons
+    if (!req.session || req.session.username !== username) {
+        return res.status(401).json({ error: 'Unauthorized request: this user is not authenticated or does not have permission to modify this profile.' });
     }
 
     //get the post from the database
-    const post = await db.send_sql('SELECT 1 FROM posts WHERE postID = ?', postID);
+    const post = await db.send_sql(`SELECT 1 FROM posts WHERE postID = ${postID}`);
 
-    //check if the post exists and if the userID matches
-    if (!post || post.userID !== userID) {
+    //check if the post exists and if the username matches
+    if (!post || post.username !== username) {
         res.status(403).json({ error: 'post does not exist or it is not your post  to delete'});
         return;
     }  
     try {
-        await updatePost(postID, userID, caption, hashtag, image, postVisibility, post_json);
+        await updatePost(postID, username, caption, hashtag, image, postVisibility, post_json);
         res.status(200).json({message: 'Post updated'});
     } catch (error) {
         res.status(500).json({error: 'Error querying database'});
