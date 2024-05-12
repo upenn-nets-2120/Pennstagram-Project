@@ -2,9 +2,10 @@ import db from '../../db-setup/db_access.js';
 
 const getTopHashtags = async (limit) => {
     const sql = `
-        SELECT hashtag, COUNT(*) as count
-        FROM user_hashtags
-        GROUP BY hashtag
+        SELECT h.phrase, COUNT(u.hashtagID) as count
+        FROM users2hashtags u
+        JOIN hashtags h ON u.hashtagID = h.hashtagID
+        GROUP BY u.hashtagID
         ORDER BY count DESC
         LIMIT ${limit}
     ;`;

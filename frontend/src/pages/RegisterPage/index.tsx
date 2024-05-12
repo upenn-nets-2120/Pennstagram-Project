@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import Select from 'react-select';
 import styled from 'styled-components';
 import config from '../../config.json';
 import { useNavigate } from 'react-router-dom';
@@ -58,38 +59,66 @@ const RegisterPage: React.FC = () => {
     const [email, setEmail] = useState('');
     const [affiliation, setAffiliation] = useState('');
     const [birthday, setBirthday] = useState('');
-    const [profilePic, setProfilePic] = useState<File | null>(null);
-    const [hashtags, setHashtags] = useState<string[]>([]);
-
+    const [profilePhoto, setProfilePhoto] = useState<File | null>(null);
+    const [hashtags, setHashtags] = useState([]);
+    const [selectedHashtags, setSelectedHashtags] = useState([]);
+    
     const handleProfilePicChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.files && e.target.files.length > 0) {
-            setProfilePic(e.target.files[0]);
+            setProfilePhoto(e.target.files[0]);
         }
     };
 
-    const handleHashtagChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-        const selected = Array.from(e.target.selectedOptions, (option) => option.value);
-        setHashtags(selected);
+
+    useEffect(() => {
+        // Function to fetch hashtags
+        const fetchHashtags = async () => {
+            try {
+                const response = await axios.get(`${rootURL}/registration/select-hashtags`);
+                if (response) {
+                    setHashtags(response.data.popularHashtags);
+                } else {
+                    throw new Error('Failed to fetch hashtags');
+                }
+            } catch (error) {
+                console.error('Error fetching hashtags:', error);
+            }
+        };
+
+        fetchHashtags();
+    }, []);
+
+    const handleHashtagChange = (selectedOptions: React.SetStateAction<never[]>) => {
+        setSelectedHashtags(selectedOptions);
+        console.log("Selected Hashtags: ", selectedOptions);
     };
+
+    const hashtagOptions = hashtags.map(hashtag => ({
+        label: `#${hashtag['phrase']}`, 
+        value: hashtag['hashtagID'] 
+    }));
+
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (username && password && confirmPassword && email && affiliation && birthday && hashtags && profilePic) {
+        if (username && password && confirmPassword && email && affiliation && birthday && hashtags && profilePhoto) {
             if (password !== confirmPassword) {
                 alert('Passwords do not match');
                 return;
             }
             try {
                 console.log(`${config.serverRootURL}/registration`)
-                const response1 = await axios.post(`${rootURL}/registration`, {
+                const response = await axios.post(`${rootURL}/registration`, {
                     username: username,
                     password: password,
                     email: email,
                     affiliation: affiliation,
                     birthday: birthday,
+                    profilePhoto: profilePhoto,
+                    hashtags: selectedHashtags,
                   });
-                console.log(response1.status);
-                console.log(response1);
+                console.log(response.status);
+                console.log(response);
 
                 // const response2 = await axios.post(`${rootURL}/registration/upload-profile-photo`, {
                 //     username: username,
@@ -99,14 +128,14 @@ const RegisterPage: React.FC = () => {
                 // console.log(response2.status);
                 // console.log(response2);
 
-                const response3 = await axios.post(`${rootURL}/registration/select-hashtags`, {
-                    userID: response1,
-                    hashtags: hashtags,
-                  });
+                // const response3 = await axios.post(`${rootURL}/registration/select-hashtags`, {
+                //     userID: response1,
+                //     hashtags: hashtags,
+                //   });
 
-                console.log(response3.status);
-                console.log(response3);
-                if ((response1.status === 200) && (response3.status === 200)) {
+                // console.log(response3.status);
+                // console.log(response3);
+                if (response.status === 200) {
                     navigate('/${username}/feed'); 
                 } else {
                     alert('Registration failed'); 
@@ -172,14 +201,16 @@ const RegisterPage: React.FC = () => {
                 />
                 {/* Hashtag Selection */}
                 <label>Hashtags of Interest</label>
-                <SelectField multiple onChange={handleHashtagChange}>
-                    <option value="#technology">Technology</option>
-                    <option value="#music">Music</option>
-                    <option value="#travel">Travel</option>
-                    <option value="#fitness">Fitness</option>
-                    <option value="#gaming">Gaming</option>
-                    <option value="#food">Food</option>
-                </SelectField>
+                    <Select
+                    isMulti
+                    name="hashtags"
+                    options={hashtagOptions}
+                    className="basic-multi-select"
+                    classNamePrefix="select"
+                    value={selectedHashtags}
+                    onChange={handleHashtagChange}
+                    placeholder="Select hashtags..."
+                />
                 <SubmitButton type="submit">Submit</SubmitButton>
             </RegisterForm>
 
