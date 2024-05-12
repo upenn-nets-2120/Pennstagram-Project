@@ -21,10 +21,6 @@ const comparePassword = (password, hash, callback) => {
     });
 };
 
-const isLoggedIn = (str) => {
-    return str != null && /^[A-Za-z0-9 \.\?,_]+$/.test(str);
-};
-
 const isOK = (str) => {
     return str != null && /^[A-Za-z0-9 \.\?,_]+$/.test(str);
 };
@@ -33,5 +29,4 @@ export default {
     encryptPassword,
     comparePassword,
     isOK,
-    isLoggedIn
 };

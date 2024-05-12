@@ -10,6 +10,7 @@ const usersCreateTable = async (db) => {
             actors VARCHAR(255),
             birthday VARCHAR(255),
             affiliation VARCHAR(255),
+            linked_actor_nconst VARCHAR(10),
             inviters INT,
             userProfilePic BLOB,
             userScore INT,
