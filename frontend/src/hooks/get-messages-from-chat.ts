@@ -13,7 +13,19 @@ export const getMessagesFromChat = async (chatID: string): Promise<Message[]> =>
                 firstName: messageData.firstName || '',
                 lastName: messageData.lastName || '',
                 profilePic: messageData.userProfilePic || '',
-                relationship: 'Following',
+                salted_password: null,
+                emailID: null,
+                actors: undefined,
+                birthday: null,
+                affiliation: null,
+                linked_actor_nconst: null,
+                inviters: undefined,
+                userProfilePic: null,
+                userScore: null,
+                userVisibility: null,
+                sessionToken: null,
+                follows_back: null,
+                requested: null
             };
 
             return {

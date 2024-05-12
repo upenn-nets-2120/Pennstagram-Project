@@ -6,16 +6,17 @@ import {
 
 const updatePost = async (postID, caption, hashtag, image, postVisibility, post_json) => {
     const updates = [];
-    if (caption !== undefined) {
+    console.log('PostID:', postID, 'Caption:', caption, 'Hashtag:', hashtag, 'Image:', image, 'PostVisibility:', postVisibility, 'Post_json:', post_json);
+    if (caption != undefined) {
         updates.push(`caption = '${caption}'`);
     }
-    if (image !== undefined) {
+    if (image != undefined) {
         updates.push(`image = '${image}'`);
     }
-    if (postVisibility !== undefined) {
+    if (postVisibility != undefined) {
         updates.push(`postVisibility = '${postVisibility}'`);
     }
-    if (post_json !== undefined) {
+    if (post_json != undefined) {
         const post_json_string = JSON.stringify(post_json);
         updates.push(`post_json = '${post_json_string}'`);
     }

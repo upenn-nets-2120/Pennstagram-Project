@@ -3,7 +3,9 @@ import db from '../../db-setup/db_access.js';
 const getFollowedsFromUser = async (userID) => {
     const sql = `
         SELECT
-            *
+            *,
+            1 AS follows_back,
+            0 AS requested
         FROM
             friends
         JOIN

@@ -4,6 +4,8 @@ export const LOGIN_PATH = '/login';
 export const FEED_PATH = '/feed';
 export const FRIENDS_PATH = '/friends';
 export const CHAT_PATH = '/chat/:chatID?';
+export const FORGOT_PATH = '/forgot-password';
+export const NEWPASS_PATH = '/new-password';
 
 export type RouterPathsMap = {
     [HOME_PATH]: {
@@ -28,6 +30,14 @@ export type RouterPathsMap = {
     };
     [CHAT_PATH]: {
         urlParams: { chatID?: number };
+        queryParams: undefined;
+    };
+    [FORGOT_PATH]: {
+        urlParams: undefined;
+        queryParams: undefined;
+    };
+    [NEWPASS_PATH]: {
+        urlParams: undefined;
         queryParams: undefined;
     };
 };

@@ -1,1 +1,1 @@
-export type FriendTabOption = 'Following' | 'Followed By' | 'Recommended';
+export type FriendTabOption = 'Following' | 'Followed By' | 'Recommended' | 'Requests';

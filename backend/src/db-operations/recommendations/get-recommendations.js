@@ -9,7 +9,7 @@ const getRecommendationsFromUser = async (userID) => {
         JOIN
             users ON recommendations.userID = users.userID
         WHERE
-            recommendations.recommended = '${userID}'
+            recommendations.recommendedID = '${userID}'
     ;`;
 
     return await db.send_sql(sql);
