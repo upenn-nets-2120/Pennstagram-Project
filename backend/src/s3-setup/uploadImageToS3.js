@@ -1,12 +1,6 @@
-import { s3 } from './s3_access.js';
-import fs from 'fs';
-import path from 'path';
-
-//set up AWS configuration
-AWS.config.update({ region: 'us-east-1' });
-
-//create an S3 instance
-const s3 = new AWS.S3();
+import {s3} from './s3_access.js';
+import fs from 'fs'; //lets us read and write files
+import path from 'path'; //for file system paths to use resolve
 
 //function to upload an image to S3 and return its public URL
 function uploadImageToS3(imagePath) {
@@ -19,7 +13,7 @@ function uploadImageToS3(imagePath) {
     //set up parameters for the S3 upload
     const params = {
         Bucket: 'images-upenn-nets2120',
-        Key: key,
+        Key: key, 
         Body: fileStream,
         ContentType: 'image/jpeg'
     };
