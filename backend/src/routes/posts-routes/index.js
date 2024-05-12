@@ -40,8 +40,6 @@ posts.post('/newPost', async (req, res) => {
     const {caption, hashtag, image, postVisibility} = req.body;
     const username = req.session.username; // USE req.session.username INSTEAD
 
-    console.log("Caption: ", caption);
-
     try {
         if (authUtils.isOK(caption)) {
             console.log("checked is okay");
@@ -77,11 +75,7 @@ posts.post('/newPost', async (req, res) => {
     };
 
     const newPost = {username, caption, hashtag, image, postVisibility, post_json: JSON.stringify(post_json)};
-    //const newPostParams = [caption, hashtag, image, postVisibility, userID];
-    //const sql = 'INSERT INTO posts (caption, hashtag, image, postVisibility, nconstID) VALUES (?, ?, ?, ?, ?)'; 
     try {
-        //await createPost(newPost);
-        //await db.send_sql(sql, newPostParams);
         const postID = await createPost(newPost);
         post_json.post_uuid_within_site = postID;
         newPost.post_json = JSON.stringify(post_json);
