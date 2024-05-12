@@ -3,13 +3,25 @@ import { User } from '../entities/User';
 
 const sampleUser: User = {
     userID: 1,
-    username: "sampleUser",
-    firstName: "John",
-    lastName: "Doe",
-    profilePic: "https://example.com/profilepic.jpg",
-    online: true,
-    relationship: 'Following',
+    username: "testUser12345",
+    firstName: null,
+    lastName: null,
+    profilePic: null,
+    salted_password: null,
+    emailID: null,
+    actors: null,
+    birthday: null,
+    affiliation: null,
+    linked_actor_nconst: null,
+    inviters: null,
+    userProfilePic: null,
+    userScore: null,
+    userVisibility: null,
+    sessionToken: null,
+    follows_back: null,
+    requested: null
 };
+
 
 export const UserContext = React.createContext<{
     user: User; // Make user non-nullable

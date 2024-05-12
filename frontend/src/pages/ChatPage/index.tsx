@@ -23,11 +23,12 @@ const ChatPage: React.FC = () => {
     const navigate = useNavigate();
 
     const [chats, setChats] = useState<Chat[]>([]);
+    const [chat, setChat] = useState<Chat | undefined>(undefined);
     const [messages, setMessages] = useState<Message[]>([]);
 
     useEffect(() => {
         const init = async () => {
-            setChats(await getChatsFromUser((await getFollowed(1))[0]));
+            setChats(await getChatsFromUser((await getFollowed(user.userID))[0]));
         };
         init();
     }, []);
@@ -43,6 +44,10 @@ const ChatPage: React.FC = () => {
 
         init();
     }, [chatID]);
+    
+    useEffect(() => {
+        setChat(findChatById(chats, chatID));
+    }, [chats, chatID]);
 
     const handleCreateChat = () => {
         navigate('/chat/create');
@@ -91,7 +96,7 @@ const ChatPage: React.FC = () => {
                         ) : chatID === undefined ? (
                             <button onClick={handleCreateChat}>Create Chat</button>
                         ) : (
-                            <DisplayMessages messages={messages} chat={findChatById(chats, chatID)} sendMessage={handleSendMessage} />
+                            <DisplayMessages messages={messages} chat={chat} sendMessage={handleSendMessage} />
                         )}
                     </Column>
                 </Row>

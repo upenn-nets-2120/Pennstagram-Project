@@ -5,7 +5,7 @@ const addRequest = async (userID, requesting) => {
         INSERT INTO
             requests (userID, requesting)
         VALUES 
-            (${userID}', '${requesting}')
+            ('${userID}', '${requesting}')
     ;`;
 
     return await db.insert_items(sql);

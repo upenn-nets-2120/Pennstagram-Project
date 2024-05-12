@@ -1,6 +1,6 @@
 import { Chat } from "../entities/Chat";
 
-const findChatById = (chats: Chat[], chatID: string): Chat => {
+const findChatById = (chats: Chat[], chatID: string | undefined): Chat => {
     const foundChat = chats.find(chat => chat.chatID === chatID);
     return foundChat ? foundChat : chats[0];
 };

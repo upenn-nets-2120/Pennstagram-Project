@@ -2,9 +2,9 @@ import axios from 'axios';
 import { User } from "../entities/User";
 import { backend_url } from '../constants/backendURL';
 
-export const getFollowing = async (userID: number): Promise<User[]> => {
+export const getRequests = async (userID: number): Promise<User[]> => {
     try {
-        const response = await axios.get(`${backend_url}/friends/followeds/${userID}`);
+        const response = await axios.get(`${backend_url}/friends/requesters/${userID}`);
 
         const users: User[] = response.data.map((follower: any) => ({
             userID: follower.userID || null,
@@ -25,6 +25,8 @@ export const getFollowing = async (userID: number): Promise<User[]> => {
             follows_back: follower.follows_back === 1 ? true : false,
             requested: follower.requested === 1 ? true : false
         }));
+
+        console.log(users);
         
         return users;
     } catch (error) {
