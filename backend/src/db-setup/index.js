@@ -40,9 +40,9 @@ const create_tables = async (db) => {
     requestsCreateTable(db),
     users2postsCreateTable(db),
     users2chatsCreateTable(db),
-    users2actorsCreateTable(db),
     actorsCreateTable(db),
-    actorsLoadTable(db)
+    actorsLoadTable(db),
+    users2actorsCreateTable(db)
   ]);
 }
 
