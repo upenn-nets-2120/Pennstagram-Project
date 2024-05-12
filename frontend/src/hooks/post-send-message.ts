@@ -8,7 +8,7 @@ export const postSendMessage = async (user: User, chatID: string, content: strin
             chatID,
             content,
         });
-        console.log('Message sent successfully');
+
         return true;
     } catch (error) {
         console.error('Error posting message:', error);

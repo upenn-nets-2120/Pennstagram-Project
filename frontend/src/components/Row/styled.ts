@@ -10,7 +10,7 @@ export const RowStyled = styled.div<RowStyledProps>`
     display: flex;
     flex-direction: row;
     align-items: center;
-    justify-content: ${({ justifyContent }) => justifyContent || 'space-between'};
+    justify-content: ${({ justifyContent }) => justifyContent || 'space-around'};
     height: ${({ height }) => height || '100%'};
     width: 100%;
     background-color: ${({ color }) => color || 'transparent'};
