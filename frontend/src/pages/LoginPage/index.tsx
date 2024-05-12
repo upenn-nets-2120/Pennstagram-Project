@@ -1,5 +1,8 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
+import config from '../../config.json';
+import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 
 const LoginContainer = styled.div`
     display: flex;
@@ -39,28 +42,39 @@ const SubmitButton = styled.button`
     }
 `;
 
-const FeedbackMessage = styled.div`
-    margin-top: 15px;
-    color: green;
-`;
 
 const LoginPage: React.FC = () => {
+    const rootURL = config.serverRootURL;
+    const navigate = useNavigate(); 
+
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
-    const [showFeedback, setShowFeedback] = useState(false);
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleLogin = async (e: { preventDefault: () => void; }) => {
         e.preventDefault();
-        if (username && password) {
-            setShowFeedback(true);
-        } else {
-            alert('Please enter both a username and a password.');
-        }
-    };
+        try {
+          console.log("User and pass", {username, password});
+          const response = await axios.post(`${rootURL}/login`, {
+            username: username,
+            password: password
+          });
+          console.log("HELLO");
+          // console.log(response.status);
+          // console.log("Response:", response);
+          if (response.status === 200) {
+            console.log('success!');
+            navigate('/feed'); 
+          } else {
+            alert('Log in failed'); 
+          }
+        } catch (error) {
+          alert('Log in failed: ' + error);
+        }  
+      };
 
     return (
         <LoginContainer>
-            <LoginForm onSubmit={handleSubmit}>
+            <LoginForm onSubmit={handleLogin}>
                 <h2>Login</h2>
                 <InputField
                     type="text"
@@ -76,12 +90,6 @@ const LoginPage: React.FC = () => {
                 />
                 <SubmitButton type="submit">Submit</SubmitButton>
             </LoginForm>
-
-            {showFeedback && (
-                <FeedbackMessage>
-                    Login successful! Now proceed to the <a href="/feed">Feed</a> page.
-                </FeedbackMessage>
-            )}
         </LoginContainer>
     );
 };
