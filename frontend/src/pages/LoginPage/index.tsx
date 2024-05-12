@@ -50,18 +50,20 @@ const LoginPage: React.FC = () => {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
 
-    const handleLogin = async () => {
+    const handleLogin = async (e: { preventDefault: () => void; }) => {
+        e.preventDefault();
         try {
+          console.log("User and pass", {username, password});
           const response = await axios.post(`${rootURL}/login`, {
             username: username,
             password: password
           });
-
-          console.log(response.status);
-          console.log(response);
+          console.log("HELLO");
+          // console.log(response.status);
+          // console.log("Response:", response);
           if (response.status === 200) {
-            console.log('success!')
-            navigate(`/feed`); 
+            console.log('success!');
+            navigate('/feed'); 
           } else {
             alert('Log in failed'); 
           }
@@ -86,7 +88,7 @@ const LoginPage: React.FC = () => {
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                 />
-                <SubmitButton type="submit" onClick={handleLogin}>Submit</SubmitButton>
+                <SubmitButton type="submit">Submit</SubmitButton>
             </LoginForm>
         </LoginContainer>
     );

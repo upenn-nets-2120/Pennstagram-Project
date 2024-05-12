@@ -80,6 +80,7 @@ const RegisterPage: React.FC = () => {
         const fetchHashtags = async () => {
             try {
                 const response = await axios.get(`${rootURL}/registration/select-hashtags`);
+                console.log("HASHTAGS", response.data);
                 if (response) {
                     // setHashtags(response.data.popularHashtags);
                     setHashtags(response.data.popularHashtags.map((h: any) => ({
@@ -90,16 +91,42 @@ const RegisterPage: React.FC = () => {
                     throw new Error('Failed to fetch hashtags');
                 }
             } catch (error) {
-                console.error('Error fetching hashtags:', error);
+                let errorMessage: string;
+            
+            // Type guard to ensure it's an instance of AxiosError
+            if (axios.isAxiosError(error)) {
+                // Axios-specific error handling
+                errorMessage = error.response?.data.error || 'An error occurred';
+                console.error(`Error fetching hashtags: ${errorMessage}`);
+                const errorDetails = {
+                    message: errorMessage,
+                    status: error.response?.status || 'Unknown status'
+                };
+                return errorDetails;
+            } else {
+                // Generic error handling
+                errorMessage = 'An unexpected error occurred';
+                console.error(errorMessage);
+                return { message: errorMessage, status: 'Unknown status' };
+            }
             }
         };
 
         fetchHashtags();
     }, []);
 
-    const handleHashtagChange = (selectedOptions: MultiValue<HashtagOption>, actionMeta: ActionMeta<HashtagOption>) => {
-        setSelectedHashtags(selectedOptions as HashtagOption[]);
+    const handleHashtagChange = (newSelected: MultiValue<HashtagOption>) => {
+        const newSelectedHashtags = Array.from(newSelected);
+    
+        setSelectedHashtags(newSelectedHashtags);
+    
+        // Create a Set for the selected IDs to filter out from available hashtags
+        const selectedIds = new Set(newSelectedHashtags.map((h) => h.value));
+    
+        // Filter out selected hashtags from the original list
+        setHashtags(hashtags.filter((h) => !selectedIds.has(h.value)));
     };
+    
 
     // const handleHashtagChange = (selectedOptions: MultiValue<HashtagOption, true>, actionMeta: ActionMeta<HashtagOption>) => {
     //     console.log("Selected Hashtags: ", selectedOptions);
@@ -121,6 +148,7 @@ const RegisterPage: React.FC = () => {
             }
             try {
                 console.log(`${config.serverRootURL}/registration`)
+                console.log("DATA: ", {username, password, email, affiliation, birthday, profilePhoto, selectedHashtags});
                 const response = await axios.post(`${rootURL}/registration`, {
                     username: username,
                     password: password,
@@ -154,7 +182,24 @@ const RegisterPage: React.FC = () => {
                     alert('Registration failed'); 
                 }
             } catch (error) {
-                alert('Registration failed: ' + error); 
+                let errorMessage: string;
+            
+            // Type guard to ensure it's an instance of AxiosError
+            if (axios.isAxiosError(error)) {
+                // Axios-specific error handling
+                errorMessage = error.response?.data.error || 'An error occurred';
+                console.error(`Registration failed: ${errorMessage}`);
+                const errorDetails = {
+                    message: errorMessage,
+                    status: error.response?.status || 'Unknown status'
+                };
+                return errorDetails;
+            } else {
+                // Generic error handling
+                errorMessage = 'An unexpected error occurred';
+                console.error(errorMessage);
+                return { message: errorMessage, status: 'Unknown status' };
+            }
             }
         } else {
             alert('One or more required fields are missing.');
