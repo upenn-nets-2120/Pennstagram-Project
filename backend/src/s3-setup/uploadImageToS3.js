@@ -1,4 +1,4 @@
-import AWS from 'aws-sdk';
+import { s3 } from './s3_access.js';
 import fs from 'fs';
 import path from 'path';
 
@@ -38,3 +38,8 @@ function uploadImageToS3(imagePath) {
 }
 
 export {uploadImageToS3};
+
+
+//set up the AWS SDK configuration with the region
+//create instance of S3 service
+//uploadeIMageToS3 --> take image path, generate S3 key for imageID?, read image file stream, upload image to S3 bucket, return S3 URL of image
