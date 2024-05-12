@@ -96,27 +96,6 @@ posts.post('/newPost', async (req, res) => {
         res.status(500).json({error: 'Error creating post'});
     }
 });
-/*
-    const newPost = {username, caption, hashtag, image, postVisibility, post_json: JSON.stringify(post_json)};
-    try {
-        const postID = await createPost(newPost);
-        post_json.post_uuid_within_site = postID;
-        newPost.post_json = JSON.stringify(post_json);
-        await updatePostJson(postID, newPost.post_json);        
-        res.status(201).json({message: 'Post created', postID: postID});
-    } catch (error) {
-        res.status(500).json({error: 'Error querying database', details: error.message});
-    }
-});*/
-
-// const updatePostJson = async (postID, post_json) => {
-//     const query = `
-//         UPDATE posts
-//         SET post_json = ?
-//         WHERE postID = ?
-//     `;
-//     await db.send_sql(query, [post_json, postID]);
-// };
 
 //update a post
 posts.put('/updatePost/:postID', async (req, res) => {
