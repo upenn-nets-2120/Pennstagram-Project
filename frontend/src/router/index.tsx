@@ -7,6 +7,8 @@ import {
    LOGIN_PATH,
    FRIENDS_PATH,
    CHAT_PATH,
+   FORGOT_PATH,
+   NEWPASS_PATH,
 } from './paths';
 import {
    FriendsPage,
@@ -14,6 +16,8 @@ import {
    HomePage,
    RegisterPage,
    LoginPage,
+   ForgotPasswordPage,
+   NewPasswordPage,
 } from '../pages';
 
 
@@ -26,6 +30,8 @@ const Router: React.FC = () => {
             <Route path={LOGIN_PATH} element={ <LoginPage /> } />
             <Route path={FRIENDS_PATH} element={ <FriendsPage /> } />
             <Route path={CHAT_PATH} element={ <ChatPage /> } />
+            <Route path={FORGOT_PATH} element={ <ForgotPasswordPage /> } />
+            <Route path={NEWPASS_PATH} element={ <NewPasswordPage /> } />
             <Route path="/" element={<Navigate replace to={HOME_PATH} />} />
          </Routes>
       </BrowserRouter>

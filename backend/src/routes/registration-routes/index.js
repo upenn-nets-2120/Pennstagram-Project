@@ -12,7 +12,7 @@ import authUtils from '../../utils/authUtils.js';
 const register = express.Router();
 
 register.post('/', async (req, res) => {
-    const { username, password, email, affiliation, birthday, profilePhoto, hashtags } = req.body;
+    const { username, password, email, affiliation, birthday, profilePhoto, hashtags, userVisibility } = req.body;
 
     if (!username || !password || !email || !affiliation || !birthday) {
         return res.status(400).json({ error: 'All fields are required' });
@@ -51,7 +51,7 @@ register.post('/', async (req, res) => {
 
     // add the user to the database if we got here
     try {
-        await addUser(username, encryptedPassword, email, affiliation, birthday);
+        await addUser(username, encryptedPassword, email, affiliation, birthday, userVisibility);
     } catch (error) {
         console.log(error);
         return res.status(500).json({ error: 'Error adding user to database' });
