@@ -1,10 +1,8 @@
 import styled from 'styled-components';
 
 export const ProfilePicStyled = styled.img`
-    width: 18%;
-    height: auto;
+    max-width: 100%;
+    max-height: 100%;
     object-fit: contain;
     border-radius: 50%;
-    margin-right: 10px;
-    padding: 5px;
 `;
