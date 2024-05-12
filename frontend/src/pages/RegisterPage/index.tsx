@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import Select from 'react-select';
+import Select, { MultiValue, ActionMeta } from 'react-select';
 import styled from 'styled-components';
 import config from '../../config.json';
 import { useNavigate } from 'react-router-dom';
@@ -53,6 +53,11 @@ const RegisterPage: React.FC = () => {
     const rootURL = config.serverRootURL;
     const navigate = useNavigate(); 
 
+    interface HashtagOption {
+        label: string;
+        value: number;
+      }
+
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
@@ -60,8 +65,8 @@ const RegisterPage: React.FC = () => {
     const [affiliation, setAffiliation] = useState('');
     const [birthday, setBirthday] = useState('');
     const [profilePhoto, setProfilePhoto] = useState<File | null>(null);
-    const [hashtags, setHashtags] = useState([]);
-    const [selectedHashtags, setSelectedHashtags] = useState([]);
+    const [hashtags, setHashtags] = useState<HashtagOption[]>([]);
+    const [selectedHashtags, setSelectedHashtags] = useState<HashtagOption[]>([]);
     
     const handleProfilePicChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.files && e.target.files.length > 0) {
@@ -76,7 +81,11 @@ const RegisterPage: React.FC = () => {
             try {
                 const response = await axios.get(`${rootURL}/registration/select-hashtags`);
                 if (response) {
-                    setHashtags(response.data.popularHashtags);
+                    // setHashtags(response.data.popularHashtags);
+                    setHashtags(response.data.popularHashtags.map((h: any) => ({
+                        label: `#${h.phrase}`,
+                        value: h.hashtagID
+                    })));
                 } else {
                     throw new Error('Failed to fetch hashtags');
                 }
@@ -88,15 +97,19 @@ const RegisterPage: React.FC = () => {
         fetchHashtags();
     }, []);
 
-    const handleHashtagChange = (selectedOptions: React.SetStateAction<never[]>) => {
-        setSelectedHashtags(selectedOptions);
-        console.log("Selected Hashtags: ", selectedOptions);
+    const handleHashtagChange = (selectedOptions: MultiValue<HashtagOption>, actionMeta: ActionMeta<HashtagOption>) => {
+        setSelectedHashtags(selectedOptions as HashtagOption[]);
     };
 
-    const hashtagOptions = hashtags.map(hashtag => ({
-        label: `#${hashtag['phrase']}`, 
-        value: hashtag['hashtagID'] 
-    }));
+    // const handleHashtagChange = (selectedOptions: MultiValue<HashtagOption, true>, actionMeta: ActionMeta<HashtagOption>) => {
+    //     console.log("Selected Hashtags: ", selectedOptions);
+    //     setSelectedHashtags(selectedOptions);
+    //   };
+
+    // const hashtagOptions = hashtags.map(hashtag => ({
+    //     label: `#${hashtag['phrase']}`, 
+    //     value: hashtag['hashtagID'] 
+    // }));
 
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -136,7 +149,7 @@ const RegisterPage: React.FC = () => {
                 // console.log(response3.status);
                 // console.log(response3);
                 if (response.status === 200) {
-                    navigate('/${username}/feed'); 
+                    navigate('/feed'); 
                 } else {
                     alert('Registration failed'); 
                 }
@@ -201,16 +214,16 @@ const RegisterPage: React.FC = () => {
                 />
                 {/* Hashtag Selection */}
                 <label>Hashtags of Interest</label>
-                    <Select
+                <Select
                     isMulti
                     name="hashtags"
-                    options={hashtagOptions}
+                    options={hashtags}
                     className="basic-multi-select"
                     classNamePrefix="select"
                     value={selectedHashtags}
                     onChange={handleHashtagChange}
                     placeholder="Select hashtags..."
-                />
+                    />
                 <SubmitButton type="submit">Submit</SubmitButton>
             </RegisterForm>
 

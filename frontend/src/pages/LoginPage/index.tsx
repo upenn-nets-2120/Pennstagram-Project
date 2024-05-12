@@ -61,7 +61,7 @@ const LoginPage: React.FC = () => {
           console.log(response);
           if (response.status === 200) {
             console.log('success!')
-            navigate(`/${username}/feed`); 
+            navigate(`/feed`); 
           } else {
             alert('Log in failed'); 
           }
