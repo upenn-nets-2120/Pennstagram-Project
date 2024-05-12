@@ -5,12 +5,12 @@ import {
 } from '../index.js';
 
 const commentPost = async (postID, userID, content, parentCommentID) => {
-    const query = `INSERT INTO comments (postID, userID, content, parentCommentID) VALUES (${postID}, ${userID}, '${comment}', ${parentCommentID || 'NULL'})`;
+    const query = `INSERT INTO comments (postID, userID, content, parentCommentID) VALUES (${postID}, ${userID}, '${content}', ${parentCommentID || 'NULL'})`;
     const result = await db.send_sql(query);
     const commentID = result.insertId;
 
-    if (comment.includes('#')) {
-        const extractedHashtags = extractHashtags(comment);
+    if (content.includes('#')) {
+        const extractedHashtags = extractHashtags(content);
         await linkHashtagsToPost(extractedHashtags, postID);
     }
     return commentID;

@@ -9,13 +9,13 @@ const fetchPostsForUser = async (userID) => {
         JOIN users u ON p.userID = u.userID
         JOIN ranks ur ON u.userID = ur.id AND ur.type = 'user'
         WHERE p.userID IN (
-            SELECT friendID FROM friends WHERE userID = ?
+            SELECT friendID FROM friends WHERE userID = ${userID}
         ) OR p.hashtag IN (
-            SELECT hashtag FROM user_hashtags WHERE userID = ?
+            SELECT hashtag FROM user_hashtags WHERE userID = ${userID}
         )
         ORDER BY postRank DESC, userRank DESC, p.timeStamp DESC;
     `;
-    return await db.send_sql(query, [userID, userID]);
+    return await db.send_sql(query);
 };
 
 /*double check this logic
