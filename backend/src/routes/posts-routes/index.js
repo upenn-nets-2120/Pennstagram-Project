@@ -8,6 +8,7 @@ import {
     commentPost,
     fetchPostsForUser
 } from '../../db-operations/index.js';
+import authUtils from '../../utils/authUtils.js';
 
 const posts = express.Router();
 
@@ -16,6 +17,15 @@ const posts = express.Router();
 
 //fetch all posts
 posts.get('/fetchAllPosts', async (req, res) => {
+    if (!authUtils.isOK(username)) {
+        return res.status(403).json({error: 'You forgot an input OR: one or more of your inputs is potentially an SQL injection attack.'})
+    }
+
+    // Verify the user's original username for security reasons
+    if (!req.session || req.session.username !== username) {
+        return res.status(401).json({ error: 'Unauthorized request: this user is not authenticated or does not have permission to modify this profile.' });
+    }
+
     const posts = await db.send_sql('SELECT * FROM posts;');
     try {
         const posts = await db.send_sql(sql);
@@ -28,61 +38,115 @@ posts.get('/fetchAllPosts', async (req, res) => {
 //create a new post
 posts.post('/newPost', async (req, res) => {
     const {caption, hashtag, image, postVisibility} = req.body;
-    const userID = req.session.userID; // USE req.session.username INSTEAD
+    const username = req.session.username; // USE req.session.username INSTEAD
 
     //check if at least one of caption, hashtag, or image is provided
-    if (!(caption || hashtag || image)) {
-        res.status(400).json({error: 'at least one of caption, hashtag, or image must be provided'});
-        return;
+    if (!((authUtils.isOK(caption) || authUtils.isOK(hashtag) || authUtils.isOK(image)))) {
+        return res.status(400).json({error: 'at least one of caption, hashtag, or image must be provided OR one or more of your inputs is potentially an SQL injection attack'});
     }
+    // Verify the user's original username for security reasons
+    if (!req.session || req.session.username !== username || req.session.username == null) {
+        return res.status(401).json({ error: 'Unauthorized request: this user is not authenticated or does not have permission to modify this profile.' });
+    }
+
     //check if postVisibility is provided
-    if (!postVisibility) {
+    if (!postVisibility || !['everyone', 'private', 'followers'].includes(postVisibility)) {
         res.status(400).json({error: 'postVisibility is required'});
         return;
      }
      
+    // const kafkaPost = {
+    //     post_json: {
+    //         username: username,
+    //         source_site: 'g07',
+    //         post_uuid_within_site: null, //gets replaced with the postID of the new post
+    //         post_text: caption,
+    //         content_type: 'BLOB' //NOTE: replace with public url to the s3 image file
+    //     },
+    //     attach: {image}
+    // }
+     
      const post_json = {
-        username: userID,
-        source_site: 'g07', // replace with your team number
-        post_uuid_within_site: postID, // replace with the postID of the new post
+        username: username,
+        source_site: 'g07',
+        post_uuid_within_site: null, //replace with the postID of the new post
         post_text: caption,
-        content_type: 'BLOB' // replace with the content type of the image
+     };
+
+    const getUserID = async (username) => {
+        const query = `SELECT userID FROM users WHERE username = '${username}'`;
+        const result = await db.send_sql(query);
+        return result[0].userID;
     };
 
-    const newPost = {userID, caption, hashtag, image, postVisibility, post_json: JSON.stringify(post_json)};
-    //const newPostParams = [caption, hashtag, image, postVisibility, userID];
-    //const sql = 'INSERT INTO posts (caption, hashtag, image, postVisibility, nconstID) VALUES (?, ?, ?, ?, ?)'; 
+    const usernamesUserID = await getUserID(username);
+
+    const newPostData = {
+        userID: usernamesUserID,
+        image: image,
+        caption: caption,
+        postVisibility: postVisibility,
+        post_json: post_json // Object, not a string
+    };
     try {
-        await createPost(newPost);
-        //await db.send_sql(sql, newPostParams);
-        res.status(201).json({message: 'Post created'});
+        const postID = await createPost(newPostData);
+        res.status(201).json({message: 'Post created', postID: postID});
     } catch (error) {
-        res.status(500).json({error: 'Error querying database'});
+        console.error("Error creating post: ", error);
+        res.status(500).json({error: 'Error creating post'});
     }
 });
 
 //update a post
-posts.put('/updatePost', async (req, res) => {
-    const {postID, post_json} = req.params;
+posts.put('/updatePost/:postID', async (req, res) => {
+    const postID = Number(req.params.postID);
+    if (isNaN(postID)) {
+        return res.status(400).json({error: 'Invalid postID'});
+    }
     const {caption, hashtag, image, postVisibility} = req.body;
-    const userID = req.session.userID; // USE req.session.username INSTEAD
+    const username = req.session.username; // USE req.session.username INSTEAD
+    console.log("postID " + postID);
+    console.log("username " + username);
 
-    //check if at least one of caption, hashtag, image, or visibility is provided
-    if (!(caption || hashtag || image || postVisibility)) {
-        res.status(400).json({error: 'at least one of following must be prvoided: caption, hashtag, image, or visibility must be provided'});
+    //check if at least one of caption, hashtag, or image is provided
+    if (!((authUtils.isOK(caption) || authUtils.isOK(hashtag) || authUtils.isOK(image)) || authUtils.isOK(postVisibility))) {
+        return res.status(400).json({error: 'at least one of caption, hashtag, or image must be provided OR one or more of your inputs is potentially an SQL injection attack'});
+    }
+
+    //check if postVisibility is valid
+    if (!postVisibility || !['everyone', 'private', 'followers'].includes(postVisibility)) {
+        res.status(400).json({error: 'Invalid postVisibility'});
         return;
     }
 
-    //get the post from the database
-    const post = await db.send_sql('SELECT 1 FROM posts WHERE postID = ?', postID);
+    // Verify the user's original username for security reasons
+    if (!req.session || req.session.username !== username || req.session.username == null) {
+        return res.status(401).json({ error: 'Unauthorized request: this user is not authenticated or does not have permission to modify this profile.' });
+    }
 
-    //check if the post exists and if the userID matches
-    if (!post || post.userID !== userID) {
-        res.status(403).json({ error: 'post does not exist or it is not your post  to delete'});
+    //get the post from the database
+    const post = await db.send_sql(`SELECT * FROM posts WHERE postID = ${postID}`);
+    console.log("post " + JSON.stringify(post));
+
+    const postUserID = post[0].userID;
+    const postCaption = post[0].caption;
+    const postHashtag = post[0].hashtag;
+    const postImage = post[0].image;
+    const postVisibilitys = post[0].postVisibility;
+    const postJson = post[0].post_json;
+
+    //get the userID from the username
+    const query = `SELECT userID FROM users WHERE username = '${username}'`;
+    const result = await db.send_sql(query);
+    const userID = result[0].userID;
+
+    //check if the post exists and if the post id and user matches
+    if (post.length == 0 || postUserID != userID) {
+        res.status(403).json({ error: 'post does not exist'});
         return;
     }  
     try {
-        await updatePost(postID, userID, caption, hashtag, image, postVisibility, post_json);
+        await updatePost(postID, postCaption, postHashtag, postImage, postVisibilitys, postJson);
         res.status(200).json({message: 'Post updated'});
     } catch (error) {
         res.status(500).json({error: 'Error querying database'});
@@ -90,21 +154,28 @@ posts.put('/updatePost', async (req, res) => {
 });
 
 //delete a post
-posts.delete('/deletePost', async (req, res) => {
-    const {postID} = req.params;
-    const userID = req.session.userID; // USE req.session.username INSTEAD
+posts.delete('/deletePost/:postID', async (req, res) => {
+    const postID = Number(req.params.postID);
+    if (isNaN(postID)) {
+        return res.status(400).json({error: 'Invalid postID'});
+    }
+    const username = req.session.username; // USE req.session.username INSTEAD
+
+     // Verify the user's original username for security reasons
+    if (!req.session || req.session.username !== username || req.session.username == null) {
+        return res.status(401).json({ error: 'Unauthorized request: this user is not authenticated or does not have permission to modify this profile.' });
+    }
 
     //get the post from the database
-    const post = await db.send_sql('SELECT * FROM posts WHERE postID = ?', postID);
+    const post = await db.send_sql(`SELECT * FROM posts WHERE postID = ${postID}`);
+    console.log("post[0].userID " +  post[0].userID);
 
     //check if the post exists and if the userID matches
-    if (!post || post.userID !== userID) {
+    if (!post || post[0].userID !== username) {
         res.status(403).json({ error: 'post does not exist or not your post to delete'});
         return;
     }   
-    //const sql = 'DELETE FROM posts WHERE postID = ?'; 
     try {
-        //await db.send_sql(sql, postID);
         await deletePost(postID);
         res.status(200).json({message: 'Post deleted.'});
     } catch (error) {
@@ -113,14 +184,19 @@ posts.delete('/deletePost', async (req, res) => {
 });
 
 //like a post
-posts.post('/likePost', async (req, res) => {
-    const {postID} = req.params; //postID
-    const userID = req.body.userID; //userID of the user who likes the post? // USE req.session.username INSTEAD
-    //insert a new like into the likes table
-    //const sql = 'INSERT INTO likes (postID, liker) VALUES (?, ?)'; 
+posts.post('/likePost/:postID', async (req, res) => {
+    const postID = Number(req.params.postID);
+    if (isNaN(postID)) {
+        return res.status(400).json({error: 'Invalid postID'});
+    }
+    const username = req.session.username; 
+    // Verify the user's original username for security reasons
+    if (!req.session || req.session.username !== username || req.session.username == null) {
+        return res.status(401).json({ error: 'Unauthorized request: this user is not authenticated or does not have permission to modify this profile.' });
+    }
+
     try {
-        //await db.send_sql(sql, [postID, userID]);
-        await likePost(postID, userID);
+        await likePost(postID, username);
         res.status(200).json({message: 'Post liked.'});
     } catch (error) {
         res.status(500).json({error: 'Error querying database.'});
@@ -130,9 +206,21 @@ posts.post('/likePost', async (req, res) => {
 
 //comment on a post
 posts.post('/commentPost', async (req, res) => {
-    const {postID} = req.params;
-    const {comment, parentCommentID} = req.body;
-    const userID = req.session.userID; // USE req.session.username INSTEAD
+    const postID = Number(req.params.postID);
+    console.log(`postID in commentPost: ${postID}`);
+
+    if (isNaN(postID)) {
+        return res.status(400).json({error: 'Invalid postID'});
+    }
+    const username = req.session.username; // USE req.session.username INSTEAD
+
+    // Verify the user's original username for security reasons
+    if (!req.session || req.session.username !== username || req.session.username == null) {
+        return res.status(401).json({ error: 'Unauthorized request: this user is not authenticated or does not have permission to modify this profile.' });
+    }
+
+    const {content, parentCommentID} = req.body;
+    console.log(`content: ${content}, parentCommentID: ${parentCommentID}`);
 
     //check if comment is gievn
     if (!comment) {
@@ -140,19 +228,19 @@ posts.post('/commentPost', async (req, res) => {
         return;
     }
 
-    const post = await db.send_sql('SELECT * FROM posts WHERE postID = ?', postID);
+    const post = await db.send_sql(`SELECT * FROM posts WHERE postID = ${postID}`);
+    console.log(`post: ${JSON.stringify(post)}`);
+
+    const postUserID = post[0].userID; 
+    console.log("postUserID " + postUserID);
 
     //check if the actually post exists
-    if (!post) {
+    if (!post || postlength == 0) {
         res.status(404).json({error: 'Post does not exist'});
         return;
     }
-
-    //const newCommentParams = [postID, userID, comment, (parentCommentID || null)];
-    //const sql = 'INSERT INTO comments (postID, userID, comment, parentCommentID) VALUES (?, ?, ?, ?)'; 
     try {
-        await commentPost(postID, userID, comment, parentCommentID);
-        //await db.send_sql(sql, newCommentParams);
+        await commentPost(postID, username, content, parentCommentID);
         res.status(200).json({message: 'Comment posted.'});
     } catch (error) {
         res.status(500).json({error: 'Error querying database.'});
@@ -161,8 +249,12 @@ posts.post('/commentPost', async (req, res) => {
 
 //fetch posts recommended for a user
 posts.get('/fetchPosts', async (req, res) => {
+    // Verify the user's original username for security reasons
+    if (!req.session || req.session.username !== username || req.session.username == null) {
+        return res.status(401).json({ error: 'Unauthorized request: this user is not authenticated or does not have permission to modify this profile.' });
+    }
     try {
-        const posts = await fetchPostsForUser(req.params.userID);
+        const posts = await fetchPostsForUser(req.params.username);
         res.status(200).json(posts);
     } catch (error) {
         res.status(500).json({ error: 'Error querying database' });

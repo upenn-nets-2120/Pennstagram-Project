@@ -36,12 +36,13 @@ public class S3Setup {
         while (partitionIterator.hasNext()) {
             Row row = partitionIterator.next();
 
-            /* TODO: Get embedding string and id from RDD */
-            String embeddingStr = row.getAs("embedding");
-            String id = row.getAs("image"); 
+            /* TODO: Get image URL and id from RDD */
+            String embeddingStr = row.getAs("image_url");
+            String id = row.getAs("image_id"); 
 
             /* TODO: Establish S3 URL */
             String s3Url = "https://" + s3Bucket + ".s3." + Config.AWS_REGION + ".amazonaws.com/" + id;
+            //s3://
 
             // Upload to S3 
             uploadToS3(embeddingStr, s3Bucket, id);

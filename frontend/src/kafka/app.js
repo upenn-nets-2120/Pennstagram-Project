@@ -40,7 +40,7 @@ const runConsumers = async () => {
 
     //twitter consumer
     await twitterConsumer.run({
-        eachMessage: async ({ topic, partition, message }) => { //ask Ives what partition
+        eachMessage: async ({ topic, message }) => { 
             console.log(`Received from ${topic}: ${message.value.toString()}`);
             kafkaMessages.twitter.push({
                 value: message.value.toString(),
@@ -50,7 +50,7 @@ const runConsumers = async () => {
 
     //federated posts 
     await federatedConsumer.run({
-        eachMessage: async ({ topic, partition, message }) => {
+        eachMessage: async ({ topic, message }) => {
             console.log(`Received from ${topic}: ${message.value.toString()}`);
             kafkaMessages.federated.push({
                 value: message.value.toString(),

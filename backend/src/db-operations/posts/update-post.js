@@ -6,29 +6,26 @@ import {
 
 const updatePost = async (postID, caption, hashtag, image, postVisibility, post_json) => {
     const updates = [];
-    const values = [];
-
     if (caption !== undefined) {
-        updates.push('caption = ?');
-        values.push(caption);
+        updates.push(`caption = '${caption}'`);
     }
     if (image !== undefined) {
-        updates.push('image = ?');
-        values.push(image);
+        updates.push(`image = '${image}'`);
     }
     if (postVisibility !== undefined) {
-        updates.push('postVisibility = ?');
-        values.push(postVisibility);
+        updates.push(`postVisibility = '${postVisibility}'`);
     }
     if (post_json !== undefined) {
-        updates.push('post_json = ?');
-        values.push(JSON.stringify(post_json));
+        const post_json_string = JSON.stringify(post_json);
+        updates.push(`post_json = '${post_json_string}'`);
     }
 
+    console.log('Updates:', updates); // Log the updates array
+
     if (updates.length > 0) {
-        const query = `UPDATE posts SET ${updates.join(', ')} WHERE postID = ?`;
-        values.push(postID);
-        await db.send_sql(query, values);
+        const query = `UPDATE posts SET ${updates.join(', ')} WHERE postID = ${postID}`;
+        console.log('Query:', query);
+        await db.send_sql(query);
     }
 
     if (caption !== undefined || hashtag !== undefined) {
@@ -36,6 +33,7 @@ const updatePost = async (postID, caption, hashtag, image, postVisibility, post_
         if (caption && caption.includes('#')) {
             hashtags = [...hashtags, ...extractHashtags(caption)];
         }
+        console.log('Hashtags:', hashtags);
         if (hashtags.length > 0) {
             await linkHashtagsToPost(hashtags, postID);
         }
