@@ -2,8 +2,8 @@ import db from '../../rds-setup/db_access.js';
 
 const addUserHashtags = async (username, hashtags) => {
     const sql = `
-        INSERT INTO user_hashtags (username, hashtag)
-        VALUES ${hashtags.map(hashtag => `('${username}', '${hashtag}')`).join(', ')}
+        INSERT INTO users2hashtags (username, hashtags)
+        VALUES ${hashtags.map(hashtags => `('${username}', '${hashtags}')`).join(', ')}
     ;`;
 
     return await db.insert_items(sql);
