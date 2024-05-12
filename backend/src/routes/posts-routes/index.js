@@ -12,9 +12,6 @@ import authUtils from '../../utils/authUtils.js';
 
 const posts = express.Router();
 
-// TODO: check Logged In --> use helper funtion and return true (should return when user is logged in)
-// "testing if this goes through"
-
 //fetch all posts for a user
 posts.get('/fetchAllPosts', async (req, res) => {
     console.log("fetchAllPosts");
