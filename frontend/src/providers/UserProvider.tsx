@@ -12,13 +12,13 @@ const sampleUser: User = {
 };
 
 export const UserContext = React.createContext<{
-    user: User | undefined;
-    isLoggedIn: boolean; // Add isLoggedIn field
+    user: User; // Make user non-nullable
+    isLoggedIn: boolean;
     login: (user: User) => void;
     logout: () => void;
 }>({
-    user: undefined,
-    isLoggedIn: false, // Initialize isLoggedIn as false
+    user: sampleUser, // Provide the sampleUser as default
+    isLoggedIn: true,
     login: () => {},
     logout: () => {},
 });
@@ -28,21 +28,18 @@ interface UserProviderProps {
 }
 
 export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
-    const [user, setUser] = useState<User | undefined>(sampleUser);
     const [isLoggedIn, setIsLoggedIn] = useState<boolean>(true);
 
     const login = (user: User) => {
-        setUser(user);
         setIsLoggedIn(true);
     }
 
     const logout = () => {
-        setUser(undefined);
         setIsLoggedIn(false);
     }
 
     return (
-        <UserContext.Provider value={{ user, isLoggedIn, login, logout }}>
+        <UserContext.Provider value={{ user: isLoggedIn ? sampleUser : {} as User, isLoggedIn, login, logout }}>
             {children}
         </UserContext.Provider>
     );

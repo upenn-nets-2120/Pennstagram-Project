@@ -39,9 +39,7 @@ friends.get('/followeds/:userID', async (req, res) => {
         return;
     }
 
-    console.log(";laskjdf;laksjd");
     const data = await getFollowedsFromUser(userID);
-    console.log(data);
 
     res.status(200).json(data);
 });
