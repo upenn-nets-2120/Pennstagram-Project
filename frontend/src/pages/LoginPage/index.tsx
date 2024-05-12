@@ -42,6 +42,20 @@ const SubmitButton = styled.button`
     }
 `;
 
+const ForgotPasswordButton = styled.button`
+    background-color: transparent;
+    color: #007bff;
+    border: none;
+    cursor: pointer;
+    text-decoration: underline;
+    font-size: 14px;
+    margin-top: -10px;
+
+    &:hover {
+        color: #0056b3;
+    }
+`;
+
 
 const LoginPage: React.FC = () => {
     const rootURL = config.serverRootURL;
@@ -58,19 +72,23 @@ const LoginPage: React.FC = () => {
             username: username,
             password: password
           });
-          console.log("HELLO");
+          console.log("Status:", response.status);
           // console.log(response.status);
           // console.log("Response:", response);
           if (response.status === 200) {
             console.log('success!');
             navigate('/feed'); 
-          } else {
-            alert('Log in failed'); 
+          } else if (response.status === 400){
+            alert('Invalid username or password.'); 
           }
         } catch (error) {
-          alert('Log in failed: ' + error);
+          alert('Invalid username or password!');
         }  
       };
+
+  const handleForgotPassword = () => {
+    navigate('/forgot-password');
+  };
 
     return (
         <LoginContainer>
@@ -89,6 +107,9 @@ const LoginPage: React.FC = () => {
                     onChange={(e) => setPassword(e.target.value)}
                 />
                 <SubmitButton type="submit">Submit</SubmitButton>
+                <ForgotPasswordButton type="button" onClick={handleForgotPassword}>
+                    Forgot Password?
+                </ForgotPasswordButton>
             </LoginForm>
         </LoginContainer>
     );
