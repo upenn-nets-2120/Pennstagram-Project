@@ -9,13 +9,12 @@ const createPost = async (newPost) => {
     const imageValue = newPost.image ? `"${newPost.image}"` : "NULL";
     const postJsonString = JSON.stringify(newPost.post_json);
 
-
     console.log("Creating post with data: ", newPost);
     const query = `
         INSERT INTO posts (image, caption, postVisibility, post_json)
         VALUES ("${imageValue}", "${newPost.caption}", "${newPost.postVisibility}", '${postJsonString}')
     `;
-    console.log('query:', query);
+    console.log('query:', query, [postJsonString]);
     const result = await db.send_sql(query);
     const postID = result.insertId;
 

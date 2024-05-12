@@ -74,6 +74,21 @@ posts.post('/newPost', async (req, res) => {
         content_type: 'BLOB'
     };
 
+    const newPostData = {
+        image: image,
+        caption: caption,
+        postVisibility: postVisibility,
+        post_json: post_json // Object, not a string
+    };
+    try {
+        const postID = await createPost(newPostData);
+        res.status(201).json({message: 'Post created', postID: postID});
+    } catch (error) {
+        console.error("Error creating post: ", error);
+        res.status(500).json({error: 'Error creating post'});
+    }
+});
+/*
     const newPost = {username, caption, hashtag, image, postVisibility, post_json: JSON.stringify(post_json)};
     try {
         const postID = await createPost(newPost);
@@ -84,7 +99,7 @@ posts.post('/newPost', async (req, res) => {
     } catch (error) {
         res.status(500).json({error: 'Error querying database', details: error.message});
     }
-});
+});*/
 
 const updatePostJson = async (postID, post_json) => {
     const query = `
