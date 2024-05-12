@@ -16,7 +16,7 @@ import {
     modifyUserHashtag,
     modifyProfilePic,
     modifyLinkedActor
-} from '../../db-operations/index.js';
+} from '../../rds-operations/index.js';
 import authUtils from '../../utils/authUtils.js';
 
 const profile = express.Router();
@@ -205,8 +205,16 @@ profile.put('/modifyLinkedActor', async (req, res) => {
 
 profile.put('/modifyProfilePic', async (req, res) => {
     try {
-        const profilePic = req.body.profilePic; // not sure if this is how you transfer files over HTTP, but assuming so
+        const profilePic = req.file;
         const username = req.body.username;
+
+        // store the picture in s3 user-profile-pictures bucket, retrieve its public link
+
+        // get the embedding for this profile pic by calling getEmbeddings(public image link in s3)
+
+        // store the embedding in the actor-embeddings database
+
+        // 
 
         // Verify the user's original username for security reasons
         if (!req.session || req.session.username !== username) {
