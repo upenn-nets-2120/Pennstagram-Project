@@ -15,7 +15,6 @@ import multer from 'multer';
 const posts = express.Router();
 const upload = multer({ storage: multer.memoryStorage() });
 
-
 //upload image for a post
 posts.post('/uploadImage', upload.single('file'), async (req, res) => {
     // Verify the user's original username for security reasons
@@ -47,14 +46,12 @@ posts.post('/uploadImage', async (req, res) => {
     if (!req.session || req.session.username !== username || req.session.username == null) {
         return res.status(401).json({ error: 'Unauthorized request: this user is not authenticated or does not have permission to modify this profile.' });
     }
-
     if (!image) {
         return res.status(400).json({error: 'No image provided'});
     }
-
     try {
         const url = await uploadImageToS3(image);
-        res.status(200).json({imageUrl: url});
+        res.status(200).json({imageUrl: url}); //throw this URL into the RDS in the frontend
     } catch (err) {
         res.status(500).json({error: 'Error uploading image'});
     }
@@ -92,12 +89,13 @@ posts.get('/fetchAllPosts', async (req, res) => {
 
 //create a new post
 posts.post('/newPost', async (req, res) => {
-    const {caption, hashtag, image, postVisibility} = req.body;
+    const { caption, postVisibility, imageUrl } = req.body;
     const username = req.session.username; 
+    // const url = req.session.s3url; // Retrieve the S3 URL from the session
 
-    //check if at least one of caption, hashtag, or image is provided
-    if (!((authUtils.isOK(caption) || authUtils.isOK(hashtag) || authUtils.isOK(image)))) {
-        return res.status(400).json({error: 'at least one of caption, hashtag, or image must be provided OR one or more of your inputs is potentially an SQL injection attack'});
+    //check if caption
+    if (!(authUtils.isOK(caption))) {
+        return res.status(400).json({error: 'caption is potentially an SQL injection attack'});
     }
     // Verify the user's original username for security reasons
     if (!req.session || req.session.username !== username || req.session.username == null) {
@@ -109,23 +107,13 @@ posts.post('/newPost', async (req, res) => {
         res.status(400).json({error: 'postVisibility is required'});
         return;
      }
-
-     let s3url;
-     if (image) {
-        try {
-            s3url = await uploadImageToS3(image);
-        } catch (error) {
-            console.error("Error uploading image: ", error);
-            return res.status(500).json({error: 'Error uploading image'});
-        }
-     }
      
      const post_json = {
         username: username,
         source_site: 'g07',
         post_uuid_within_site: null, //replace with the postID of the new post
         post_text: caption,
-        content_type: s3url
+        content_type: imageUrl
      };
 
     const getUserID = async (username) => {
@@ -138,7 +126,7 @@ posts.post('/newPost', async (req, res) => {
 
     const newPostData = {
         userID: usernamesUserID,
-        image: image,
+        image: imageUrl,
         caption: caption,
         postVisibility: postVisibility,
         post_json: post_json //Object, not a string
@@ -147,6 +135,8 @@ posts.post('/newPost', async (req, res) => {
     try {
         const postID = await createPost(newPostData);
         post_json.post_uuid_within_site = postID; //to update the post_uuid_within_site
+        console.log("post_json " + JSON.stringify(post_json));
+        console.log("newPostDATA " + newPostData);
         res.status(201).json({message: 'Post created', postID: postID});
     } catch (error) {
         console.error("Error creating post: ", error);
