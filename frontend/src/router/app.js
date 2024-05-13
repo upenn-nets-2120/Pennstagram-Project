@@ -6,6 +6,7 @@ import Profile from './Profile';
 import Friends from './Friends';
 import Chat from './Chat';
 import Search from './Search';
+import Feed from './Feed';
 
 const App = () => {
     return (
@@ -16,6 +17,7 @@ const App = () => {
             <Route path="/friends" component={Friends} />
             <Route path="/chat" component={Chat} />
             <Route path="/search" component={Search} />
+            <Route path="/feed" component={Feed} />
         </Router>
     );
 };

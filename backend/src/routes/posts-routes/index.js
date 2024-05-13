@@ -15,7 +15,6 @@ import multer from 'multer';
 const posts = express.Router();
 const upload = multer({ storage: multer.memoryStorage() });
 
-
 //upload image for a post
 posts.post('/uploadImage', upload.single('file'), async (req, res) => {
     // Verify the user's original username for security reasons
@@ -25,11 +24,9 @@ posts.post('/uploadImage', upload.single('file'), async (req, res) => {
     if (!req.session || req.session.username !== username || req.session.username == null) {
         return res.status(401).json({ error: 'Unauthorized request: this user is not authenticated or does not have permission to modify this profile.' });
     }
-
     if (!image) {
         return res.status(400).json({error: 'No image provided'});
     }
-
     try {
         const url = await uploadImageToS3(image);
         res.status(200).json({imageUrl: url});
