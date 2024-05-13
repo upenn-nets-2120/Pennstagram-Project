@@ -7,6 +7,7 @@ export const CHAT_PATH = '/chat/:chatID?';
 export const FORGOT_PATH = '/forgot-password';
 export const NEWPASS_PATH = '/new-password';
 export const VERIFICATION_PATH = '/verification';
+export const NOTIFICATIONS_PATH = '/notifications';
 
 export type RouterPathsMap = {
     [HOME_PATH]: {
@@ -42,6 +43,10 @@ export type RouterPathsMap = {
         queryParams: undefined;
     };
     [VERIFICATION_PATH]: {
+        urlParams: undefined;
+        queryParams: undefined;
+    };
+    [NOTIFICATIONS_PATH]: {
         urlParams: undefined;
         queryParams: undefined;
     };

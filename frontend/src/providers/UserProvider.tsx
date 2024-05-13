@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { User } from '../entities/User';
 
 const sampleUser: User = {
-    userID: 2,
+    userID: 5,
     username: "testUser12345",
     firstName: null,
     lastName: null,

@@ -7,5 +7,6 @@ export { default as FeedPage } from './FeedPage';
 export { default as ForgotPasswordPage } from './ForgotPasswordPage';
 export { default as NewPasswordPage } from './NewPasswordPage';
 export { default as VerificationPage } from './VerificationPage';
+export { default as NotificationsPage } from './NotificationsPage';
 
 

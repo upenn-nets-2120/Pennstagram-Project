@@ -28,8 +28,9 @@ const ChatPage: React.FC = () => {
 
     useEffect(() => {
         const init = async () => {
-            setChats(await getChatsFromUser((await getFollowed(user.userID))[0]));
+            setChats(await getChatsFromUser(user));
         };
+        
         init();
     }, []);
 

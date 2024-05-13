@@ -9,7 +9,8 @@ import {
    CHAT_PATH,
    FORGOT_PATH,
    NEWPASS_PATH,
-   VERIFICATION_PATH
+   VERIFICATION_PATH,
+   NOTIFICATIONS_PATH,
 } from './paths';
 import {
    FriendsPage,
@@ -20,6 +21,7 @@ import {
    ForgotPasswordPage,
    NewPasswordPage,
    VerificationPage,
+   NotificationsPage,
 } from '../pages';
 
 
@@ -35,6 +37,7 @@ const Router: React.FC = () => {
             <Route path={FORGOT_PATH} element={ <ForgotPasswordPage /> } />
             <Route path={NEWPASS_PATH} element={ <NewPasswordPage /> } />
             <Route path={VERIFICATION_PATH} element={ <VerificationPage /> } />
+            <Route path={NOTIFICATIONS_PATH} element={ <NotificationsPage /> } />
             <Route path="/" element={<Navigate replace to={HOME_PATH} />} />
          </Routes>
       </BrowserRouter>
