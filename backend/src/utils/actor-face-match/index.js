@@ -1,140 +1,218 @@
-// import path from 'path';
-// import { ChromaClient } from "chromadb";
-// import fs from 'fs';
-// import * as tf from '@tensorflow/tfjs-node';
-// import * as faceapi from '@vladmandic/face-api';
+/***
+ * Face-API embedding computations.
+ * 
+ * We will be embedding each face.
+ * 
+ * For NETS 2120
+ * 
+ * Derived from the face-api.js example code, https://github.com/vladmandic/face-api/blob/master/demo/node-face-compare.js
+ */
 
-// let optionsSSDMobileNet;
+// Setup
+var path = require('path');
+const { ChromaClient } = require("chromadb");
+const fs = require('fs');
+const tf = require('@tensorflow/tfjs-node');
+const faceapi = require('@vladmandic/face-api');
+const axios = require('axios');
 
-// // Helper function, converts "descriptor" Int32Array to JavaScript array
-// const getArray = (array) => {
-//   let ret = [];
-//   for (let i = 0; i < array.length; i++) {
-//     ret.push(array[i]);
-//   }
-//   return ret;
-// };
 
-// // Compute the face embeddings within an image file
-// async function getEmbeddings(imageFile) {
-//   const buffer = fs.readFileSync(imageFile);
-//   const tensor = tf.node.decodeImage(buffer, 3);
+let optionsSSDMobileNet;
 
-//   const faces = await faceapi.detectAllFaces(tensor, optionsSSDMobileNet)
-//     .withFaceLandmarks()
-//     .withFaceDescriptors();
-//   tf.dispose(tensor);
+/**
+ * Helper function, converts "descriptor" Int32Array to JavaScript array
+ * @param {Int32Array} array 
+ * @returns JavaScript array
+ */
+const getArray = (array) => {
+  var ret = [];
+  for (var i = 0; i < array.length; i++) {
+    ret.push(array[i]);
+  }
+  return ret;
+}
 
-//   return faces.map(face => getArray(face.descriptor));
-// };
 
-// async function initializeFaceModels() {
-//   console.log("Initializing FaceAPI...");
+/**
+ * Compute the face embeddings within an image file
+ * 
+ * @param {*} imageFile 
+ * @returns List of detected faces' embeddings
+ */
+async function getEmbeddingsFile(imageFile) {
+  const buffer = fs.readFileSync(imageFile);
+  const tensor = tf.node.decodeImage(buffer, 3);
 
-//   await tf.ready();
-//   await faceapi.nets.ssdMobilenetv1.loadFromDisk('../');
-//   optionsSSDMobileNet = new faceapi.SsdMobilenetv1Options({ minConfidence: 0.5, maxResults: 1 });
-//   await faceapi.nets.faceLandmark68Net.loadFromDisk('model');
-//   await faceapi.nets.faceRecognitionNet.loadFromDisk('model');
+  console.log("got tensor shape", tensor.shape);
 
-//   return;
-// }
+  const faces = await faceapi.detectAllFaces(tensor, optionsSSDMobileNet)
+    .withFaceLandmarks()
+    .withFaceDescriptors();
+  tf.dispose(tensor);
 
-// async function indexAllFaces(pathName, image, collection) {
-//   const embeddings = await getEmbeddings(pathName);
+  console.log("got faces count", faces.length);
 
-//   let success = true;
-//   let inx = 1;
-//   for (let embedding of embeddings) {
-//     const data = {
-//       ids: [image + '-' + inx++],
-//       embeddings: [embedding],
-//       metadatas: [{ source: "imdb" }],
-//       documents: [image],
-//     };
-//     let res = await collection.add(data);
+  // For each face, get the descriptor and convert to a standard array
+  return faces.map((face) => getArray(face.descriptor));
+};
 
-//     if (res === true) {
-//       console.info(`Added image embedding for ${image} to collection.`);
-//     } else {
-//       console.error(res.error);
-//       success = false;
-//     }
-//   }
-//   return success;
-// }
+/**
+ * Compute the face embeddings for a website-hosted s3 file
+ * 
+ * @param {*} imageURL 
+ * @returns List of detected faces' embeddings
+ */
+async function getEmbeddingsURL(imageURL) {
+    const response = await axios.get(imageURL, { responseType: 'arraybuffer' });
+    const buffer = Buffer.from(response.data, 'binary');
+    const tensor = tf.node.decodeImage(buffer, 3);
+    console.log("got tensor shape", tensor.shape);
 
-// async function findTopKMatches(collection, image, k) {
-//   let ret = [];
+  
+    const faces = await faceapi.detectAllFaces(tensor, optionsSSDMobileNet)
+      .withFaceLandmarks()
+      .withFaceDescriptors();
+    tf.dispose(tensor);
 
-//   let queryEmbeddings = await getEmbeddings(image);
-//   for (let queryEmbedding of queryEmbeddings) {
-//     let results = await collection.query({
-//       queryEmbeddings: queryEmbedding,
-//       nResults: k
-//     });
+    console.log("got faces count", faces.length);
+  
+    // For each face, get the descriptor and convert to a standard array
+    return faces.map((face) => getArray(face.descriptor));
+  };
 
-//     ret.push(results);
-//   }
-//   return ret;
-// }
+async function initializeFaceModels() {
+  console.log("Initializing FaceAPI...");
 
-// async function compareImages(file1, file2) {
-//   console.log(`Comparing images: ${file1}, ${file2}`);
+  await tf.ready();
+  await faceapi.nets.ssdMobilenetv1.loadFromDisk('./src/utils/actor-face-match/model');
+  optionsSSDMobileNet = new faceapi.SsdMobilenetv1Options({ minConfidence: 0.5, maxResults: 1 });
+  await faceapi.nets.faceLandmark68Net.loadFromDisk('./src/utils/actor-face-match/model');
+  await faceapi.nets.faceRecognitionNet.loadFromDisk('./src/utils/actor-face-match/model');
 
-//   const desc1 = await getEmbeddings(file1);
-//   const desc2 = await getEmbeddings(file2);
+  return;
+}
 
-//   const distance = faceapi.euclideanDistance(desc1[0], desc2[0]);
-//   console.log(`L2 distance between most prominent detected faces: ${distance}`);
-//   console.log(`Similarity between most prominent detected faces: ${1 - distance}`);
-// };
+/**
+ * Given a list of images, index their embeddings
+ * within the ChromaDB collection.
+ * 
+ * @param {*} pathName Path to image
+ * @param {*} image Image filename
+ * @param {*} collection ChromaDB collection
+ */
+async function indexAllFaces(pathName, image, collection) {
+  const embeddings = await getEmbeddingsFile(pathName);
 
-// // main for example
+  var success = true;
+  var inx = 1;
+  for (var embedding of embeddings) {
+    const data = {
+      ids: [image + '-' + inx++],
+      embeddings: [
+        embedding,
+      ],
+      metadatas: [{ source: "imdb" } ],
+      documents: [ image ],
+    };
+    var res = await collection.add(data);
+
+    if (res === true) {
+      console.info("Added image embedding for " + image + " to collection.");
+    } else {
+      console.error(res.error);
+      success = false;
+    }
+  }
+  return success;
+}
+
+async function findTopKMatches(collection, image, k) {
+  var ret = [];
+
+  var queryEmbeddings = await getEmbeddingsURL(image);
+  for (var queryEmbedding of queryEmbeddings) {
+    var results = await collection.query({
+      queryEmbeddings: queryEmbedding,
+      // By default embeddings aren't returned -- if you want
+      // them you need to uncomment this line
+      // include: ['embeddings', 'documents', 'metadatas'],
+      nResults: k
+    });
+
+    ret.push(results);
+  }
+  return ret;
+}
+
+/**
+ * Example: Compare two images in files directly using FaceAPI
+ * 
+ * @param {*} file1 
+ * @param {*} file2 
+ */
+async function compareImages(file1, file2) {
+  console.log('Comparing images:', file1, file2); // eslint-disable-line no-console
+
+  const desc1 = await getEmbeddings(file1);
+  const desc2 = await getEmbeddings(file2);
+
+  // Euclidean distance or L2 distance between two face descriptors
+  const distance = faceapi.euclideanDistance(desc1[0], desc2[0]); // only compare first found face in each image
+  console.log('L2 distance between most prominent detected faces:', distance); // eslint-disable-line no-console
+  console.log('Similarity between most prominent detected faces:', 1 - distance); // eslint-disable-line no-console
+};
+
+////////////////////////
+// Main example code
+
 // const client = new ChromaClient();
-// await initializeFaceModels();
+// initializeFaceModels()
+// .then(async () => {
 
-// try {
 //   const collection = await client.getOrCreateCollection({
 //     name: "face-api",
 //     embeddingFunction: null,
+//     // L2 here is squared L2, not Euclidean distance
 //     metadata: { "hnsw:space": "l2" },
 //   });
 
 //   console.info("Looking for files");
-//   const files = await fs.promises.readdir("images");
-//   const indexPromises = files.map(file => indexAllFaces(path.join("images", file), file, collection));
-//   await Promise.all(indexPromises);
-//   console.info("All images indexed.");
-
-//   console.log(`\nTop-k indexed matches to ${profilePhoto}:`);
-
-//   const matchResults = await findTopKMatches(collection, profilePhoto, 5);
-//   const formattedResults = matchResults.map(item => {
-//     const results = [];
-//     for (let i = 0; i < item.ids[0].length; i++) {
-//       const resultDetails = {
-//         id: item.ids[0][i],
-//         distance: Math.sqrt(item.distances[0][i]),
-//         document: item.documents[0][i]
-//       };
-//       console.log(`${resultDetails.id} (Euclidean distance = ${resultDetails.distance}) in ${resultDetails.document}`);
-//       results.push(resultDetails);
+//   const promises = [];
+//   // Loop through all the files in the images directory
+//   fs.readdir("images", function (err, files) {
+//     if (err) {
+//       console.error("Could not list the directory.", err);
+//       process.exit(1);
 //     }
-//     return results;
-//   });
 
-//   return formattedResults;
-// } catch (err) {
-//   console.error("Error during face matching:", err);
-//   throw err;
-// }
+//     files.forEach(function (file, index) {
+//       console.info("Adding task for " + file + " to index.");
+//       promises.push(indexAllFaces(path.join("images", file), file, collection));
+//     });
+//     console.info("Done adding promises, waiting for completion.");
+//     Promise.all(promises)
+//     .then(async (results) => {
+//       console.info("All images indexed.");
+  
+//       const search = 'testProfilePic2.jpg';
+  
+//       console.log('\nTop-k indexed matches to ' + search + ':');
+//       for (var item of await findTopKMatches(collection, search, 5)) {
+//         for (var i = 0; i < item.ids[0].length; i++) {
+//           console.log(item.ids[0][i] + " (Euclidean distance = " + Math.sqrt(item.distances[0][i]) + ") in " + item.documents[0][i]);
+//         }
+//       }
+    
+//     })
+//     .catch((err) => {
+//       console.error("Error indexing images:", err);
+//     });
+//     });
 
-// // ES6 Export
-// export default {
-//   initializeFaceModels,
-//   compareImages,
-//   findTopKMatches,
-//   getEmbeddings,
-//   indexAllFaces,
-// }
+// });
+
+module.exports = {
+    initializeFaceModels,
+    indexAllFaces,
+    findTopKMatches
+}
