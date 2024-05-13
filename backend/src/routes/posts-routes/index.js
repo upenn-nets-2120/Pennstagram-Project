@@ -15,6 +15,15 @@ import multer from 'multer';
 const posts = express.Router();
 const upload = multer({ storage: multer.memoryStorage() });
 
+posts.get('/getAllPosts', async (req, res) => {
+    try {
+        const [rows] = await db.query('SELECT * FROM posts');
+        res.json(rows);
+    } catch (err) {
+        res.status(500).json({ message: err.message });
+    }
+});
+
 //upload image for a post
 posts.post('/uploadImage', upload.single('file'), async (req, res) => {
     // Verify the user's original username for security reasons
@@ -40,8 +49,8 @@ posts.post('/uploadImage', upload.single('file'), async (req, res) => {
 
 
 //fetch all posts for a user
-posts.get('/fetchAllPosts', async (req, res) => {
-    console.log("fetchAllPosts");
+posts.get('/fetchAllPostsUser', async (req, res) => {
+    console.log("fetchAllPostsUser");
     const username = "testUser12345"; //req.session.username; 
     console.log(username);
     if (!authUtils.isOK(username)) {
@@ -55,12 +64,10 @@ posts.get('/fetchAllPosts', async (req, res) => {
     
     try {
         const query = `
-            SELECT p.*, COUNT(l.liker) as likes
-            FROM posts p
-            LEFT JOIN likes l ON p.postID = l.postID
-            WHERE p.userID = (SELECT userID FROM users WHERE username = '${username}')
-            GROUP BY p.postID
-            ORDER BY p.timeStamp DESC;
+        SELECT p.*, COUNT(l.liker) as likes
+        FROM posts p
+        LEFT JOIN likes l ON p.postID = l.postID
+        GROUP BY p.postID;
         `;
         console.log("query", query);
         const posts = await db.send_sql(query);
@@ -276,9 +283,9 @@ posts.post('/commentPost/:postID', async (req, res) => {
     const username = "testUser12345"; //req.session.username; 
 
     // Verify the user's original username for security reasons
-    if (!req.session || req.session.username !== username || req.session.username == null) {
-        return res.status(401).json({ error: 'Unauthorized request: this user is not authenticated or does not have permission to modify this profile.' });
-    }
+    // if (!req.session || req.session.username !== username || req.session.username == null) {
+    //     return res.status(401).json({ error: 'Unauthorized request: this user is not authenticated or does not have permission to modify this profile.' });
+    // }
 
     let {content, parentCommentID} = req.body;
     //check if parentCommentID is given, if not, set it to null
@@ -309,6 +316,29 @@ posts.post('/commentPost/:postID', async (req, res) => {
     try {
         await commentPost(postID, userID, content, parentCommentID);
         res.status(200).json({message: 'Comment posted.'});
+    } catch (error) {
+        res.status(500).json({error: 'Error querying database.', details: error.message});
+    }
+});
+
+//fetch comments for a post
+posts.get('/fetchComments/:postID', async (req, res) => {
+    const postID = Number(req.params.postID);
+
+    if (isNaN(postID)) {
+        return res.status(400).json({error: 'Invalid postID'});
+    }
+
+    try {
+        const query = `
+            SELECT c.commentID as id, c.content as text, u.username as username
+            FROM comments c
+            JOIN users u ON c.userID = u.userID
+            WHERE c.postID = ${postID}
+            ORDER BY c.timeStamp DESC
+        `;
+        const comments = await db.send_sql(query);
+        res.status(200).json(comments);
     } catch (error) {
         res.status(500).json({error: 'Error querying database.', details: error.message});
     }

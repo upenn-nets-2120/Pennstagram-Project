@@ -13,3 +13,4 @@ const likesCreateTable = async (db) => {
 };
   
 export default likesCreateTable;
+

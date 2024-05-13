@@ -1,0 +1,7 @@
+{
+    "groupId": "g07",
+    "bootstrapServers": ["localhost:9092"],
+    "twitterTopic": "twitter-topic",
+    "federatedTopic": "federated-topic",
+    "port": 4567
+}
