@@ -14,6 +14,9 @@ import {
    SEARCH_PATH,
    PROFILE_PATH,
    EDIT_PROFILE_PATH,
+   POST_PATH,
+   FEED_PATH
+
 } from './paths';
 import {
    FriendsPage,
@@ -27,6 +30,8 @@ import {
    NotificationsPage,
    ProfilePage,
    SearchPage,
+   FeedPage,
+   PostPage
    // EditProfilePage,
 } from '../pages';
 
@@ -47,6 +52,8 @@ const Router: React.FC = () => {
             <Route path={PROFILE_PATH} element={ <ProfilePage /> } />
             {/* <Route path={EDIT_PROFILE_PATH} element={ <EditProfilePage /> } /> */}
             <Route path={SEARCH_PATH} element={ <SearchPage /> } />
+            <Route path={POST_PATH} element={ <PostPage /> } />
+            <Route path={FEED_PATH} element={ <FeedPage /> } />
             <Route path="/" element={<Navigate replace to={HOME_PATH} />} />
          </Routes>
       </BrowserRouter>

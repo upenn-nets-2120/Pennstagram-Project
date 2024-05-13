@@ -11,6 +11,7 @@ export const NOTIFICATIONS_PATH = '/notifications';
 export const PROFILE_PATH = '/profile';
 export const SEARCH_PATH = '/search';
 export const EDIT_PROFILE_PATH = '/editProfile';
+export const POST_PATH = '/post';
 
 export type RouterPathsMap = {
     [HOME_PATH]: {
@@ -62,6 +63,10 @@ export type RouterPathsMap = {
         queryParams: undefined;
     };
     [EDIT_PROFILE_PATH]: {
+        urlParams: undefined;
+        queryParams: undefined;
+    };
+    [POST_PATH]: {
         urlParams: undefined;
         queryParams: undefined;
     };
