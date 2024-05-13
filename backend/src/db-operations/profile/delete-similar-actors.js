@@ -8,8 +8,8 @@ const deleteSimilarActors = async (username) => {
     const userResult = await getUser(username);
     const userID = userResult[0].userID;
 
-    const deleteQuery = 'DELETE FROM users2actors WHERE userID = ?';
-    const result = await db.send_sql(deleteQuery, [userID]);
+    const deleteQuery = `DELETE FROM users2actors WHERE userID = '${userID}';`;
+    const result = await db.send_sql(deleteQuery);
 
     console.log(`Deleted ${result.affectedRows} entries from 'users2actors' for user ${username} (userID: ${userID}).`);
     return result;

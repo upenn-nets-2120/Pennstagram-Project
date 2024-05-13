@@ -46,7 +46,7 @@ export { default as modifyProfilePic } from './profile/modify-profile-pic.js';
 export { default as modifyLinkedActor } from './profile/modify-linked-actor.js';
 export { default as modifySimilarActors } from './profile/modify-similar-actors.js';
 export { default as deleteSimilarActors } from './profile/delete-similar-actors.js';
-// export { default as calculateFaceMatches } from './profile/calculate-face-matches.js';
+export { default as calculateFaceMatches } from './profile/calculate-face-matches.js';
 export { default as getUserHashtags } from './profile/get-user-hashtags.js';
 export { default as getTopHashtagsAlain } from './profile/get-top-hashtags.js';
 export { default as getProfilePic } from './profile/get-profile-pic.js';
