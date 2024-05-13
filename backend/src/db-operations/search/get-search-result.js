@@ -3,7 +3,7 @@ import { PromptTemplate } from "@langchain/core/prompts";
 import { formatDocumentsAsString } from "langchain/util/document";
 import { RunnableSequence, RunnablePassthrough } from "@langchain/core/runnables";
 import { Chroma } from "@langchain/community/vectorstores/chroma";
-import config from '../../utils/searchConfig.json' assert { type: "json" };
+import config from './config.json' assert { type: "json" };
 
 const getVectorStore = async function(req) {
     if (vectorStore == null) {
