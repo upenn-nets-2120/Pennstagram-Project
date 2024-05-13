@@ -10,7 +10,6 @@ const createPost = async (newPost) => {
     const postJsonString = JSON.stringify(newPost.post_json);
 
     console.log("Creating post with data: ", newPost);
-    console.log("in create post, userID is " + newPost.userID);
     const query = `
         INSERT INTO posts (userID, image, caption, postVisibility, post_json)
         VALUES ("${newPost.userID}", "${imageValue}", "${newPost.caption}", "${newPost.postVisibility}", '${postJsonString}')
