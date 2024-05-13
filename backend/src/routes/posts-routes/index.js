@@ -9,8 +9,34 @@ import {
     fetchPostsForUser
 } from '../../db-operations/index.js';
 import authUtils from '../../utils/authUtils.js';
+import {uploadImageToS3} from '../../s3-setup/uploadImageToS3.js';    
+import multer from 'multer';
 
 const posts = express.Router();
+const upload = multer({ storage: multer.memoryStorage() });
+
+
+//upload image for a post
+posts.post('/uploadImage', upload.single('file'), async (req, res) => {
+    // Verify the user's original username for security reasons
+    const username = req.session.username;
+    const image = req.file;
+
+    if (!req.session || req.session.username !== username || req.session.username == null) {
+        return res.status(401).json({ error: 'Unauthorized request: this user is not authenticated or does not have permission to modify this profile.' });
+    }
+
+    if (!image) {
+        return res.status(400).json({error: 'No image provided'});
+    }
+
+    try {
+        const url = await uploadImageToS3(image);
+        res.status(200).json({imageUrl: url});
+    } catch (err) {
+        res.status(500).json({error: 'Error uploading image', details: err.message});
+    }
+});
 
 //fetch all posts for a user
 posts.get('/fetchAllPosts', async (req, res) => {
@@ -61,23 +87,23 @@ posts.post('/newPost', async (req, res) => {
         res.status(400).json({error: 'postVisibility is required'});
         return;
      }
-     
-    // const kafkaPost = {
-    //     post_json: {
-    //         username: username,
-    //         source_site: 'g07',
-    //         post_uuid_within_site: null, //gets replaced with the postID of the new post
-    //         post_text: caption,
-    //         content_type: 'BLOB' //NOTE: replace with public url to the s3 image file
-    //     },
-    //     attach: {image}
-    // }
+
+     let s3url;
+     if (image) {
+        try {
+            s3url = await uploadImageToS3(image);
+        } catch (error) {
+            console.error("Error uploading image: ", error);
+            return res.status(500).json({error: 'Error uploading image'});
+        }
+     }
      
      const post_json = {
         username: username,
         source_site: 'g07',
         post_uuid_within_site: null, //replace with the postID of the new post
         post_text: caption,
+        content_type: s3url
      };
 
     const getUserID = async (username) => {
@@ -95,8 +121,10 @@ posts.post('/newPost', async (req, res) => {
         postVisibility: postVisibility,
         post_json: post_json //Object, not a string
     };
+
     try {
         const postID = await createPost(newPostData);
+        post_json.post_uuid_within_site = postID; //to update the post_uuid_within_site
         res.status(201).json({message: 'Post created', postID: postID});
     } catch (error) {
         console.error("Error creating post: ", error);
