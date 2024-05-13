@@ -18,10 +18,10 @@ async function uploadImage(imagePath) {
 async function getImage(imagePath, downloadPath) {
     try {
         const s3Url = await getImageFromS3(imagePath, downloadPath);
-        console.log('Image uploaded successfully:', s3Url);
+        console.log('Image downloaded successfully:', s3Url);
         return s3Url;
     } catch (error) {
-        console.error('Failed to upload image:', error);
+        console.error('Failed to download image:', error);
     }
 }
 
