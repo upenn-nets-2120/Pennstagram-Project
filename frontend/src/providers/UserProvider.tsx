@@ -4,9 +4,9 @@ import { User } from '../entities/User';
 const sampleUser: User = {
     userID: 2,
     username: "testUser12345",
-    firstName: null,
-    lastName: null,
-    profilePic: null,
+    firstName: '',
+    lastName: '',
+    profilePic: '',
     salted_password: null,
     emailID: null,
     actors: null,

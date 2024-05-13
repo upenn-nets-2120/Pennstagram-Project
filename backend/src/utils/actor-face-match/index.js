@@ -10,10 +10,10 @@
 
 // Setup
 var path = require('path');
-const { ChromaClient } = require("chromadb");
-const fs = require('fs');
-const tf = require('@tensorflow/tfjs-node');
-const faceapi = require('@vladmandic/face-api');
+// const { ChromaClient } = require("chromadb");
+// const fs = require('fs');
+// const tf = require('@tensorflow/tfjs-node');
+// const faceapi = require('@vladmandic/face-api');
 const axios = require('axios');
 
 

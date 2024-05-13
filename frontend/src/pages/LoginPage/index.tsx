@@ -5,6 +5,7 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { UserContext } from '../../providers/UserProvider';
 import { User } from '../../entities/User';
+import { useAuth } from '../../contexts/AuthContexts'
 
 const LoginContainer = styled.div`
     display: flex;
@@ -66,7 +67,7 @@ const LoginPage: React.FC = () => {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
 
-    const { login } = useContext(UserContext);
+    const { login } = useAuth();
 
     const handleLogin = async (e: { preventDefault: () => void; }) => {
         e.preventDefault();
@@ -81,36 +82,37 @@ const LoginPage: React.FC = () => {
           // console.log(response.status);
           // console.log("Response:", response);
           if (response.status === 200) {
+            login(response.data.token);
             console.log('success!');
             console.log(response.data[0].userID);
             console.log(response.data);
             
 
 
-            const user: User = {
-                userID: response.data[0].userID || null,
-                username: username || '',
-                firstName: null,
-                lastName: null,
-                profilePic: null,
-                salted_password: null,
-                emailID: null,
-                actors: undefined,
-                birthday: null,
-                affiliation: null,
-                linked_actor_nconst: null,
-                inviters: undefined,
-                userProfilePic: null,
-                userScore: null,
-                userVisibility: null,
-                sessionToken: null,
-                follows_back: null,
-                requested: null
-            }
+            // const user: User = {
+            //     userID: response.data[0].userID || null,
+            //     username: username || '',
+            //     firstName: null,
+            //     lastName: null,
+            //     profilePic: null,
+            //     salted_password: null,
+            //     emailID: null,
+            //     actors: undefined,
+            //     birthday: null,
+            //     affiliation: null,
+            //     linked_actor_nconst: null,
+            //     inviters: undefined,
+            //     userProfilePic: null,
+            //     userScore: null,
+            //     userVisibility: null,
+            //     sessionToken: null,
+            //     follows_back: null,
+            //     requested: null
+            // }
 
-            login(user);
+            // login(user);
 
-            navigate('/chat'); 
+            navigate('/feed'); 
           } else if (response.status === 400){
             alert('Invalid username or password.'); 
           }
