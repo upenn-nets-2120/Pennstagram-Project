@@ -15,6 +15,7 @@ import {
     addNotification,
     deleteNotification,
     getNotificationsFromUser,
+    getUsersFromChat,
 } from  '../../db-operations/index.js';
 
 const chats = express.Router();
@@ -36,6 +37,8 @@ chats.post('/create/:userID', async (req, res) => {
         await addUsers2chat(userID, chatID, true);
         for (const user of users) {
             await addUsers2chat(user, chatID, false);
+
+            addNotification(user, 'like', `${userID} has added you to a new chat, ${chatName}!`)
         }
 
         res.status(200).json({ chatID: chatID });
@@ -82,6 +85,8 @@ chats.post('/add-user/:userID', async (req, res) => {
 
     const data = await addUsers2chat(userID, chatID, isAdmin);
 
+    addNotification(userID, 'like', `You have been added to the chat, ${chatName}!`)
+
     res.status(200).json(data);
 });
 
@@ -98,6 +103,8 @@ chats.post('/delete-user/:userID', async (req, res) => {
     }
 
     const data = await deleteUsers2chat(userID, chatID);
+
+    addNotification(userID, 'like', `You have been removed from the chat, ${chatName}.`)
 
     res.status(200).json(data);
 });
@@ -202,6 +209,11 @@ chats.post('/send-message/:userID', async (req, res) => {
     }
 
     await addMessage(userID, chatID, content);
+
+    const users = await getUsersFromChat(chatID);
+    for (const user of users) {
+        addNotification(user.userID, 'like', `From ${userID}: ${content}`)
+    }
 
     res.status(200).json({message: 'success'});
 });

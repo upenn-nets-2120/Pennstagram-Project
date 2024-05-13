@@ -9,19 +9,22 @@ import {
     checkUsernameValid,
     getUser,
     getUserHashtags,
-    getTopHashtagsAlain,
     getProfilePic,
     getSimilarActors,
     modifyUser,
     modifyUserHashtag,
     modifyProfilePic,
-    modifyLinkedActor
+    modifyLinkedActor,
+    getTopHashtagsSem
 } from '../../db-operations/index.js';
 import authUtils from '../../utils/authUtils.js';
+import multer from 'multer';
 
 const profile = express.Router();
+const upload = multer({ storage: multer.memoryStorage() });
+const imagePath = './profilePicDownload';
 
-// used for getting profile of another user OR the current user's own profile
+// used for getting regular text profile information
 profile.get('/fetchProfile', async (req, res) => {
     
     try {
@@ -41,16 +44,13 @@ profile.get('/fetchProfile', async (req, res) => {
             return res.status(403).json({ error: 'One or more of your inputs is potentially an SQL injection attack.' });
         }
 
-        // CAN CHANGE LATER: if the querying user trying to fetch their OWN profile, the request will return their current hashtags
         let userProfileData;
-        let userProfilePicData;
         let userHashtagData;
         let mostPopularHashtagData;
         
         userProfileData = await getUser(username);
         userHashtagData = await getUserHashtags(username);
-        mostPopularHashtagData = await getTopHashtagsAlain(username);
-        userProfilePicData = await getProfilePic(username);
+        mostPopularHashtagData = await getTopHashtagsSem(10);
 
         if (!userProfileData) {
             return res.status(404).json({ error: 'User profile data not found.' });
@@ -61,10 +61,6 @@ profile.get('/fetchProfile', async (req, res) => {
         if (userHashtagData) {
             returnObject['userHashtags'] = userHashtagData[0];
         } 
-        
-        if (userProfilePicData) {
-            returnObject['userProfilePic'] = userProfilePicData[0].userProfilePic;
-        }
 
         return res.status(200).json(returnObject);
     } catch (error) {
@@ -72,6 +68,33 @@ profile.get('/fetchProfile', async (req, res) => {
         res.status(500).json({ error: `Internal Server ${error}` });;
     }
 });
+
+// just for profile pic!!
+profile.get('/fetchProfilePic', async (req, res) => {
+    try {
+        const username = req.session.username;
+        const { desiredUsername } = req.body;
+
+        if (!username) {
+            return res.status(401).json({ error: 'User is not yet authenticated' });
+        }
+        if (!desiredUsername) {
+            return res.status(403).json({ error: 'no input for desiredUsername received' });
+        }
+        if (!authUtils.isOK(desiredUsername)) {
+            return res.status(403).json({ error: 'Potential SQL injection detected.' });
+        }
+
+        const result = await getProfilePic(desiredUsername);
+
+        // Instead of sending a JSON with the profile picture path, send the image file directly
+        return res.status(200).json({ message: "successful profile pic fetch", profilePicURL: result });
+    } catch (error) {
+        console.error('Failed to fetch profile pic:', error);
+        res.status(500).json({ error: `Internal Server Error: failed to fetch profile pic ${error}` });
+    }
+});
+
 
 // used for changing the user's username, password, or email 
 profile.put('/modifyProfile', async (req, res) => {
@@ -170,11 +193,11 @@ profile.get('/fetchSimilarActors', async (req, res) => {
         }
 
         if (!authUtils.isOK(username)) {
-            return res.status(403).json({error: 'One or more of your inputs is potentially an SQL injection attack.'})
+            return res.status(403).json({error: 'you forgot to input username OR One or more of your inputs is potentially an SQL injection attack.'})
         }
         
         const result = await getSimilarActors(username);
-        return res.status(200).json({ message: `Top 5 similar actors for ${username} have been calculated.`, result: result});   
+        return res.status(200).json({ message: `retrieved top 5 similar actors for ${username}.`, result: result});   
     } catch (error) {
         console.error('Failed fetch similar actors:', error);
         res.status(500).json({ error: `Internal Server ${error}` });
@@ -203,23 +226,30 @@ profile.put('/modifyLinkedActor', async (req, res) => {
     }
 });
 
-profile.put('/modifyProfilePic', async (req, res) => {
+profile.put('/modifyProfilePic', upload.single('file'), async (req, res) => {
     try {
-        const profilePic = req.body.profilePic; // not sure if this is how you transfer files over HTTP, but assuming so
-        const username = req.body.username;
+        const profilePic = req.file;
+        const username = req.session.username; // NOT SECURE, FIX LATER
 
         // Verify the user's original username for security reasons
         if (!req.session || req.session.username !== username) {
             return res.status(401).json({ error: 'Unauthorized request: this user is not authenticated or does not have permission to modify this profile.' });
         }
 
-        if (!authUtils.isOK(username) || !authUtils.isOK(profilePic)) {
+        if (!profilePic) {
+            return res.status(400).json({error: 'No image provided'});
+        }
+
+        if (!authUtils.isOK(username)) {
             return res.status(403).json({error: 'One or more of your inputs is potentially an SQL injection attack.'})
         }
         
-        const modifyResult = await modifyProfilePic(username, profilePic);
+        const result = await modifyProfilePic(username, profilePic);
 
-        return res.status(200).json({ message: `Profile pic successfully modified`, result: modifyResult});   
+        return res.status(200).json({ message: `Profile pic successfully modified: modified user 
+                                      profile picture in rds: ${result.modify}, deleted ${result.delete} rows, got the following top 5 
+                                      similar actors matches: ${result.recalculate.top_matches}, and reset similar actors in RDS 
+                                      accordingly, affecting ${result.setSimilar} rows. Boom.` });   
     } catch (error) {
         console.error('Failed to modify user profile pic', error);
         res.status(500).json({ error: `Internal Server ${error}` });

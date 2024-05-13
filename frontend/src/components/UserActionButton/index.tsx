@@ -4,24 +4,22 @@ import { ThemeContext } from '../../providers/ThemeProvider';
 
 interface UserActionButtonProps {
     onClick: (actionType: string) => void;
-    actionType: 'Request' | 'Following' | 'Follow' | 'Requested' | 'Accept' | 'Reject';
+    actionType: 'Request' | 'Unfollow' | 'Follow' | 'Remove Request' | 'Accept' | 'Reject';
 }
 
 const UserActionButton: React.FC<UserActionButtonProps> = ({ onClick, actionType }) => {
     const { theme } = useContext(ThemeContext);
 
-    const isDisabled = () => actionType === 'Following' || actionType === 'Requested';
-
     const getBackgroundColor = () => {
         switch (actionType) {
             case 'Request':
                 return theme.primaryColor;
-            case 'Following':
-                return theme.tertiaryColor;
+            case 'Unfollow':
+                return 'red';
             case 'Follow':
                 return theme.primaryColor;
-            case 'Requested':
-                return theme.tertiaryColor;
+            case 'Remove Request':
+                return 'red';
             case 'Accept':
                 return theme.primaryColor;
             case 'Reject':
@@ -33,11 +31,7 @@ const UserActionButton: React.FC<UserActionButtonProps> = ({ onClick, actionType
 
     return (
         <UserActionButtonStyled
-            onClick={() => onClick(actionType)}
-            theme={theme}
-            backgroundColor={getBackgroundColor()}
-            disabled={isDisabled()}
-        >
+            onClick={() => onClick(actionType)} theme={theme} background_color={getBackgroundColor()}>
             {actionType}
         </UserActionButtonStyled>
     );

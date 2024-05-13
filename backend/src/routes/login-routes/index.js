@@ -17,7 +17,7 @@ login.post('/', async (req, res) => {
 
     try {
         const userQuery = `SELECT userID, salted_password FROM users WHERE username = '${username}'`;
-        const userResults = await db.send_sql(userQuery);
+        const userResults = await db.insert_items(userQuery);
 
         if (userResults.length === 0) {
             return res.status(401).json({error: 'Username and/or password are invalid.'});
@@ -34,7 +34,7 @@ login.post('/', async (req, res) => {
 
             if (isMatch) {
                 req.session.username = username;
-                return res.status(200).json({ username: username });
+                return res.status(200).json(userResults);
             } else {
                 return res.status(401).json({ error: 'Username and/or password are invalid.' });
             }

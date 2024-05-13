@@ -5,7 +5,7 @@ const addNotification = async (userID, type, content) => {
         INSERT INTO
             notifications (userID, type, content)
         VALUES 
-            (${userID}', '${type}', '${content}')
+            ('${userID}', '${type}', '${content}')
     ;`;
 
     return await db.insert_items(sql);

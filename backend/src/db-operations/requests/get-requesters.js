@@ -7,9 +7,9 @@ const getRequestersFromUser = async (userID) => {
         FROM
             requests
         JOIN
-            users ON requests.userID = users.userID
+            users ON requests.requesting = users.userID
         WHERE
-            requests.requesting = '${userID}'
+            requests.userID = '${userID}'
     ;`;
 
     return await db.send_sql(sql);

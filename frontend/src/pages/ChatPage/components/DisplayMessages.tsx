@@ -71,6 +71,11 @@ const DisplayMessages: React.FC<DisplayMessagesProps> = ({ messages, chat, sendM
                     type="text"
                     value={newMessage}
                     onChange={(e) => setNewMessage(e.target.value)}
+                    onKeyDown={(e) => {
+                        if (e.key === 'Enter') {
+                            handleSendMessage();
+                        }
+                    }}
                     placeholder="Type your message..."
                     style={{ marginLeft: '10px', padding: '5px', borderRadius: '10px', height: '70%', width: '90%' }}
                 />
