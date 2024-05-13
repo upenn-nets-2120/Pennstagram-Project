@@ -105,7 +105,8 @@ const LoginPage: React.FC = () => {
                 userVisibility: null,
                 sessionToken: null,
                 follows_back: null,
-                requested: null
+                requested: null,
+                online: null
             }
 
             login(user);

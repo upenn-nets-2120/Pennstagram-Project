@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { User } from '../entities/User';
 
 const sampleUser: User = {
-    userID: 5,
+    userID: 1,
     username: "testUser12345",
     firstName: null,
     lastName: null,
@@ -19,9 +19,9 @@ const sampleUser: User = {
     userVisibility: null,
     sessionToken: null,
     follows_back: null,
-    requested: null
+    requested: null,
+    online: null
 };
-
 
 export const UserContext = React.createContext<{
     user: User;

@@ -10,3 +10,4 @@ export { default as UserActionButton } from './UserActionButton';
 export { default as Highlightable } from './Highlightable';
 export { default as Scrollable } from './Scrollable';
 export { default as LinkContainer } from './LinkContainer';
+export { default as RowOnlineOffline } from './RowOnlineOffline';

@@ -23,7 +23,8 @@ export const getRequests = async (userID: number): Promise<User[]> => {
             userVisibility: follower.userVisibility || null,
             sessionToken: follower.sessionToken || null,
             follows_back: follower.follows_back === 1 ? true : false,
-            requested: follower.requested === 1 ? true : false
+            requested: follower.requested === 1 ? true : false,
+            online: follower.online || false,
         }));
         
         return users;

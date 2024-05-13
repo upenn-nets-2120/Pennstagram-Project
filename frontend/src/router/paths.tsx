@@ -8,6 +8,8 @@ export const FORGOT_PATH = '/forgot-password';
 export const NEWPASS_PATH = '/new-password';
 export const VERIFICATION_PATH = '/verification';
 export const NOTIFICATIONS_PATH = '/notifications';
+export const PROFILE_PATH = '/profile';
+export const SEARCH_PATH = '/search';
 
 export type RouterPathsMap = {
     [HOME_PATH]: {
@@ -47,6 +49,14 @@ export type RouterPathsMap = {
         queryParams: undefined;
     };
     [NOTIFICATIONS_PATH]: {
+        urlParams: undefined;
+        queryParams: undefined;
+    };
+    [PROFILE_PATH]: {
+        urlParams: undefined;
+        queryParams: undefined;
+    };
+    [SEARCH_PATH]: {
         urlParams: undefined;
         queryParams: undefined;
     };

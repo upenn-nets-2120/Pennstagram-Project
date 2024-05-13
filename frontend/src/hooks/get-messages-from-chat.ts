@@ -25,7 +25,8 @@ export const getMessagesFromChat = async (chatID: string): Promise<Message[]> =>
                 userVisibility: null,
                 sessionToken: null,
                 follows_back: null,
-                requested: null
+                requested: null,
+                online: null
             };
 
             return {

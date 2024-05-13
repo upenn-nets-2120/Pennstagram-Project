@@ -11,7 +11,11 @@ const getFollowersFromUser = async (userID) => {
             CASE
                 WHEN requests.userID IS NULL THEN 0
                 ELSE 1
-            END AS requested
+            END AS requested,
+            CASE
+                WHEN TIMESTAMPDIFF(MINUTE, users.lastOnline, NOW()) <= 100 THEN 1
+                ELSE 0
+            END AS within_10_minutes
         FROM
             friends
         JOIN

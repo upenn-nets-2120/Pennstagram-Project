@@ -19,4 +19,5 @@ export interface User {
     sessionToken: string | null;
     follows_back: boolean | null;
     requested: boolean | null;
+    online: boolean | null;
 }
