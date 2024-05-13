@@ -32,6 +32,7 @@ export { default as getNotificationsFromUser } from './notifications/get-notific
 
 // exports for login/registration
 export { default as addUser } from './registration/add-user.js';
+export { default as addCode } from './registration/add-code.js';
 export { default as getUser } from './registration/get-user.js';
 export { default as updateProfilePhoto } from './registration/update-profile-photo.js';
 export { default as getTopHashtagsSem } from './registration/get-top-hashtags.js';

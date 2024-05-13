@@ -16,3 +16,4 @@ export { default as users2chatsCreateTable } from './users2chats-create-table.js
 export { default as users2actorsCreateTable } from './users2actors-create-table.js';
 export { default as actorsCreateTable } from './actors-create-table.js';
 export { default as actorsLoadTable } from './actors-load-table.js';
+export { default as codesCreateTable } from './codes-create-table.js';

@@ -50,6 +50,8 @@ const NewPasswordPage: React.FC = () => {
     const [confirmPassword, setConfirmPassword] = useState('');
 
     const handleSubmit = async (e: React.FormEvent) => {
+        const email = localStorage.getItem('email');
+        localStorage.removeItem('email');
         e.preventDefault();
         if (newPassword !== confirmPassword) {
             alert('Passwords do not match');
@@ -57,7 +59,7 @@ const NewPasswordPage: React.FC = () => {
         }
 
         try {
-            const response = await axios.put(`${rootURL}/login/new-password`, {
+            const response = await axios.put(`${rootURL}/login/new-password`, { email,
                 newPassword,
             });
 
