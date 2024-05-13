@@ -15,14 +15,38 @@ import {
     modifyUserHashtag,
     modifyProfilePic,
     modifyLinkedActor,
-    getTopHashtagsSem
+    getTopHashtagsSem,
+    getUserByNConst
 } from '../../db-operations/index.js';
 import authUtils from '../../utils/authUtils.js';
 import multer from 'multer';
 
 const profile = express.Router();
 const upload = multer({ storage: multer.memoryStorage() });
-const imagePath = './profilePicDownload';
+
+// used for getting profile information by nconst
+profile.get('/fetchProfileByNConst', async (req, res) => {
+    
+    try {
+        // Assuming 'username' is stored in the session upon login
+        const nconst = req.body.nconst;
+        
+        if (!authUtils.isOK(nconst)) {
+            return res.status(403).json({ error: 'you forgot nconst OR One or more of your inputs is potentially an SQL injection attack.' });
+        }
+        
+        userProfileData = await getUserByNConst(nconst);
+    
+        if (!userProfileData) {
+            return res.status(404).json({ error: 'User profile data not found.' });
+        }
+
+        return res.status(200).json(userProfileData[0]);
+    } catch (error) {
+        console.error('Failed to fetch user profile:', error);
+        res.status(500).json({ error: `Internal Server ${error}` });;
+    }
+});
 
 // used for getting regular text profile information
 profile.get('/fetchProfile', async (req, res) => {
@@ -30,17 +54,12 @@ profile.get('/fetchProfile', async (req, res) => {
     try {
         // Assuming 'username' is stored in the session upon login
         const username = req.session.username;
-        const { desiredUsername } = req.body;
 
         if (!username) {
             return res.status(401).json({ error: 'User is not yet authenticated' });
         }
-
-        if (!desiredUsername) {
-            return res.status(403).json({ error: 'no input for desiredUsername recieved' });
-        }
         
-        if (!authUtils.isOK(desiredUsername)) {
+        if (!authUtils.isOK(username)) {
             return res.status(403).json({ error: 'One or more of your inputs is potentially an SQL injection attack.' });
         }
 
@@ -193,11 +212,11 @@ profile.get('/fetchSimilarActors', async (req, res) => {
         }
 
         if (!authUtils.isOK(username)) {
-            return res.status(403).json({error: 'you forgot to input username OR One or more of your inputs is potentially an SQL injection attack.'})
+            return res.status(403).json({error: 'One or more of your inputs is potentially an SQL injection attack.'})
         }
         
         const result = await getSimilarActors(username);
-        return res.status(200).json({ message: `retrieved top 5 similar actors for ${username}.`, result: result});   
+        return res.status(200).json({ message: `Top 5 similar actors for ${username} have been calculated.`, result: result});   
     } catch (error) {
         console.error('Failed fetch similar actors:', error);
         res.status(500).json({ error: `Internal Server ${error}` });
@@ -246,10 +265,7 @@ profile.put('/modifyProfilePic', upload.single('file'), async (req, res) => {
         
         const result = await modifyProfilePic(username, profilePic);
 
-        return res.status(200).json({ message: `Profile pic successfully modified: modified user 
-                                      profile picture in rds: ${result.modify}, deleted ${result.delete} rows, got the following top 5 
-                                      similar actors matches: ${result.recalculate.top_matches}, and reset similar actors in RDS 
-                                      accordingly, affecting ${result.setSimilar} rows. Boom.` });   
+        return res.status(200).json({ message: `Profile pic successfully modified: ${result.modify}` });   
     } catch (error) {
         console.error('Failed to modify user profile pic', error);
         res.status(500).json({ error: `Internal Server ${error}` });

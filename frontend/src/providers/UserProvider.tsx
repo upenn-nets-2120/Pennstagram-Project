@@ -3,15 +3,16 @@ import { User } from '../entities/User';
 
 const sampleUser: User = {
     userID: 1,
-    username: "testUser12345",
+    username: "alainTest",
     firstName: null,
     lastName: null,
     profilePic: null,
-    salted_password: null,
+    salted_password: 'testPassword123',
     emailID: null,
     actors: null,
     birthday: null,
     affiliation: null,
+    hashtags: [],
     linked_actor_nconst: null,
     inviters: null,
     userProfilePic: null,

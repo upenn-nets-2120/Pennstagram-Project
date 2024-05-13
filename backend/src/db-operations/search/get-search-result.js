@@ -26,9 +26,11 @@ const getSearchResult = async (username, context, searchQuery) => {
 
     // Ensure prompt is formatted as a runnable or function
     const prompt = PromptTemplate.fromTemplate(`Use the following pieces of context to answer the Search Query at the end. Feel free to make up information about users or actors you know about 
-    Always say "thanks for asking!" at the end of the answer.
+    Personalize the reply to the username and who their friends are, and state the name of the user when replying. Answer questions with ANY and ALL knowledge of actors, users, posts, hashtags, etc. that you might have. Always say "thanks for asking!" at the end of the answer.
     
     ${context}
+
+    For user with username: ${username}
     
     Search Query: ${searchQuery}
         

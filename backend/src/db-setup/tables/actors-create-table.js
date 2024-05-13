@@ -4,7 +4,8 @@ const actorsCreateTable = async (db) => {
             primaryName VARCHAR(255),
             birthYear INT,
             deathYear INT,
-            actor_nconst_short VARCHAR(10) PRIMARY KEY
+            actor_nconst_short VARCHAR(10) PRIMARY KEY,
+            local_actor_image VARCHAR(255)
         );
     `;
   

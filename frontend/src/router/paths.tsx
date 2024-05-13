@@ -10,6 +10,7 @@ export const VERIFICATION_PATH = '/verification';
 export const NOTIFICATIONS_PATH = '/notifications';
 export const PROFILE_PATH = '/profile';
 export const SEARCH_PATH = '/search';
+export const EDIT_PROFILE_PATH = '/editProfile';
 
 export type RouterPathsMap = {
     [HOME_PATH]: {
@@ -57,6 +58,10 @@ export type RouterPathsMap = {
         queryParams: undefined;
     };
     [SEARCH_PATH]: {
+        urlParams: undefined;
+        queryParams: undefined;
+    };
+    [EDIT_PROFILE_PATH]: {
         urlParams: undefined;
         queryParams: undefined;
     };
