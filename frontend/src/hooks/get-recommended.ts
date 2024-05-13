@@ -24,7 +24,7 @@ export const getRecommended = async (userID: number): Promise<User[]> => {
             sessionToken: follower.sessionToken || null,
             follows_back: follower.follows_back === 1 ? true : false,
             requested: follower.requested === 1 ? true : false,
-            online: follower.online || false,
+            online: follower.within_10_minutes === 1 ? true : false,
         }));
         
         return users;

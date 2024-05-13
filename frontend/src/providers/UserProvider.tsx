@@ -24,6 +24,7 @@ const sampleUser: User = {
     online: null
 };
 
+
 export const UserContext = React.createContext<{
     user: User;
     isLoggedIn: boolean;

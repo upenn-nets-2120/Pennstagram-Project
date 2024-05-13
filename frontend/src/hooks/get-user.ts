@@ -2,11 +2,13 @@ import axios from 'axios';
 import { User } from "../entities/User";
 import { backend_url } from '../constants/backendURL';
 
-export const getFollowed = async (userID: number): Promise<User[]> => {
+export const getUser = async (): Promise<User> => {
     try {
-        const response = await axios.get(`${backend_url}/friends/followers/${userID}`);
+        const response = await axios.get(`${backend_url}/profile/fetchProfile`);
 
-        const users: User[] = response.data.map((follower: any) => ({
+        const follower = response.data;
+
+        const user: User = {
             userID: follower.userID || null,
             username: follower.username || null,
             firstName: follower.firstName || null,
@@ -24,12 +26,13 @@ export const getFollowed = async (userID: number): Promise<User[]> => {
             sessionToken: follower.sessionToken || null,
             follows_back: follower.follows_back === 1 ? true : false,
             requested: follower.requested === 1 ? true : false,
-            online: follower.within_10_minutes === 1 ? true : false,
-        }));
+            online: true,
+            userProfilePic: null
+        };
         
-        return users;
+        return user;
     } catch (error) {
-        console.error('Error fetching followed users:', error);
-        return [];
+        console.error('Error fetching user profile:', error);
+        return {} as User;
     }
 };
