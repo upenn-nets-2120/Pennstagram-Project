@@ -23,7 +23,7 @@ register.post('/', async (req, res) => {
     }
 
     try {
-        const usernameValid = await checkUsernameValid(username);
+        const usernameValid = await checkUsernameValid(username, email);
         if (!usernameValid) {
             return res.status(409).json({ error: 'Username or email already exists' });
         }

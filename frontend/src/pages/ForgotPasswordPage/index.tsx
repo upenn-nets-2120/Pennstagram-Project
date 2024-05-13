@@ -51,10 +51,11 @@ const ForgotPasswordPage: React.FC = () => {
     const handleForgotPassword = async (e: { preventDefault: () => void; }) => {
         e.preventDefault();
         try {
+            localStorage.setItem('email', email);
             const response = await axios.post(`${rootURL}/login/forgot-password`, { email });
             if (response.status === 200) {
                 alert('Password reset link has been sent to your email.');
-                navigate('/login');
+                navigate('/verification');
             } else {
                 alert('Failed to send password reset link.');
             }
