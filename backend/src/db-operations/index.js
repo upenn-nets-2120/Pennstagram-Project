@@ -33,6 +33,7 @@ export { default as getNotificationsFromUser } from './notifications/get-notific
 
 // exports for login/registration
 export { default as addUser } from './registration/add-user.js';
+export { default as addCode } from './registration/add-code.js';
 export { default as getUser } from './registration/get-user.js';
 export { default as updateProfilePhoto } from './registration/update-profile-photo.js';
 export { default as getTopHashtagsSem } from './registration/get-top-hashtags.js';
@@ -46,7 +47,7 @@ export { default as modifyProfilePic } from './profile/modify-profile-pic.js';
 export { default as modifyLinkedActor } from './profile/modify-linked-actor.js';
 export { default as modifySimilarActors } from './profile/modify-similar-actors.js';
 export { default as deleteSimilarActors } from './profile/delete-similar-actors.js';
-export { default as calculateFaceMatches } from './profile/calculate-face-matches.js';
+// export { default as calculateFaceMatches } from './profile/calculate-face-matches.js';
 export { default as getUserHashtags } from './profile/get-user-hashtags.js';
 export { default as getTopHashtagsAlain } from './profile/get-top-hashtags.js';
 export { default as getProfilePic } from './profile/get-profile-pic.js';

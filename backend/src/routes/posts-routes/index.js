@@ -9,36 +9,91 @@ import {
     fetchPostsForUser
 } from '../../db-operations/index.js';
 import authUtils from '../../utils/authUtils.js';
+import { uploadImageToS3 } from '../../db-operations/s3-operations/index.js';    
+import multer from 'multer';
 
 const posts = express.Router();
+const upload = multer({ storage: multer.memoryStorage() });
 
-// TODO: check Logged In --> use helper funtion and return true (should return when user is logged in)
-// "testing if this goes through"
 
-//fetch all posts
+//upload image for a post
+posts.post('/uploadImage', upload.single('file'), async (req, res) => {
+    // Verify the user's original username for security reasons
+    const username = req.session.username; // NOT SECURE, FIX LATER
+    const image = req.file;
+
+    if (!req.session || req.session.username !== username || req.session.username == null) {
+        return res.status(401).json({ error: 'Unauthorized request: this user is not authenticated or does not have permission to modify this profile.' });
+    }
+
+    if (!image) {
+        return res.status(400).json({error: 'No image provided'});
+    }
+
+    try {
+        const url = await uploadImageToS3(image, true); // true for post images, false for profile images
+        res.status(200).json({imageUrl: url});
+    } catch (err) {
+        res.status(500).json({error: `Error uploading image: ${err.message}`});
+    }
+});
+
+//upload image for a post
+posts.post('/uploadImage', async (req, res) => {
+    // Verify the user's original username for security reasons
+    const username = req.session.username;
+    const image = req.file;
+
+    if (!req.session || req.session.username !== username || req.session.username == null) {
+        return res.status(401).json({ error: 'Unauthorized request: this user is not authenticated or does not have permission to modify this profile.' });
+    }
+
+    if (!image) {
+        return res.status(400).json({error: 'No image provided'});
+    }
+
+    try {
+        const url = await uploadImageToS3(image);
+        res.status(200).json({imageUrl: url});
+    } catch (err) {
+        res.status(500).json({error: 'Error uploading image'});
+    }
+});
+
+//fetch all posts for a user
 posts.get('/fetchAllPosts', async (req, res) => {
+    console.log("fetchAllPosts");
+    const username = req.session.username;
     if (!authUtils.isOK(username)) {
         return res.status(403).json({error: 'You forgot an input OR: one or more of your inputs is potentially an SQL injection attack.'})
     }
 
     // Verify the user's original username for security reasons
-    if (!req.session || req.session.username !== username) {
+    if (!req.session || req.session.username !== username || req.session.username == null) {
         return res.status(401).json({ error: 'Unauthorized request: this user is not authenticated or does not have permission to modify this profile.' });
     }
-
-    const posts = await db.send_sql('SELECT * FROM posts;');
+    
     try {
-        const posts = await db.send_sql(sql);
+        const query = `
+            SELECT p.*, COUNT(l.liker) as likes
+            FROM posts p
+            LEFT JOIN likes l ON p.postID = l.postID
+            WHERE p.userID = (SELECT userID FROM users WHERE username = '${username}')
+            GROUP BY p.postID
+            ORDER BY p.timeStamp DESC;
+        `;
+        console.log("query", query);
+        const posts = await db.send_sql(query);
         res.status(200).json(posts);
     } catch (error) {
-        res.status(500).json({error: 'Error querying database'});
+        res.status(500).json({error: 'Error querying database', details: error.message});
     }
 });
 
 //create a new post
 posts.post('/newPost', async (req, res) => {
     const {caption, hashtag, image, postVisibility} = req.body;
-    const username = req.session.username; // USE req.session.username INSTEAD
+    const username = req.session.username; 
 
     //check if at least one of caption, hashtag, or image is provided
     if (!((authUtils.isOK(caption) || authUtils.isOK(hashtag) || authUtils.isOK(image)))) {
@@ -54,23 +109,23 @@ posts.post('/newPost', async (req, res) => {
         res.status(400).json({error: 'postVisibility is required'});
         return;
      }
-     
-    // const kafkaPost = {
-    //     post_json: {
-    //         username: username,
-    //         source_site: 'g07',
-    //         post_uuid_within_site: null, //gets replaced with the postID of the new post
-    //         post_text: caption,
-    //         content_type: 'BLOB' //NOTE: replace with public url to the s3 image file
-    //     },
-    //     attach: {image}
-    // }
+
+     let s3url;
+     if (image) {
+        try {
+            s3url = await uploadImageToS3(image);
+        } catch (error) {
+            console.error("Error uploading image: ", error);
+            return res.status(500).json({error: 'Error uploading image'});
+        }
+     }
      
      const post_json = {
         username: username,
         source_site: 'g07',
         post_uuid_within_site: null, //replace with the postID of the new post
         post_text: caption,
+        content_type: s3url
      };
 
     const getUserID = async (username) => {
@@ -86,10 +141,12 @@ posts.post('/newPost', async (req, res) => {
         image: image,
         caption: caption,
         postVisibility: postVisibility,
-        post_json: post_json // Object, not a string
+        post_json: post_json //Object, not a string
     };
+
     try {
         const postID = await createPost(newPostData);
+        post_json.post_uuid_within_site = postID; //to update the post_uuid_within_site
         res.status(201).json({message: 'Post created', postID: postID});
     } catch (error) {
         console.error("Error creating post: ", error);
@@ -128,12 +185,15 @@ posts.put('/updatePost/:postID', async (req, res) => {
     const post = await db.send_sql(`SELECT * FROM posts WHERE postID = ${postID}`);
     console.log("post " + JSON.stringify(post));
 
+
     const postUserID = post[0].userID;
     const postCaption = post[0].caption;
     const postHashtag = post[0].hashtag;
     const postImage = post[0].image;
     const postVisibilitys = post[0].postVisibility;
-    const postJson = post[0].post_json;
+    const postJson = JSON.parse(post[0].post_json);
+
+    console.log("postJson " + postJson);
 
     //get the userID from the username
     const query = `SELECT userID FROM users WHERE username = '${username}'`;
@@ -149,7 +209,8 @@ posts.put('/updatePost/:postID', async (req, res) => {
         await updatePost(postID, postCaption, postHashtag, postImage, postVisibilitys, postJson);
         res.status(200).json({message: 'Post updated'});
     } catch (error) {
-        res.status(500).json({error: 'Error querying database'});
+        console.error(error); // Log the error message
+        res.status(500).json({error: 'Error querying database', details: error.message});
     }
 });
 
@@ -168,10 +229,16 @@ posts.delete('/deletePost/:postID', async (req, res) => {
 
     //get the post from the database
     const post = await db.send_sql(`SELECT * FROM posts WHERE postID = ${postID}`);
-    console.log("post[0].userID " +  post[0].userID);
+    const postUserID = post[0].userID;
+    console.log("post[0].userID " +  postUserID);
+
+    //get the userID from the username
+    const query = `SELECT userID FROM users WHERE username = '${username}'`;
+    const result = await db.send_sql(query);
+    const userID = result[0].userID;
 
     //check if the post exists and if the userID matches
-    if (!post || post[0].userID !== username) {
+    if (post.length == 0 || postUserID != userID) {
         res.status(403).json({ error: 'post does not exist or not your post to delete'});
         return;
     }   
@@ -195,17 +262,28 @@ posts.post('/likePost/:postID', async (req, res) => {
         return res.status(401).json({ error: 'Unauthorized request: this user is not authenticated or does not have permission to modify this profile.' });
     }
 
+    //get the userID from the username
+    const query = `SELECT userID FROM users WHERE username = '${username}'`;
+    const result = await db.send_sql(query);
+    const userID = result[0].userID;
+
+    //check if the user has already liked this post
+    const likeQuery = `SELECT * FROM likes WHERE postID = ${postID} AND liker = '${userID}'`;
+    const likeResult = await db.send_sql(likeQuery);
+    if (likeResult.length > 0) {
+        return res.status(400).json({ error: 'You have already liked this post.' });
+    }
+
     try {
-        await likePost(postID, username);
+        await likePost(postID, userID);
         res.status(200).json({message: 'Post liked.'});
     } catch (error) {
-        res.status(500).json({error: 'Error querying database.'});
+        res.status(500).json({error: 'Error querying database.', details: error.message});
     }
-    res.status(200).json({ message: 'post liked successfully' });
 });
 
 //comment on a post
-posts.post('/commentPost', async (req, res) => {
+posts.post('/commentPost/:postID', async (req, res) => {
     const postID = Number(req.params.postID);
     console.log(`postID in commentPost: ${postID}`);
 
@@ -219,11 +297,15 @@ posts.post('/commentPost', async (req, res) => {
         return res.status(401).json({ error: 'Unauthorized request: this user is not authenticated or does not have permission to modify this profile.' });
     }
 
-    const {content, parentCommentID} = req.body;
+    let {content, parentCommentID} = req.body;
+    //check if parentCommentID is given, if not, set it to null
+    if (!parentCommentID) {
+        parentCommentID = null;
+    }
     console.log(`content: ${content}, parentCommentID: ${parentCommentID}`);
 
     //check if comment is gievn
-    if (!comment) {
+    if (!content) {
         res.status(400).json({error: 'you need to give a comment'});
         return;
     }
@@ -231,33 +313,40 @@ posts.post('/commentPost', async (req, res) => {
     const post = await db.send_sql(`SELECT * FROM posts WHERE postID = ${postID}`);
     console.log(`post: ${JSON.stringify(post)}`);
 
-    const postUserID = post[0].userID; 
-    console.log("postUserID " + postUserID);
+    //get the userID from the username
+    const query = `SELECT userID FROM users WHERE username = '${username}'`;
+    const result = await db.send_sql(query);
+    const userID = result[0].userID;
 
     //check if the actually post exists
-    if (!post || postlength == 0) {
+    if (!post || post.length == 0) {
         res.status(404).json({error: 'Post does not exist'});
         return;
     }
     try {
-        await commentPost(postID, username, content, parentCommentID);
+        await commentPost(postID, userID, content, parentCommentID);
         res.status(200).json({message: 'Comment posted.'});
     } catch (error) {
-        res.status(500).json({error: 'Error querying database.'});
+        res.status(500).json({error: 'Error querying database.', details: error.message});
     }
 });
 
 //fetch posts recommended for a user
-posts.get('/fetchPosts', async (req, res) => {
+posts.get('/fetchRecPosts', async (req, res) => {
     // Verify the user's original username for security reasons
-    if (!req.session || req.session.username !== username || req.session.username == null) {
+    const username = req.session.username; // USE req.session.username INSTEAD
+
+    if (!username || req.session.username !== username || req.session.username == null) {
         return res.status(401).json({ error: 'Unauthorized request: this user is not authenticated or does not have permission to modify this profile.' });
     }
+    const query = `SELECT userID FROM users WHERE username = '${username}'`;
+    const result = await db.send_sql(query);
+    const userID = result[0].userID;
     try {
-        const posts = await fetchPostsForUser(req.params.username);
+        const posts = await fetchPostsForUser(userID);
         res.status(200).json(posts);
     } catch (error) {
-        res.status(500).json({ error: 'Error querying database' });
+        res.status(500).json({ error: 'Error querying database', details: error.message});
     }
 });
 
