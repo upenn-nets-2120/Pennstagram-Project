@@ -1,8 +1,10 @@
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import styled from 'styled-components';
 import config from '../../config.json';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import { UserContext } from '../../providers/UserProvider';
+import { User } from '../../entities/User';
 
 const LoginContainer = styled.div`
     display: flex;
@@ -64,6 +66,8 @@ const LoginPage: React.FC = () => {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
 
+    const { login } = useContext(UserContext);
+
     const handleLogin = async (e: { preventDefault: () => void; }) => {
         e.preventDefault();
         try {
@@ -73,11 +77,40 @@ const LoginPage: React.FC = () => {
             password: password
           });
           console.log("Status:", response.status);
+          console.log(response);
           // console.log(response.status);
           // console.log("Response:", response);
           if (response.status === 200) {
             console.log('success!');
-            navigate('/feed'); 
+            console.log(response.data[0].userID);
+            console.log(response.data);
+            
+
+
+            const user: User = {
+                userID: response.data[0].userID || null,
+                username: username || '',
+                firstName: null,
+                lastName: null,
+                profilePic: null,
+                salted_password: null,
+                emailID: null,
+                actors: undefined,
+                birthday: null,
+                affiliation: null,
+                linked_actor_nconst: null,
+                inviters: undefined,
+                userProfilePic: null,
+                userScore: null,
+                userVisibility: null,
+                sessionToken: null,
+                follows_back: null,
+                requested: null
+            }
+
+            login(user);
+
+            navigate('/chat'); 
           } else if (response.status === 400){
             alert('Invalid username or password.'); 
           }

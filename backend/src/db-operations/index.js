@@ -24,6 +24,7 @@ export { default as deleteMessage } from './messages/delete-message.js';
 export { default as getMessagesFromChat } from './messages/get-messages.js';
 export { default as addUsers2chat } from './users2chats/add-user2chat.js';
 export { default as deleteUsers2chat } from './users2chats/delete-user2chat.js';
+export { default as getUsersFromChat } from './users2chats//get-users-from-chat.js';
 
 // exports for notifications
 export { default as addNotification } from './notifications/add-notification.js';

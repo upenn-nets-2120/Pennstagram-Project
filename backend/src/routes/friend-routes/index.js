@@ -118,8 +118,10 @@ friends.post('/acceptRequest/:userID/:requester', async (req, res) => {
             return;
         }
 
-        await deleteRequest(requester, userID);
+        await deleteRequest(userID, requester);
         await addFriend(requester, userID);
+
+        addNotification(requester, 'like', `${userID} has accepted your follow request!`);
 
         res.status(200).json({ message: 'Request accepted successfully' });
     } catch (error) {
@@ -157,7 +159,9 @@ friends.post('/addRequest/:userID/:requested', async (req, res) => {
             return;
         }
 
-        await addRequest(userID, requested);
+        await addRequest(requested, userID);
+
+        addNotification(requested, 'like', `${userID} has requested to follow you!`)
 
         res.status(200).json({ message: 'Request added successfully' });
     } catch (error) {
@@ -178,6 +182,8 @@ friends.post('/removeFriend/:userID/:friend', async (req, res) => {
 
         await deleteFriend(userID, friend);
 
+        addNotification(friend, 'like', `${userID} has stopped following you.`)
+
         res.status(200).json({ message: 'Friend removed successfully' });
     } catch (error) {
         console.error('Error removing friend:', error);
@@ -196,6 +202,8 @@ friends.post('/addFollower/:userID/:friend', async (req, res) => {
         }
 
         await addFriend(userID, friend);
+
+        addNotification(friend, 'like', `${userID} has started following you.`)
 
         res.status(200).json({ message: 'Follower added successfully' });
     } catch (error) {

@@ -1,13 +1,13 @@
 import styled from 'styled-components';
 
 interface UserActionButtonStyledProps {
-    backgroundColor?: string;
+    background_color?: string;
     disabled?: boolean;
 }
 
 export const UserActionButtonStyled = styled.button<UserActionButtonStyledProps>`
     padding: 5px 10px;
-    background-color: ${({ backgroundColor, theme }) => backgroundColor || theme.primaryColor};
+    background-color: ${({ background_color, theme }) => background_color || theme.primaryColor};
     color: ${({ theme }) => theme.backgroundColor};
     border: none;
     border-radius: 5px;
