@@ -12,7 +12,7 @@ const createPost = async (newPost) => {
     console.log("Creating post with data: ", newPost);
     const query = `
         INSERT INTO posts (userID, image, caption, postVisibility, post_json)
-        VALUES ("${newPost.userID}", "${imageValue}", "${newPost.caption}", "${newPost.postVisibility}", '${postJsonString}')
+        VALUES ("${newPost.userID}", ${imageValue}, "${newPost.caption}", "${newPost.postVisibility}", '${postJsonString}')
     `;
     console.log('query:', query, [postJsonString]);
     const result = await db.send_sql(query);

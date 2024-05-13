@@ -18,12 +18,13 @@ const upload = multer({ storage: multer.memoryStorage() });
 //upload image for a post
 posts.post('/uploadImage', upload.single('file'), async (req, res) => {
     // Verify the user's original username for security reasons
-    const username = req.session.username; // NOT SECURE, FIX LATER
+    const username = "testUser12345"; //req.session.username; 
+    console.log(username);
     const image = req.file;
 
-    if (!req.session || req.session.username !== username || req.session.username == null) {
-        return res.status(401).json({ error: 'Unauthorized request: this user is not authenticated or does not have permission to modify this profile.' });
-    }
+    // if (!req.session || req.session.username !== username || req.session.username == null) {
+    //     return res.status(401).json({ error: 'Unauthorized request: this user is not authenticated or does not have permission to modify this profile.' });
+    // }
 
     if (!image) {
         return res.status(400).json({error: 'No image provided'});
@@ -37,38 +38,20 @@ posts.post('/uploadImage', upload.single('file'), async (req, res) => {
     }
 });
 
-//upload image for a post
-posts.post('/uploadImage', async (req, res) => {
-    // Verify the user's original username for security reasons
-    const username = req.session.username;
-    const image = req.file;
-
-    if (!req.session || req.session.username !== username || req.session.username == null) {
-        return res.status(401).json({ error: 'Unauthorized request: this user is not authenticated or does not have permission to modify this profile.' });
-    }
-    if (!image) {
-        return res.status(400).json({error: 'No image provided'});
-    }
-    try {
-        const url = await uploadImageToS3(image);
-        res.status(200).json({imageUrl: url}); //throw this URL into the RDS in the frontend
-    } catch (err) {
-        res.status(500).json({error: 'Error uploading image'});
-    }
-});
 
 //fetch all posts for a user
 posts.get('/fetchAllPosts', async (req, res) => {
     console.log("fetchAllPosts");
-    const username = req.session.username;
+    const username = "testUser12345"; //req.session.username; 
+    console.log(username);
     if (!authUtils.isOK(username)) {
         return res.status(403).json({error: 'You forgot an input OR: one or more of your inputs is potentially an SQL injection attack.'})
     }
 
     // Verify the user's original username for security reasons
-    if (!req.session || req.session.username !== username || req.session.username == null) {
-        return res.status(401).json({ error: 'Unauthorized request: this user is not authenticated or does not have permission to modify this profile.' });
-    }
+    // if (!req.session || req.session.username !== username || req.session.username == null) {
+    //     return res.status(401).json({ error: 'Unauthorized request: this user is not authenticated or does not have permission to modify this profile.' });
+    // }
     
     try {
         const query = `
@@ -90,17 +73,18 @@ posts.get('/fetchAllPosts', async (req, res) => {
 //create a new post
 posts.post('/newPost', async (req, res) => {
     const { caption, postVisibility, imageUrl } = req.body;
-    const username = req.session.username; 
+    const username = "testUser12345"; //req.session.username; 
+    console.log(username);
     // const url = req.session.s3url; // Retrieve the S3 URL from the session
 
     //check if caption
     if (!(authUtils.isOK(caption))) {
         return res.status(400).json({error: 'caption is potentially an SQL injection attack'});
     }
-    // Verify the user's original username for security reasons
-    if (!req.session || req.session.username !== username || req.session.username == null) {
-        return res.status(401).json({ error: 'Unauthorized request: this user is not authenticated or does not have permission to modify this profile.' });
-    }
+    // // Verify the user's original username for security reasons
+    // if (!req.session || req.session.username !== username || req.session.username == null) {
+    //     return res.status(401).json({ error: 'Unauthorized request: this user is not authenticated or does not have permission to modify this profile.' });
+    // }
 
     //check if postVisibility is provided
     if (!postVisibility || !['everyone', 'private', 'followers'].includes(postVisibility)) {
@@ -116,16 +100,21 @@ posts.post('/newPost', async (req, res) => {
         content_type: imageUrl
      };
 
-    const getUserID = async (username) => {
-        const query = `SELECT userID FROM users WHERE username = '${username}'`;
-        const result = await db.send_sql(query);
-        return result[0].userID;
-    };
+    //get the userID from the username
+    const query = `SELECT userID FROM users WHERE username = '${username}'`;
+    const result = await db.send_sql(query);
+    const userID = result[0].userID;
 
-    const usernamesUserID = await getUserID(username);
+    // const getUserID = async (username) => {
+    //     const query = `SELECT userID FROM users WHERE username = '${username}'`;
+    //     const result = await db.send_sql(query);
+    //     return result[0].userID;
+    // };
+
+    // const usernamesUserID = await getUserID(username);
 
     const newPostData = {
-        userID: usernamesUserID,
+        userID: userID,
         image: imageUrl,
         caption: caption,
         postVisibility: postVisibility,
@@ -136,7 +125,7 @@ posts.post('/newPost', async (req, res) => {
         const postID = await createPost(newPostData);
         post_json.post_uuid_within_site = postID; //to update the post_uuid_within_site
         console.log("post_json " + JSON.stringify(post_json));
-        console.log("newPostDATA " + newPostData);
+        console.log("newPostDATA " + JSON.stringify(newPostData));
         res.status(201).json({message: 'Post created', postID: postID});
     } catch (error) {
         console.error("Error creating post: ", error);
@@ -150,14 +139,15 @@ posts.put('/updatePost/:postID', async (req, res) => {
     if (isNaN(postID)) {
         return res.status(400).json({error: 'Invalid postID'});
     }
-    const {caption, hashtag, image, postVisibility} = req.body;
-    const username = req.session.username; // USE req.session.username INSTEAD
+    const {caption, postVisibility, imageUrl} = req.body;
+    const username = "testUser12345"; //req.session.username; 
+
     console.log("postID " + postID);
     console.log("username " + username);
 
     //check if at least one of caption, hashtag, or image is provided
-    if (!((authUtils.isOK(caption) || authUtils.isOK(hashtag) || authUtils.isOK(image)) || authUtils.isOK(postVisibility))) {
-        return res.status(400).json({error: 'at least one of caption, hashtag, or image must be provided OR one or more of your inputs is potentially an SQL injection attack'});
+    if (!((authUtils.isOK(caption)))) {
+        return res.status(400).json({error: 'caption is potentially an SQL injection attack'});
     }
 
     //check if postVisibility is valid
@@ -167,9 +157,9 @@ posts.put('/updatePost/:postID', async (req, res) => {
     }
 
     // Verify the user's original username for security reasons
-    if (!req.session || req.session.username !== username || req.session.username == null) {
-        return res.status(401).json({ error: 'Unauthorized request: this user is not authenticated or does not have permission to modify this profile.' });
-    }
+    // if (!req.session || req.session.username !== username || req.session.username == null) {
+    //     return res.status(401).json({ error: 'Unauthorized request: this user is not authenticated or does not have permission to modify this profile.' });
+    // }
 
     //get the post from the database
     const post = await db.send_sql(`SELECT * FROM posts WHERE postID = ${postID}`);
@@ -183,6 +173,7 @@ posts.put('/updatePost/:postID', async (req, res) => {
     const postVisibilitys = post[0].postVisibility;
     const postJson = JSON.parse(post[0].post_json);
 
+    console.log("postImage " + postImage);
     console.log("postJson " + postJson);
 
     //get the userID from the username
@@ -196,7 +187,7 @@ posts.put('/updatePost/:postID', async (req, res) => {
         return;
     }  
     try {
-        await updatePost(postID, postCaption, postHashtag, postImage, postVisibilitys, postJson);
+        await updatePost(postID, postCaption, postHashtag, imageUrl ? imageUrl : postImage, postVisibilitys, postJson);
         res.status(200).json({message: 'Post updated'});
     } catch (error) {
         console.error(error); // Log the error message
@@ -210,12 +201,12 @@ posts.delete('/deletePost/:postID', async (req, res) => {
     if (isNaN(postID)) {
         return res.status(400).json({error: 'Invalid postID'});
     }
-    const username = req.session.username; // USE req.session.username INSTEAD
+    const username = "testUser12345"; //req.session.username; 
 
-     // Verify the user's original username for security reasons
-    if (!req.session || req.session.username !== username || req.session.username == null) {
-        return res.status(401).json({ error: 'Unauthorized request: this user is not authenticated or does not have permission to modify this profile.' });
-    }
+    //  // Verify the user's original username for security reasons
+    // if (!req.session || req.session.username !== username || req.session.username == null) {
+    //     return res.status(401).json({ error: 'Unauthorized request: this user is not authenticated or does not have permission to modify this profile.' });
+    // }
 
     //get the post from the database
     const post = await db.send_sql(`SELECT * FROM posts WHERE postID = ${postID}`);
@@ -225,7 +216,9 @@ posts.delete('/deletePost/:postID', async (req, res) => {
     //get the userID from the username
     const query = `SELECT userID FROM users WHERE username = '${username}'`;
     const result = await db.send_sql(query);
+    console.log('Result:', result);
     const userID = result[0].userID;
+    console.log("result[0].userID " + result[0].userID);
 
     //check if the post exists and if the userID matches
     if (post.length == 0 || postUserID != userID) {
@@ -246,7 +239,7 @@ posts.post('/likePost/:postID', async (req, res) => {
     if (isNaN(postID)) {
         return res.status(400).json({error: 'Invalid postID'});
     }
-    const username = req.session.username; 
+    const username = "testUser12345"; //req.session.username; 
     // Verify the user's original username for security reasons
     if (!req.session || req.session.username !== username || req.session.username == null) {
         return res.status(401).json({ error: 'Unauthorized request: this user is not authenticated or does not have permission to modify this profile.' });
@@ -280,7 +273,7 @@ posts.post('/commentPost/:postID', async (req, res) => {
     if (isNaN(postID)) {
         return res.status(400).json({error: 'Invalid postID'});
     }
-    const username = req.session.username; // USE req.session.username INSTEAD
+    const username = "testUser12345"; //req.session.username; 
 
     // Verify the user's original username for security reasons
     if (!req.session || req.session.username !== username || req.session.username == null) {
@@ -324,7 +317,7 @@ posts.post('/commentPost/:postID', async (req, res) => {
 //fetch posts recommended for a user
 posts.get('/fetchRecPosts', async (req, res) => {
     // Verify the user's original username for security reasons
-    const username = req.session.username; // USE req.session.username INSTEAD
+    const username = "testUser12345"; //req.session.username; 
 
     if (!username || req.session.username !== username || req.session.username == null) {
         return res.status(401).json({ error: 'Unauthorized request: this user is not authenticated or does not have permission to modify this profile.' });

@@ -9,24 +9,28 @@ console.log("rootURL: ", rootURL);
 
   const [content, setContent] = useState('');
   const [image, setImage] = useState<File | null>(null);
-  const [postVisibility, setPostVisibility] = useState('everyone');
+  const [postVisibility, setPostVisibility] = useState('');
 
+  const [updatePostId, setUpdatePostId] = useState('');
+  const [updateContent, setUpdateContent] = useState('');
+  const [updateImage, setUpdateImage] = useState<File | null>(null);
+  const[updatePostVisibility, setUpdatePostVisibility] = useState(''); 
+  
+  const [deletePostId, setDeletePostId] = useState('');
+  
   const handleImageUpload = async () => {
     if (!image) {
         return null;
     }
     console.log("image not null");
     const formData = new FormData();
-    formData.append('image', image);
-
-    //http://localhost:3000/
-    //http://localhost:8080/
+    formData.append('file', image);
 
     try {
         const response = await axios.post(`${rootURL}/posts/uploadImage`, formData);
         console.log("after response " + response);
-        console.log("response.data.url: " + response.data.url)
-        return response.data.url;
+        console.log("response.data.url: " + response.data.imageUrl)
+        return response.data.imageUrl;
     } catch (error) {
   if (axios.isAxiosError(error)) {
     if (error.response) {
@@ -43,8 +47,38 @@ console.log("rootURL: ", rootURL);
     console.log(error.config);
   }
   throw error;
-}
-  };
+}};
+
+const handleUpdateImageUpload = async () => {
+  if (!updateImage) {
+    return null;
+  }
+  console.log("updateImage not null");
+  const formData = new FormData();
+  formData.append('file', updateImage);
+
+  try {
+    const response = await axios.post(`${rootURL}/posts/uploadImage`, formData);
+    console.log("after response " + response);
+    console.log("response.data.url: " + response.data.imageUrl)
+    return response.data.imageUrl;
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      if (error.response) {
+        console.log(error.response.data);
+        console.log(error.response.status);
+        console.log(error.response.headers);
+      } else if (error.request) {
+        // The request was made but no response was received
+        console.log(error.request);
+      } else {
+        // Something happened in setting up the request that triggered an Error
+        console.log('Error', error.message);
+      }
+      console.log(error.config);
+    }
+    throw error;
+  }};
 
 const handleSubmit = async (event: React.FormEvent) => {
   event.preventDefault();
@@ -56,7 +90,7 @@ const handleSubmit = async (event: React.FormEvent) => {
     console.log('Image uploaded, URL:', imageUrl);
 
     const postData = {
-      content,
+      caption: content,
       imageUrl,
       postVisibility,
     };
@@ -88,6 +122,75 @@ const handleSubmit = async (event: React.FormEvent) => {
   }
 };
 
+const handleUpdate = async (event: React.FormEvent) => {
+  event.preventDefault();
+
+  console.log('handleUpdate called');
+
+  try {
+    const imageUrl = await handleUpdateImageUpload();
+    console.log('Image uploaded, URL:', imageUrl);
+
+    const postData = {
+      caption: updateContent,
+      imageUrl,
+      postVisibility: updatePostVisibility,
+    };
+    console.log('Update data:', postData);
+
+    const response = await axios.put(`${rootURL}/posts/updatePost/${updatePostId}`, postData, {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+    console.log('Response from server:', response);
+  } catch (error) {
+    console.error('Error in handleSubmit:', error);
+    if (axios.isAxiosError(error)) {
+      if (error.response) {
+        console.log('Server responded with status:', error.response.status);
+        console.log('Response data:', error.response.data);
+        console.log('Response headers:', error.response.headers);
+      } else if (error.request) {
+        console.log('Request made but no response received');
+        console.log('Request:', error.request);
+      } else {
+        console.log('Error setting up request:', error.message);
+      }
+      console.log('Config:', error.config);
+    }
+    throw error;
+  }
+};
+
+const handleDelete = async (event: React.FormEvent) => {
+  event.preventDefault();
+
+  console.log('handleDelete called');
+
+  try {
+    const response = await axios.delete(`${rootURL}/posts/deletePost/${deletePostId}`);
+    console.log('Response from server:', response);
+  } catch (error) {
+    console.error('Error in handleDelete:', error);
+    if (axios.isAxiosError(error)) {
+      if (error.response) {
+        console.log('Server responded with status:', error.response.status);
+        console.log('Response data:', error.response.data);
+        console.log('Response headers:', error.response.headers);
+      } else if (error.request) {
+        console.log('Request made but no response received');
+        console.log('Request:', error.request);
+      } else {
+        console.log('Error setting up request:', error.message);
+      }
+      console.log('Config:', error.config);
+    }
+    throw error;
+  }
+};
+
+
   return (
     <>
       <NavBar />
@@ -111,6 +214,38 @@ const handleSubmit = async (event: React.FormEvent) => {
             </select>
           </label>
           <input type="submit" value="Create Post" />
+        </form>
+        <h2 style={{ textAlign: 'center' }}>Update Post</h2>
+        <form onSubmit={handleUpdate} style={{ display: 'flex', flexDirection: 'column', gap: '1em' }}>
+          <label>
+            Post ID:
+            <input type="text" value={updatePostId} onChange={e => setUpdatePostId(e.target.value)} />
+          </label>
+          <label>
+            New Content:
+            <textarea value={updateContent} onChange={e => setUpdateContent(e.target.value)} style={{ width: '100%', minHeight: '100px' }} />
+          </label>
+          <label>
+            New Image:
+            <input type="file" onChange={e => setUpdateImage(e.target.files ? e.target.files[0] : null)} />
+          </label>
+          <label>
+            Visibility:
+            <select value={updatePostVisibility} onChange={e => setUpdatePostVisibility(e.target.value)}>
+              <option value="everyone">Everyone</option>
+              <option value="private">Private</option>
+              <option value="followers">Followers</option>
+            </select>
+          </label>
+          <input type="submit" value="Update Post" />
+        </form>
+        <h2 style={{ textAlign: 'center' }}>Delete Post</h2>
+        <form onSubmit={handleDelete} style={{ display: 'flex', flexDirection: 'column', gap: '1em' }}>
+          <label>
+            Post ID:
+            <input type="text" value={deletePostId} onChange={e => setDeletePostId(e.target.value)} />
+          </label>
+          <input type="submit" value="Delete Post" />
         </form>
       </div>
     </>

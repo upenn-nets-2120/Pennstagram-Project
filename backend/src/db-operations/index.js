@@ -40,18 +40,18 @@ export { default as getTopHashtagsSem } from './registration/get-top-hashtags.js
 export { default as addUserHashtags } from './registration/add-user-hashtags.js';
 export { default as checkUsernameValid } from './registration/check-username-valid.js';
 
-// exports for profile modification/similar actors
-export { default as modifyUser } from './profile/modify-profile.js';
-export { default as modifyUserHashtag } from './profile/modify-user-hashtags.js';
-export { default as modifyProfilePic } from './profile/modify-profile-pic.js';
-export { default as modifyLinkedActor } from './profile/modify-linked-actor.js';
-export { default as modifySimilarActors } from './profile/modify-similar-actors.js';
-export { default as deleteSimilarActors } from './profile/delete-similar-actors.js';
-export { default as calculateFaceMatches } from './profile/calculate-face-matches.js';
-export { default as getUserHashtags } from './profile/get-user-hashtags.js';
-export { default as getTopHashtagsAlain } from './profile/get-top-hashtags.js';
-export { default as getProfilePic } from './profile/get-profile-pic.js';
-export { default as getSimilarActors } from './profile/get-similar-actors.js';
+// // exports for profile modification/similar actors
+// export { default as modifyUser } from './profile/modify-profile.js';
+// export { default as modifyUserHashtag } from './profile/modify-user-hashtags.js';
+// export { default as modifyProfilePic } from './profile/modify-profile-pic.js';
+// export { default as modifyLinkedActor } from './profile/modify-linked-actor.js';
+// export { default as modifySimilarActors } from './profile/modify-similar-actors.js';
+// export { default as deleteSimilarActors } from './profile/delete-similar-actors.js';
+// //export { default as calculateFaceMatches } from './profile/calculate-face-matches.js';
+// export { default as getUserHashtags } from './profile/get-user-hashtags.js';
+// export { default as getTopHashtagsAlain } from './profile/get-top-hashtags.js';
+// export { default as getProfilePic } from './profile/get-profile-pic.js';
+// export { default as getSimilarActors } from './profile/get-similar-actors.js';
 
 // exports for posts/feed
 export { default as linkHashtagsToPost } from './posts/link-hashtags-to-posts.js';

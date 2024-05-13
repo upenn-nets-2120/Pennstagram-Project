@@ -5,14 +5,14 @@ import registrationRoutes from './registration-routes/index.js';
 import notificationRoutes from './notification-routes/index.js';
 import chatRoutes from './chat-routes/index.js';
 import loginRoutes from './login-routes/index.js';
-import profileRoutes from './profile-routes/index.js';
+////import profileRoutes from './profile-routes/index.js';
 import searchRoutes from './search-routes/index.js';
 
 const routes = express.Router();
 
 routes.use('/posts', postsRoutes);
 routes.use('/friends', friendRoutes);
-routes.use('/profile', profileRoutes);
+//routes.use('/profile', profileRoutes);
 routes.use('/search', searchRoutes);
 routes.use('/registration', registrationRoutes);
 routes.use('/notification', notificationRoutes);
