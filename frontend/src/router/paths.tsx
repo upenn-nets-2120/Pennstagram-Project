@@ -2,6 +2,7 @@ export const HOME_PATH = '/home';
 export const REGISTER_PATH = '/register';
 export const LOGIN_PATH = '/login';
 export const FEED_PATH = '/feed';
+export const POST_PATH = '/post';
 export const FRIENDS_PATH = '/friends';
 export const CHAT_PATH = '/chat/:chatID?';
 export const FORGOT_PATH = '/forgot-password';
@@ -21,6 +22,10 @@ export type RouterPathsMap = {
         queryParams: undefined;
     };
     [FEED_PATH]: {
+        urlParams: undefined;
+        queryParams: undefined;
+    };
+    [POST_PATH]: {
         urlParams: undefined;
         queryParams: undefined;
     };

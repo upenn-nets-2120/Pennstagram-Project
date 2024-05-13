@@ -7,6 +7,7 @@ import Friends from './Friends';
 import Chat from './Chat';
 import Search from './Search';
 import Feed from './Feed';
+import Post from './Post';
 
 const App = () => {
     return (
@@ -18,6 +19,7 @@ const App = () => {
             <Route path="/chat" component={Chat} />
             <Route path="/search" component={Search} />
             <Route path="/feed" component={Feed} />
+            <Route path="/post" component={Post} />
         </Router>
     );
 };

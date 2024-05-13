@@ -29,7 +29,7 @@ posts.post('/uploadImage', upload.single('file'), async (req, res) => {
     }
     try {
         const url = await uploadImageToS3(image);
-        res.status(200).json({imageUrl: url});
+        res.status(200).json({imageUrl: url}); //throw this URL into the RDS in the frontend
     } catch (err) {
         res.status(500).json({error: 'Error uploading image', details: err.message});
     }
