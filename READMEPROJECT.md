@@ -16,7 +16,6 @@
 
 ### Features Implemented
 - Feature 1: Chats
-    -
 - Feature 2: Post
 - Feature 3: Home
 - Feature 4: Registration
