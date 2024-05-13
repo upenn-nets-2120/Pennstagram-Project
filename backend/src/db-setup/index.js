@@ -41,8 +41,8 @@ const create_tables = async (db) => {
     // requestsCreateTable(db),
     // users2postsCreateTable(db),
     // users2chatsCreateTable(db),
-    // users2actorsCreateTable(db),
     // actorsCreateTable(db),
+    // users2actorsCreateTable(db),
     // actorsLoadTable(db),
     codesCreateTable(db)
   ]);

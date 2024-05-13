@@ -25,17 +25,19 @@ const actorsLoadTable = async (db) => {
       insertDataIntoDB(db, results);
     });
 };
+
 function insertDataIntoDB(db, data) {
   data.forEach(item => {
-    const query = 'INSERT INTO actors SET ?';
-    const values = {
-      primaryName: item.primaryName,
-      birthYear: item.birthYear,
-      deathYear: item.deathYear,
-      actor_nconst_short: item.nconst_short
-    };
+    // Construct the query using `${}` string interpolation
 
-    db.send_sql(query, values, (error, results) => {
+    const fixedPrimaryName = item.primaryName.replace(/'/g, "''");
+
+    const query = `
+      INSERT INTO actors (primaryName, birthYear, deathYear, actor_nconst_short)
+      VALUES ('${fixedPrimaryName}', ${item.birthYear === null ? 'NULL' : item.birthYear}, ${item.deathYear === null ? 'NULL' : item.deathYear}, '${item.nconst_short}')
+    `;
+
+    db.send_sql(query, [], (error, results) => {
       if (error) {
         console.error(error.message);
         return;

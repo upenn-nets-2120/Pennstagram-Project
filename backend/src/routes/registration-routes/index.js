@@ -12,7 +12,7 @@ import authUtils from '../../utils/authUtils.js';
 const register = express.Router();
 
 register.post('/', async (req, res) => {
-    const { username, password, email, affiliation, birthday, profilePhoto, hashtags, userVisibility } = req.body;
+    const { username, password, email, affiliation, birthday, /* profilePhoto, */ hashtags, userVisibility } = req.body;
 
     if (!username || !password || !email || !affiliation || !birthday) {
         return res.status(400).json({ error: 'All fields are required' });
@@ -58,30 +58,30 @@ register.post('/', async (req, res) => {
     }
     console.log('Account created');
 
-    if (!profilePhoto) {
-        return res.status(400).json({ error: 'Profile photo is required' });
-    }
+    // if (!profilePhoto) {
+    //     return res.status(400).json({ error: 'Profile photo is required' });
+    // }
 
-    try {
-        await updateProfilePhoto(username, profilePhoto);
-    } catch (error) {
-        return res.status(500).json({ error: 'Error updating profile photo' });
-    }
-    console.log('Profile photo updated successfully');
+    // try {
+    //     await updateProfilePhoto(username, profilePhoto);
+    // } catch (error) {
+    //     return res.status(500).json({ error: 'Error updating profile photo' });
+    // }
+    // console.log('Profile photo updated successfully');
 
-    if (!authUtils.isOK(username) || !authUtils.isOK(hashtags)) {
+    if (!authUtils.isOK(username) /* || !authUtils.isOK(hashtags) */ ) {
         return res.status(403).json({error: 'One or more of your inputs is potentially an SQL injection attack.'})
     }
 
-    if (!hashtags || hashtags.length === 0) {
-        return res.status(400).json({ error: 'At least one hashtag must be selected' });
-    }
+    // if (!hashtags || hashtags.length === 0) {
+    //     return res.status(400).json({ error: 'At least one hashtag must be selected' });
+    // }
 
-    try {
-        await addUserHashtags(username, hashtags);
-    } catch (error) {
-        return res.status(500).json({ error: 'Error adding hashtags' });
-    }
+    // try {
+    //     await addUserHashtags(username, hashtags);
+    // } catch (error) {
+    //     return res.status(500).json({ error: 'Error adding hashtags' });
+    // }
 
     return res.status(201).json({ message: 'Account created successfully' });
 });

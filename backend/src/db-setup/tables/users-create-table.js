@@ -12,7 +12,7 @@ const usersCreateTable = async (db) => {
             affiliation VARCHAR(255),
             linked_actor_nconst VARCHAR(10),
             inviters INT,
-            userProfilePic VARCHAR(255),
+            profilePicURL VARCHAR(255),
             userScore INT,
             userVisibility ENUM('public', 'private'),
             sessionToken VARCHAR(255)
