@@ -1,6 +1,6 @@
 ## Team Information
 
-- **Team Number**: g07
+- **Team Number**: go7
 - **Team Name**: project-electro-motive-diesel-sd70-ace-t4
 
 
