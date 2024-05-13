@@ -81,7 +81,6 @@ const RegisterPage: React.FC = () => {
         const fetchHashtags = async () => {
             try {
                 const response = await axios.get(`${rootURL}/registration/select-hashtags`);
-                console.log("HASHTAGS", response.data);
                 if (response) {
                     // setHashtags(response.data.popularHashtags);
                     setHashtags(response.data.popularHashtags.map((h: any) => ({
@@ -177,28 +176,34 @@ const RegisterPage: React.FC = () => {
                 return;
             }
             try {
+                console.log("profilePHOTO", profilePhoto);
+                const formData = new FormData();
+                formData.append('file', profilePhoto); 
+                formData.append('username', username);
+                const response2 = await axios.post(`${rootURL}/registration/uploadImage`, formData, {
+                    headers: {
+                        'Content-Type': 'multipart/form-data',
+                    },
+                });
+
+                console.log(response2.status);
+                console.log(response2);
+
                 console.log(`${config.serverRootURL}/registration`)
-                console.log("DATA: ", {username, password, email, affiliation, birthday, profilePhoto, selectedHashtags});
+                console.log("DATA: ", {username, password, email, affiliation, birthday, selectedHashtags});
                 const response = await axios.post(`${rootURL}/registration`, {
                     username: username,
                     password: password,
                     email: email,
                     affiliation: affiliation,
                     birthday: birthday,
-                    profilePhoto: profilePhoto,
                     hashtags: selectedHashtags,
                     userVisibility: visibility,
                   });
                 console.log(response.status);
                 console.log(response);
 
-                // const response2 = await axios.post(`${rootURL}/registration/upload-profile-photo`, {
-                //     username: username,
-                //     profilePic: profilePic,
-                //   });
-
-                // console.log(response2.status);
-                // console.log(response2);
+                
 
                 // const response3 = await axios.post(`${rootURL}/registration/select-hashtags`, {
                 //     userID: response1,
@@ -207,10 +212,10 @@ const RegisterPage: React.FC = () => {
 
                 // console.log(response3.status);
                 // console.log(response3);
-                if (response.status === 200) {
+                if (response.status === 201 && response2.status === 200) {
                     navigate('/feed'); 
                 } else {
-                    alert('Registration failed'); 
+                    alert('Registration'); 
                 }
             } catch (error) {
                 let errorMessage: string;

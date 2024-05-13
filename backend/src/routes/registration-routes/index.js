@@ -8,22 +8,26 @@ import {
     checkUsernameValid
 } from '../../db-operations/index.js';
 import authUtils from '../../utils/authUtils.js';
+import { uploadImageToS3 } from '../../db-operations/s3-operations/index.js';
+import multer from 'multer';
+
+const upload = multer({ storage: multer.memoryStorage() });
 
 const register = express.Router();
 
 register.post('/', async (req, res) => {
-    const { username, password, email, affiliation, birthday, profilePhoto, hashtags, userVisibility } = req.body;
+    const { username, password, email, affiliation, birthday, hashtags, userVisibility } = req.body;
 
     if (!username || !password || !email || !affiliation || !birthday) {
         return res.status(400).json({ error: 'All fields are required' });
     }
 
     if (!authUtils.isOK(username) || !authUtils.isOK(password)) {
-        return res.status(403).json({error: 'One or more of your inputs is potentially an SQL injection attack.'})
+        return res.status(403).json({error: 'You forgot an input OR one or more of your inputs is potentially an SQL injection attack.'})
     }
 
     try {
-        const usernameValid = await checkUsernameValid(username);
+        const usernameValid = await checkUsernameValid(username, email);
         if (!usernameValid) {
             return res.status(409).json({ error: 'Username or email already exists' });
         }
@@ -50,35 +54,27 @@ register.post('/', async (req, res) => {
     }
 
     // add the user to the database if we got here
+    let userId;
     try {
-        await addUser(username, encryptedPassword, email, affiliation, birthday, userVisibility);
+        const newUser = await addUser(username, encryptedPassword, email, affiliation, birthday, userVisibility);
+        userId = newUser.insertId;
     } catch (error) {
         console.log(error);
         return res.status(500).json({ error: 'Error adding user to database' });
     }
     console.log('Account created');
 
-    if (!profilePhoto) {
-        return res.status(400).json({ error: 'Profile photo is required' });
-    }
-
-    try {
-        await updateProfilePhoto(username, profilePhoto);
-    } catch (error) {
-        return res.status(500).json({ error: 'Error updating profile photo' });
-    }
-    console.log('Profile photo updated successfully');
-
-    if (!authUtils.isOK(username) || !authUtils.isOK(hashtags)) {
-        return res.status(403).json({error: 'One or more of your inputs is potentially an SQL injection attack.'})
+    if (!authUtils.isOK(username)) {
+        return res.status(403).json({error: 'You forgot an input OR one or more of your inputs is potentially an SQL injection attack.'})
     }
 
     if (!hashtags || hashtags.length === 0) {
         return res.status(400).json({ error: 'At least one hashtag must be selected' });
     }
 
+    console.log("ID: ", userId);
     try {
-        await addUserHashtags(username, hashtags);
+        await addUserHashtags(userId, hashtags);
     } catch (error) {
         return res.status(500).json({ error: 'Error adding hashtags' });
     }
@@ -99,7 +95,23 @@ register.get('/select-hashtags', async (req, res) => {
     return popularHashtags;
 });
 
+register.post('/uploadImage', upload.single('file'), async (req, res) => {
+    // Verify the user's original username for security reasons
+    // const username = req.body.username;
+    const image = req.file;
+    console.log("file:", req.file);
 
+    if (!image) {
+        return res.status(400).json({error: 'No image provided'});
+    }
+
+    try {
+        const url = await uploadImageToS3(image);
+        res.status(200).json({imageUrl: url});
+    } catch (err) {
+        res.status(500).json({error: 'Error uploading image', details: err.message});
+    }
+});
 
 export default register;
 

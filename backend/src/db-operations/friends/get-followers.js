@@ -5,7 +5,7 @@ const getFollowersFromUser = async (userID) => {
         SELECT
             users.*,
             CASE
-                WHEN friends.follower IS NULL THEN 0
+                WHEN friends2.follower IS NULL THEN 0
                 ELSE 1
             END AS follows_back,
             CASE
@@ -13,15 +13,17 @@ const getFollowersFromUser = async (userID) => {
                 ELSE 1
             END AS requested
         FROM
-            users
+            friends
+        JOIN
+            users ON friends.follower = users.userID
         LEFT JOIN
-            friends ON friends.follower = users.userID AND friends.followed = '${userID}'
+            friends friends2 ON friends2.follower = '${userID}' AND friends2.followed = friends.follower
         LEFT JOIN
-            requests ON requests.requesting = '${userID}' AND requests.userID = users.userID
+            requests ON requests.requesting = friends.followed AND requests.userID = friends.follower
         WHERE
             friends.followed = '${userID}'
     ;`;
-    
+
     return await db.send_sql(sql);
 }
 

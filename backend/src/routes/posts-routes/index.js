@@ -9,7 +9,7 @@ import {
     fetchPostsForUser
 } from '../../db-operations/index.js';
 import authUtils from '../../utils/authUtils.js';
-import {uploadImageToS3} from '../../s3-setup/uploadImageToS3.js';    
+import { uploadImageToS3 } from '../../db-operations/s3-operations/index.js';    
 import multer from 'multer';
 
 const posts = express.Router();
@@ -17,6 +17,28 @@ const upload = multer({ storage: multer.memoryStorage() });
 
 //upload image for a post
 posts.post('/uploadImage', upload.single('file'), async (req, res) => {
+    // Verify the user's original username for security reasons
+    const username = req.session.username; // NOT SECURE, FIX LATER
+    const image = req.file;
+
+    if (!req.session || req.session.username !== username || req.session.username == null) {
+        return res.status(401).json({ error: 'Unauthorized request: this user is not authenticated or does not have permission to modify this profile.' });
+    }
+
+    if (!image) {
+        return res.status(400).json({error: 'No image provided'});
+    }
+
+    try {
+        const url = await uploadImageToS3(image, true); // true for post images, false for profile images
+        res.status(200).json({imageUrl: url});
+    } catch (err) {
+        res.status(500).json({error: `Error uploading image: ${err.message}`});
+    }
+});
+
+//upload image for a post
+posts.post('/uploadImage', async (req, res) => {
     // Verify the user's original username for security reasons
     const username = req.session.username;
     const image = req.file;
@@ -31,7 +53,7 @@ posts.post('/uploadImage', upload.single('file'), async (req, res) => {
         const url = await uploadImageToS3(image);
         res.status(200).json({imageUrl: url}); //throw this URL into the RDS in the frontend
     } catch (err) {
-        res.status(500).json({error: 'Error uploading image', details: err.message});
+        res.status(500).json({error: 'Error uploading image'});
     }
 });
 

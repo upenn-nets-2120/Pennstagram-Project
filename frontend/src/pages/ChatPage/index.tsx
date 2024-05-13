@@ -28,8 +28,9 @@ const ChatPage: React.FC = () => {
 
     useEffect(() => {
         const init = async () => {
-            setChats(await getChatsFromUser((await getFollowed(user.userID))[0]));
+            setChats(await getChatsFromUser(user));
         };
+        
         init();
     }, []);
 
@@ -71,9 +72,8 @@ const ChatPage: React.FC = () => {
                 <Row height="100%">
                     <Column width="30%">
                         <Row height="15%" color={theme.primaryColor}>
-                            <ChatTitleContainer>
-                                <h1>Here are the settings</h1>
-                            </ChatTitleContainer>
+                            <h1 style={{ color: 'white', fontSize: '4vw', marginBottom: '2vh' }}>Chats</h1>
+                            <button onClick={handleCreateChat} style={{ marginBottom: '2vh' }}>Create Chat</button>
                         </Row>
                         <Row height="85%">
                             <Scrollable>

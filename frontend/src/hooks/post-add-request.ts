@@ -9,6 +9,5 @@ export const postAddRequest = async (user: User, requestedID: string) => {
         return response.data;
     } catch (error) {
         console.error('Error adding request:', error);
-        throw new Error('Failed to add request');
     }
 };

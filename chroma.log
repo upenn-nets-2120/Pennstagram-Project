@@ -1,28 +1,27 @@
-[33mWARNING[0m:  [12-05-2024 02:24:47] chroma_server_nofile is set to 65535, but this is less than current soft limit of 1048576. chroma_server_nofile will not be set.
-[32mINFO[0m:     [12-05-2024 02:24:47] Anonymized telemetry enabled. See                     https://docs.trychroma.com/telemetry for more information.
-[36mDEBUG[0m:    [12-05-2024 02:24:47] Starting component System
-[36mDEBUG[0m:    [12-05-2024 02:24:47] Starting component OpenTelemetryClient
-[36mDEBUG[0m:    [12-05-2024 02:24:47] Starting component SimpleAssignmentPolicy
-[36mDEBUG[0m:    [12-05-2024 02:24:47] Starting component SqliteDB
-[36mDEBUG[0m:    [12-05-2024 02:24:50] Starting component QuotaEnforcer
-[36mDEBUG[0m:    [12-05-2024 02:24:50] Starting component Posthog
-[36mDEBUG[0m:    [12-05-2024 02:24:50] Starting component LocalSegmentManager
-[36mDEBUG[0m:    [12-05-2024 02:24:50] Starting component SegmentAPI
-[32mINFO[0m:     [12-05-2024 02:24:50] Started server process [[36m3483[0m]
-[32mINFO[0m:     [12-05-2024 02:24:50] Waiting for application startup.
-[32mINFO[0m:     [12-05-2024 02:24:50] Application startup complete.
-[32mINFO[0m:     [12-05-2024 02:24:50] Uvicorn running on [1mhttp://0.0.0.0:8000[0m (Press CTRL+C to quit)
-[33mWARNING[0m:  [12-05-2024 13:09:52] chroma_server_nofile is set to 65535, but this is less than current soft limit of 1048576. chroma_server_nofile will not be set.
-[32mINFO[0m:     [12-05-2024 13:09:53] Anonymized telemetry enabled. See                     https://docs.trychroma.com/telemetry for more information.
-[36mDEBUG[0m:    [12-05-2024 13:09:53] Starting component System
-[36mDEBUG[0m:    [12-05-2024 13:09:53] Starting component OpenTelemetryClient
-[36mDEBUG[0m:    [12-05-2024 13:09:53] Starting component SimpleAssignmentPolicy
-[36mDEBUG[0m:    [12-05-2024 13:09:53] Starting component SqliteDB
-[36mDEBUG[0m:    [12-05-2024 13:09:53] Starting component QuotaEnforcer
-[36mDEBUG[0m:    [12-05-2024 13:09:53] Starting component Posthog
-[36mDEBUG[0m:    [12-05-2024 13:09:53] Starting component LocalSegmentManager
-[36mDEBUG[0m:    [12-05-2024 13:09:53] Starting component SegmentAPI
-[32mINFO[0m:     [12-05-2024 13:09:53] Started server process [[36m6007[0m]
-[32mINFO[0m:     [12-05-2024 13:09:53] Waiting for application startup.
-[32mINFO[0m:     [12-05-2024 13:09:53] Application startup complete.
-[32mINFO[0m:     [12-05-2024 13:09:53] Uvicorn running on [1mhttp://0.0.0.0:8000[0m (Press CTRL+C to quit)
+[33mWARNING[0m:  [13-05-2024 08:34:48] chroma_server_nofile is set to 65535, but this is less than current soft limit of 1048576. chroma_server_nofile will not be set.
+[32mINFO[0m:     [13-05-2024 08:34:48] Anonymized telemetry enabled. See                     https://docs.trychroma.com/telemetry for more information.
+[36mDEBUG[0m:    [13-05-2024 08:34:48] Starting component System
+[36mDEBUG[0m:    [13-05-2024 08:34:48] Starting component OpenTelemetryClient
+[36mDEBUG[0m:    [13-05-2024 08:34:48] Starting component SimpleAssignmentPolicy
+[36mDEBUG[0m:    [13-05-2024 08:34:48] Starting component SqliteDB
+[36mDEBUG[0m:    [13-05-2024 08:34:48] Starting component Posthog
+[36mDEBUG[0m:    [13-05-2024 08:34:48] Starting component LocalSegmentManager
+[36mDEBUG[0m:    [13-05-2024 08:34:48] Starting component SegmentAPI
+[32mINFO[0m:     [13-05-2024 08:34:48] Started server process [[36m26552[0m]
+[32mINFO[0m:     [13-05-2024 08:34:48] Waiting for application startup.
+[32mINFO[0m:     [13-05-2024 08:34:48] Application startup complete.
+[32mINFO[0m:     [13-05-2024 08:34:48] Uvicorn running on [1mhttp://0.0.0.0:8000[0m (Press CTRL+C to quit)
+[32mINFO[0m:     [13-05-2024 08:39:47] 127.0.0.1:49120 - "POST /api/v1/collections?tenant=default_tenant&database=default_database HTTP/1.1" 200
+[32mINFO[0m:     [13-05-2024 08:45:11] 127.0.0.1:51968 - "POST /api/v1/collections?tenant=default_tenant&database=default_database HTTP/1.1" 200
+[32mINFO[0m:     [13-05-2024 08:50:44] 127.0.0.1:45660 - "POST /api/v1/collections?tenant=default_tenant&database=default_database HTTP/1.1" 200
+[32mINFO[0m:     [13-05-2024 08:55:24] 127.0.0.1:43288 - "POST /api/v1/collections?tenant=default_tenant&database=default_database HTTP/1.1" 200
+[32mINFO[0m:     [13-05-2024 09:06:34] 127.0.0.1:38530 - "POST /api/v1/collections?tenant=default_tenant&database=default_database HTTP/1.1" 200
+[32mINFO[0m:     [13-05-2024 09:10:10] 127.0.0.1:60762 - "POST /api/v1/collections?tenant=default_tenant&database=default_database HTTP/1.1" 200
+[32mINFO[0m:     [13-05-2024 09:17:15] 127.0.0.1:34454 - "POST /api/v1/collections?tenant=default_tenant&database=default_database HTTP/1.1" 200
+[32mINFO[0m:     [13-05-2024 09:37:03] 127.0.0.1:36476 - "POST /api/v1/collections?tenant=default_tenant&database=default_database HTTP/1.1" 200
+[32mINFO[0m:     [13-05-2024 09:37:52] 127.0.0.1:37042 - "POST /api/v1/collections?tenant=default_tenant&database=default_database HTTP/1.1" 200
+[32mINFO[0m:     [13-05-2024 09:38:03] 127.0.0.1:54606 - "POST /api/v1/collections?tenant=default_tenant&database=default_database HTTP/1.1" 200
+[32mINFO[0m:     [13-05-2024 09:57:30] 127.0.0.1:59556 - "POST /api/v1/collections?tenant=default_tenant&database=default_database HTTP/1.1" 200
+[32mINFO[0m:     [13-05-2024 10:10:06] 127.0.0.1:34872 - "POST /api/v1/collections?tenant=default_tenant&database=default_database HTTP/1.1" 200
+[32mINFO[0m:     [13-05-2024 10:11:31] 127.0.0.1:55412 - "POST /api/v1/collections?tenant=default_tenant&database=default_database HTTP/1.1" 200
+[32mINFO[0m:     [13-05-2024 10:12:09] 127.0.0.1:48628 - "POST /api/v1/collections?tenant=default_tenant&database=default_database HTTP/1.1" 200

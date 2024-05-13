@@ -24,6 +24,7 @@ export { default as deleteMessage } from './messages/delete-message.js';
 export { default as getMessagesFromChat } from './messages/get-messages.js';
 export { default as addUsers2chat } from './users2chats/add-user2chat.js';
 export { default as deleteUsers2chat } from './users2chats/delete-user2chat.js';
+export { default as getUsersFromChat } from './users2chats//get-users-from-chat.js';
 
 // exports for notifications
 export { default as addNotification } from './notifications/add-notification.js';
@@ -32,6 +33,7 @@ export { default as getNotificationsFromUser } from './notifications/get-notific
 
 // exports for login/registration
 export { default as addUser } from './registration/add-user.js';
+export { default as addCode } from './registration/add-code.js';
 export { default as getUser } from './registration/get-user.js';
 export { default as updateProfilePhoto } from './registration/update-profile-photo.js';
 export { default as getTopHashtagsSem } from './registration/get-top-hashtags.js';

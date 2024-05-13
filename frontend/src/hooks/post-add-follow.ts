@@ -9,6 +9,5 @@ export const postAddFollow = async (user: User, requestedID: string) => {
         return response.data;
     } catch (error) {
         console.error('Error adding follow:', error);
-        throw new Error('Failed to add follow');
     }
 };

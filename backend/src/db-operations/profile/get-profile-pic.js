@@ -2,9 +2,9 @@ import db from '../../db-setup/db_access.js';
 
 const getProfilePic = async (username) => {
     // retrieve user profile photo from username
-    const result = await db.send_sql(`SELECT userProfilePic from users
+    const fullS3URL = await db.send_sql(`SELECT profilePicURL from users
                                       WHERE username = '${username}';`);
-    return result;
+    return fullS3URL[0].profilePicURL;
 };
 
 export default getProfilePic;

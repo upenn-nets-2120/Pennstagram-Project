@@ -7,7 +7,7 @@ const getNotificationsFromUser = async (userID) => {
         FROM
             notifications
         WHERE
-            friends.followed = '${userID}'
+            notifications.userID = '${userID}'
     ;`;
 
     return await db.send_sql(sql);
