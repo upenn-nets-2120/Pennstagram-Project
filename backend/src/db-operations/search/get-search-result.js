@@ -1,16 +1,21 @@
-import { OpenAI, ChatOpenAI, OpenAIEmbeddings } from "@langchain/openai";
-import { PromptTemplate } from "@langchain/core/prompts";
+import { ChatOpenAI, OpenAIEmbeddings } from "@langchain/openai";
 import { formatDocumentsAsString } from "langchain/util/document";
+import { StringOutputParser } from "@langchain/core/output_parsers";
 import { RunnableSequence, RunnablePassthrough } from "@langchain/core/runnables";
+import { PromptTemplate } from "@langchain/core/prompts";
 import { Chroma } from "@langchain/community/vectorstores/chroma";
 import config from './config.json' assert { type: "json" };
 
-const getVectorStore = async function(req) {
+let vectorStore = null;
+
+const getVectorStore = async function() {
     if (vectorStore == null) {
-        vectorStore = await Chroma.fromExistingCollection(new OpenAIEmbeddings(), {
-            collectionName: "imdb_reviews2",
-            url: "http://localhost:8000", // Optional, will default to this value
-            });
+        vectorStore = await Chroma.fromExistingCollection(new OpenAIEmbeddings({
+            apiKey: config.open_ai_key
+        }), {
+            collectionName: "all_appdata_embeddings",
+            url: "http://localhost:8000",
+        });
     }
     return vectorStore;
 }
@@ -19,19 +24,18 @@ const getSearchResult = async (username, context, searchQuery) => {
     const vs = await getVectorStore();
     const retriever = vs.asRetriever();
 
-    const prompt = PromptTemplate.fromTemplate(`Use the following pieces of context to answer the Search Query at the end.
-    If you don't know the answer, just say that you don't know, don't try to make up an answer.
-    Use three sentences maximum and keep the answer as concise as possible.
+    // Ensure prompt is formatted as a runnable or function
+    const prompt = PromptTemplate.fromTemplate(`Use the following pieces of context to answer the Search Query at the end. Feel free to make up information about users or actors you know about 
     Always say "thanks for asking!" at the end of the answer.
     
     ${context}
     
     Search Query: ${searchQuery}
-    
+        
     Helpful Answer:`);
     const llm = new ChatOpenAI({
-        api_key: config.open_ai_key,
-        model: "gpt-3.5-turbo",
+        apiKey: config.open_ai_key,
+        model: "gpt-3.5-turbo-16k-0613",
         temperature: 0
     });
 
@@ -45,10 +49,8 @@ const getSearchResult = async (username, context, searchQuery) => {
       new StringOutputParser(),
     ]);
 
-    console.log(searchQuery);
+    let result = await ragChain.invoke(searchQuery);
 
-    result = await ragChain.invoke(searchQuery);
-    console.log(result);
     return result;
 }
 

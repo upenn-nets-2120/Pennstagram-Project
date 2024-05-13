@@ -8,7 +8,7 @@ import {
     checkUsernameValid
 } from '../../db-operations/index.js';
 import authUtils from '../../utils/authUtils.js';
-import {uploadImageToS3} from '../../s3-setup/uploadImageToS3.js';    
+import { uploadImageToS3 } from '../../db-operations/s3-operations/index.js';
 import multer from 'multer';
 
 const upload = multer({ storage: multer.memoryStorage() });
