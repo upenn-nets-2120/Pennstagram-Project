@@ -2,7 +2,7 @@
 console.log('index.js is running');
 import {uploadImageToS3} from './uploadImageToS3.js';
 
-const imagePath = '/nets2120/project-electro-motive-diesel-sd70-ace-t4-AnushkaLev/backend/src/s3-setup/sunset.jpeg'; //path to your test image
+// const imagePath = '/nets2120/project-electro-motive-diesel-sd70-ace-t4-AnushkaLev/backend/src/s3-setup/sunset.jpeg'; //path to your test image
 
 async function uploadImage(imagePath) {
     try {
@@ -14,4 +14,3 @@ async function uploadImage(imagePath) {
     }
 }
 uploadImage(imagePath);
-//export {uploadImage as uploadImageToS3};
