@@ -1,11 +1,11 @@
 import { User } from '../entities/User';
 
-export const getUserActionType = (user: User): 'Request' | 'Following' | 'Follow' | 'Requested' => {
+export const getUserActionType = (user: User): 'Request' | 'Unfollow' | 'Follow' | 'Remove Request' => {
     console.log(user);
     if (user.follows_back) {
-        return 'Following';
+        return 'Unfollow';
     } else if (user.requested) {
-        return 'Requested';
+        return 'Remove Request';
     } else if (user.userVisibility === 'public') {
         return 'Follow';
     } else {

@@ -1,7 +1,7 @@
 import { useContext, useEffect, useState } from "react";
 import { FriendTabOption } from "../../entities/FriendTabOption";
 import { User } from "../../entities/User";
-import { Main, Row, Tab, ProfilePic, NavBar, RowName, UserActionButton, Page, Column, Scrollable } from '../../components';
+import { Main, Row, Tab, ProfilePic, NavBar, RowName, UserActionButton, Page, Column, Scrollable, Highlightable } from '../../components';
 import { getFollowing } from "../../hooks/get-following";
 import { getFollowed } from "../../hooks/get-followed";
 import { getRecommended } from "../../hooks/get-recommended";
@@ -16,6 +16,8 @@ import { postAddFollow } from "../../hooks/post-add-follow";
 import { getRequests } from "../../hooks/get-requests";
 import { postAcceptRequest } from "../../hooks/post-accept-request";
 import { postRejectRequest } from "../../hooks/post-reject-request";
+import { postRemoveFollow } from "../../hooks/post-remove-follow";
+import { postRemoveRequest } from "../../hooks/post-remove-request";
 
 const FriendsPage: React.FC = () => {
     const [tab, setTab] = useState<FriendTabOption>('Following');
@@ -27,14 +29,14 @@ const FriendsPage: React.FC = () => {
     const { theme } = useContext(ThemeContext);
     const { user } = useContext(UserContext);
 
-    useEffect(() => {
-        const init = async () => {
-            setFollowing(await getFollowing(user.userID));
-            setFollowed(await getFollowed(user.userID));
-            setRecommended(await getRecommended(user.userID));
-            setRequests(await getRequests(user.userID));
-        };
+    const init = async () => {
+        setFollowing(await getFollowing(user.userID));
+        setFollowed(await getFollowed(user.userID));
+        setRecommended(await getRecommended(user.userID));
+        setRequests(await getRequests(user.userID));
+    };
 
+    useEffect(() => {
         init();
     }, []);
 
@@ -57,28 +59,34 @@ const FriendsPage: React.FC = () => {
             break;
     }
 
-    const handleAction = (actionType: string, userID: number) => {
+    const handleAction = async (actionType: string, userID: number) => {
         switch (actionType) {
             case 'Follow':
-                postAddFollow(user, userID.toString());
+                await postAddFollow(user, userID.toString());
                 break;
-            case 'Following':
+            case 'Unfollow':
+                await postRemoveFollow(user, userID.toString());
                 break;
-            case 'Requested':
+            case 'Remove Request':
+                await postRemoveRequest(user, userID.toString());
                 break;
             case 'Request':
-                postAddRequest(user, userID.toString());
+                await postAddRequest(user, userID.toString());
                 break;
             case 'Accept':
-                postAcceptRequest(user, userID.toString());
+                await postAcceptRequest(user, userID.toString());
                 break;
             case 'Reject':
-                postRejectRequest(user, userID.toString());
+                await postRejectRequest(user, userID.toString());
                 break;
             default:
                 break;
         }
+
+        init();
     };
+
+    console.log(displayedUsers);
 
     return (
         <Page>
@@ -97,30 +105,31 @@ const FriendsPage: React.FC = () => {
                     </Row>
                     <Row height="80%">
                         <Scrollable>
-                        {displayedUsers.map((user, index) => (
-                            <Row key={index} height='20%' color={theme.quaternaryColor}>
-                                <Border sides="bottom" color={'gray'}>
-                                    <Row height='100%'>
-                                        <MiniUserCard to={`/user/${user.userID}`}>
-                                            <ProfilePic src={defaultProfilePic} alt='' />
-                                            <RowName>{user.username}</RowName>
-                                        </MiniUserCard>
-                                        {tab === 'Requests'
-                                            ?
-                                                <Column width="5%">
-                                                    <Row height="100%">
-                                                        
-                                                        <UserActionButton onClick={(actionType: string) => handleAction(actionType, user.userID)} actionType={'Accept'} />
-                                                        <UserActionButton onClick={(actionType: string) => handleAction(actionType, user.userID)} actionType={'Reject'} />
-                                                    </Row>
-                                                </Column>
-                                            :
-                                                <UserActionButton onClick={(actionType: string) => handleAction(actionType, user.userID)} actionType={getUserActionType(user)} />
-                                        }
-                                    </Row>
-                                </Border>
-                            </Row>
-                        ))}
+                            {displayedUsers.map((user, index) => (
+                                <Row key={index} height='18%' color={theme.quaternaryColor}>
+                                    <Highlightable>
+                                        <Border sides="bottom" color={'gray'}>
+                                            <Row height='100%'>
+                                                <MiniUserCard to={`/user/${user.userID}`}>
+                                                    <ProfilePic src={defaultProfilePic} alt='' />
+                                                    <RowName>{user.username}</RowName>
+                                                </MiniUserCard>
+                                                {tab === 'Requests'
+                                                    ?
+                                                        <Column width="5%">
+                                                            <Row height="100%">
+                                                                <UserActionButton onClick={(actionType: string) => handleAction(actionType, user.userID)} actionType={'Accept'} />
+                                                                <UserActionButton onClick={(actionType: string) => handleAction(actionType, user.userID)} actionType={'Reject'} />
+                                                            </Row>
+                                                        </Column>
+                                                    :
+                                                        <UserActionButton onClick={(actionType: string) => handleAction(actionType, user.userID)} actionType={getUserActionType(user)} />
+                                                    }
+                                            </Row>
+                                        </Border>
+                                    </Highlightable>
+                                </Row>
+                            ))}
                         </Scrollable>
                     </Row>
                 </Column>

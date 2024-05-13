@@ -25,8 +25,6 @@ export const getRequests = async (userID: number): Promise<User[]> => {
             follows_back: follower.follows_back === 1 ? true : false,
             requested: follower.requested === 1 ? true : false
         }));
-
-        console.log(users);
         
         return users;
     } catch (error) {

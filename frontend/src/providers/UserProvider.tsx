@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { User } from '../entities/User';
 
 const sampleUser: User = {
-    userID: 1,
+    userID: 2,
     username: "testUser12345",
     firstName: null,
     lastName: null,
@@ -24,12 +24,12 @@ const sampleUser: User = {
 
 
 export const UserContext = React.createContext<{
-    user: User; // Make user non-nullable
+    user: User;
     isLoggedIn: boolean;
     login: (user: User) => void;
     logout: () => void;
 }>({
-    user: sampleUser, // Provide the sampleUser as default
+    user: sampleUser,
     isLoggedIn: true,
     login: () => {},
     logout: () => {},
@@ -41,9 +41,11 @@ interface UserProviderProps {
 
 export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
     const [isLoggedIn, setIsLoggedIn] = useState<boolean>(true);
+    const [user, setUser] = useState<User>(sampleUser);
 
     const login = (user: User) => {
         setIsLoggedIn(true);
+        setUser(user);
     }
 
     const logout = () => {
