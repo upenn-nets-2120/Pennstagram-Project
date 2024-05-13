@@ -57,6 +57,7 @@ import styled from 'styled-components';
 import localImage from '../../assets/sunset.jpeg';
 import {NavBar} from '../../components';
 import { Link } from 'react-router-dom';
+import { useAuth } from '../../contexts/AuthContexts';
 
 //import localImage from '../assets/sunset.jpeg';
 //import localImage from '/frontend/src/assets/sunset.jpeg'; 
@@ -101,7 +102,7 @@ const Button = styled.button.attrs<{ active?: boolean }>(props => ({
 }))`
   padding: 5px 10px;
   border-radius: 5px;
-  border: none;
+  border: none;
   cursor: pointer;
 
   background-color: ${props => props.active ? 'red' : 'initial'};
@@ -158,6 +159,7 @@ const Sidebar = styled.div`
 `;
 
 const FeedPage: React.FC = () => {
+  const { isLoggedIn, logout } = useAuth(); // Use the auth context
   const [posts, setPosts] = useState([
     { id: 1, author: 'Alice', content: 'What a beautiful sunset!', imageUrl: localImage, liked: false, comments: [{ id: 1, text: 'Absolutely stunning!', author: 'Bob' }] },
     { id: 2, author: 'Charlie', content: 'Anyone up for a hike?', imageUrl: '', liked: false, comments: [] },
@@ -200,7 +202,7 @@ const FeedPage: React.FC = () => {
 
   return (
     <>
-    <NavBar />
+    <NavBar isLoggedIn={isLoggedIn} onLogout={logout} />
     <Sidebar>
     <Link to="/post">
       <Button>Create Post</Button>

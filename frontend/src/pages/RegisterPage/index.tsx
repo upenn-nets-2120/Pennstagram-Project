@@ -129,29 +129,32 @@ const RegisterPage: React.FC = () => {
 
     const handleHashtagChange = (newSelected: MultiValue<HashtagOption>, actionMeta: ActionMeta<HashtagOption>) => {
         // Convert the readonly MultiValue array to a mutable array before setting state
+        // console.log("SELECTED", newSelected);
+        // console.log("HASHTAGS:", hashtags);
+        // const newSelectedHashtags = [...newSelected];
+        // setSelectedHashtags(newSelectedHashtags);
+
+        // let filtered: HashtagOption[] = [];
+        // for (const selected of newSelected) {
+        //     filtered = hashtags.filter(hashtag => hashtag.label !== selected.label);   
+        // }
+        // console.log("FILTERERD:", filtered);
+        // setHashtags(filtered);
+        // console.log("UPDATED", hashtags);
+        console.log("SELECTED", newSelected);
+        console.log("HASHTAGS:", hashtags);
         const newSelectedHashtags = [...newSelected];
         setSelectedHashtags(newSelectedHashtags);
-    
-        switch (actionMeta.action) {
-            case 'select-option':
-                if (actionMeta.option) {
-                    setHashtags((prevHashtags) => prevHashtags.filter((option) => option.value !== actionMeta.option!.value));
-                }
-                break;
-    
-            case 'remove-value':
-            case 'pop-value':
-                if (actionMeta.removedValue) {
-                    // Add back the removed hashtag to the list of available options
-                    setHashtags((prevHashtags) => [...prevHashtags, actionMeta.removedValue].sort((a, b) => a.value - b.value));
-                }
-                break;
-    
-            default:
-                // Handle other actions if necessary
-                break;
-        }
+
+        const selectedLabels = new Set(newSelected.map(option => option.label));
+        const filtered = hashtags.filter(hashtag => !selectedLabels.has(hashtag.label));
+        console.log("FILTERED:", filtered);
+        setHashtags(filtered);
     };
+    
+    useEffect(() => {
+        console.log("HASHTAGS AFTER UPDATE:", hashtags);
+    }, [hashtags]);
     
     
     
@@ -280,6 +283,7 @@ const RegisterPage: React.FC = () => {
                     value={affiliation}
                     onChange={(e) => setAffiliation(e.target.value)}
                 />
+                <label>Date of Birth</label>
                 <InputField
                     type="date"
                     placeholder="Birthday"

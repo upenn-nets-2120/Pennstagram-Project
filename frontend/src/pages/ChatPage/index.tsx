@@ -13,12 +13,14 @@ import { postSendMessage } from '../../hooks/post-send-message';
 import { UserContext } from '../../providers/UserProvider';
 import DisplayMessages from './components/DisplayMessages';
 import findChatById from '../../utils/chatsToChat';
+import { useAuth } from '../../contexts/AuthContexts';
 
 const ChatPage: React.FC = () => {
     const { chatID } = useParams();
     const { theme } = useContext(ThemeContext);
     const { user } = useContext(UserContext);
     const navigate = useNavigate();
+    const { isLoggedIn, logout } = useAuth();
 
     const [chats, setChats] = useState<Chat[]>([]);
     const [chat, setChat] = useState<Chat | undefined>(undefined);
@@ -65,7 +67,7 @@ const ChatPage: React.FC = () => {
 
     return (
         <Page>
-            <NavBar />
+            <NavBar isLoggedIn={isLoggedIn} onLogout={logout}/>
             <Main>
                 <Row height="100%">
                     <Column width="30%">

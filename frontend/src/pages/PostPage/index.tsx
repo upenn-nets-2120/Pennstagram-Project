@@ -2,8 +2,11 @@ import React, { useState } from 'react';
 import { NavBar } from '../../components';
 import config from '../../config.json';
 import axios from 'axios';
+import { useAuth } from '../../contexts/AuthContexts';
 
 const PostPage: React.FC = () => {
+const { isLoggedIn, logout } = useAuth(); // Use the auth context
+
 const rootURL = config.serverRootURL;
 console.log("rootURL: ", rootURL);
 
@@ -193,7 +196,7 @@ const handleDelete = async (event: React.FormEvent) => {
 
   return (
     <>
-      <NavBar />
+    <NavBar isLoggedIn={isLoggedIn} onLogout={logout} />
       <div style={{ margin: '0 auto', maxWidth: '600px', padding: '1em' }}>
         <h1 style={{ textAlign: 'center' }}>Post Page</h1>
         <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1em' }}>

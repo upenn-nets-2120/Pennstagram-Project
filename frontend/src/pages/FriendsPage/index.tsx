@@ -18,6 +18,7 @@ import { postAcceptRequest } from "../../hooks/post-accept-request";
 import { postRejectRequest } from "../../hooks/post-reject-request";
 import { postRemoveFollow } from "../../hooks/post-remove-follow";
 import { postRemoveRequest } from "../../hooks/post-remove-request";
+import { useAuth } from "../../contexts/AuthContexts";
 
 const FriendsPage: React.FC = () => {
     const [tab, setTab] = useState<FriendTabOption>('Following');
@@ -25,6 +26,7 @@ const FriendsPage: React.FC = () => {
     const [followed, setFollowed] = useState<User[]>([]);
     const [recommended, setRecommended] = useState<User[]>([]);
     const [requests, setRequests] = useState<User[]>([]);
+    const { isLoggedIn, logout } = useAuth();
 
     const { theme } = useContext(ThemeContext);
     const { user } = useContext(UserContext);
@@ -88,7 +90,7 @@ const FriendsPage: React.FC = () => {
 
     return (
         <Page>
-            <NavBar />
+            <NavBar isLoggedIn={isLoggedIn} onLogout={logout}/>
             <Main>
                 <Column width='100%'>
                     <Row height='20%'>
