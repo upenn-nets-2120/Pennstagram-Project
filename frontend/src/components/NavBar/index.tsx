@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import styled from 'styled-components';
 import { headerSize } from '../../constants/headerSize';
+import { UserContext } from '../../providers/UserProvider';
 
 const TopBar = styled.nav`
     background-color: #f8f9fa;
@@ -44,6 +45,10 @@ const LoginButton = styled.a`
 `;
 
 const NavBar: React.FC = () => {
+    const { user, isLoggedIn } = useContext(UserContext);
+
+    console.log(user.username)
+
     return (
         <header>
             <TopBar>
