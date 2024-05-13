@@ -258,10 +258,6 @@ profile.put('/modifyProfilePic', upload.single('file'), async (req, res) => {
         if (!profilePic) {
             return res.status(400).json({error: 'No image provided'});
         }
-
-        if (!authUtils.isOK(username)) {
-            return res.status(403).json({error: 'One or more of your inputs is potentially an SQL injection attack.'})
-        }
         
         const result = await modifyProfilePic(username, profilePic);
 
