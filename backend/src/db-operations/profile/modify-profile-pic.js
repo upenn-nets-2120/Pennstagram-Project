@@ -1,7 +1,7 @@
 import db from '../../db-setup/db_access.js';
 import {
     deleteSimilarActors,
-    calculateFaceMatches,
+//    calculateFaceMatches,
     modifySimilarActors
 } from '../index.js';
 

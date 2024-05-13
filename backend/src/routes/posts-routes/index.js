@@ -12,6 +12,28 @@ import authUtils from '../../utils/authUtils.js';
 
 const posts = express.Router();
 
+//upload image for a post
+posts.post('/uploadImage', async (req, res) => {
+    // Verify the user's original username for security reasons
+    const username = req.session.username;
+    const image = req.file;
+
+    if (!req.session || req.session.username !== username || req.session.username == null) {
+        return res.status(401).json({ error: 'Unauthorized request: this user is not authenticated or does not have permission to modify this profile.' });
+    }
+
+    if (!image) {
+        return res.status(400).json({error: 'No image provided'});
+    }
+
+    try {
+        const url = await uploadImageToS3(image);
+        res.status(200).json({imageUrl: url});
+    } catch (err) {
+        res.status(500).json({error: 'Error uploading image'});
+    }
+});
+
 //fetch all posts for a user
 posts.get('/fetchAllPosts', async (req, res) => {
     console.log("fetchAllPosts");
