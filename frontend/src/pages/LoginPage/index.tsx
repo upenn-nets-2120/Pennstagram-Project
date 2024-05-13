@@ -98,6 +98,7 @@ const LoginPage: React.FC = () => {
                 actors: undefined,
                 birthday: null,
                 affiliation: null,
+                hashtags: [],
                 linked_actor_nconst: null,
                 inviters: undefined,
                 userProfilePic: null,
@@ -105,7 +106,8 @@ const LoginPage: React.FC = () => {
                 userVisibility: null,
                 sessionToken: null,
                 follows_back: null,
-                requested: null
+                requested: null,
+                online: null
             }
 
             login(user);

@@ -1,7 +1,7 @@
 import { useContext, useEffect, useState } from "react";
 import { FriendTabOption } from "../../entities/FriendTabOption";
 import { User } from "../../entities/User";
-import { Main, Row, Tab, ProfilePic, NavBar, RowName, UserActionButton, Page, Column, Scrollable, Highlightable } from '../../components';
+import { Main, Row, Tab, ProfilePic, NavBar, RowName, UserActionButton, Page, Column, Scrollable, Highlightable, RowOnlineOffline } from '../../components';
 import { getFollowing } from "../../hooks/get-following";
 import { getFollowed } from "../../hooks/get-followed";
 import { getRecommended } from "../../hooks/get-recommended";
@@ -86,8 +86,6 @@ const FriendsPage: React.FC = () => {
         init();
     };
 
-    console.log(displayedUsers);
-
     return (
         <Page>
             <NavBar />
@@ -112,7 +110,10 @@ const FriendsPage: React.FC = () => {
                                             <Row height='100%'>
                                                 <MiniUserCard to={`/user/${user.userID}`}>
                                                     <ProfilePic src={defaultProfilePic} alt='' />
-                                                    <RowName>{user.username}</RowName>
+                                                    <Column width="auto">
+                                                        <RowName>{user.username}</RowName>
+                                                        <RowOnlineOffline>({user.online ? 'online' : 'offline'})</RowOnlineOffline>
+                                                    </Column>
                                                 </MiniUserCard>
                                                 {tab === 'Requests'
                                                     ?

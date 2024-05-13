@@ -52,6 +52,7 @@ export { default as getUserHashtags } from './profile/get-user-hashtags.js';
 export { default as getTopHashtagsAlain } from './profile/get-top-hashtags.js';
 export { default as getProfilePic } from './profile/get-profile-pic.js';
 export { default as getSimilarActors } from './profile/get-similar-actors.js';
+export { default as getUserByNConst } from './profile/get-user-by-nconst.js';
 
 // exports for posts/feed
 export { default as linkHashtagsToPost } from './posts/link-hashtags-to-posts.js';

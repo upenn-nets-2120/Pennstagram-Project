@@ -15,7 +15,8 @@ const usersCreateTable = async (db) => {
             profilePicURL VARCHAR(255),
             userScore INT,
             userVisibility ENUM('public', 'private'),
-            sessionToken VARCHAR(255)
+            sessionToken VARCHAR(255),
+            lastOnline TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         );
     `;
   

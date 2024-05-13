@@ -8,5 +8,7 @@ export { default as ForgotPasswordPage } from './ForgotPasswordPage';
 export { default as NewPasswordPage } from './NewPasswordPage';
 export { default as VerificationPage } from './VerificationPage';
 export { default as NotificationsPage } from './NotificationsPage';
+export { default as ProfilePage } from './ProfilePage';
+export { default as SearchPage } from './SearchPage';
 
 

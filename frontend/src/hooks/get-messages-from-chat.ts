@@ -18,6 +18,7 @@ export const getMessagesFromChat = async (chatID: string): Promise<Message[]> =>
                 actors: undefined,
                 birthday: null,
                 affiliation: null,
+                hashtags: [],
                 linked_actor_nconst: null,
                 inviters: undefined,
                 userProfilePic: null,
@@ -25,7 +26,8 @@ export const getMessagesFromChat = async (chatID: string): Promise<Message[]> =>
                 userVisibility: null,
                 sessionToken: null,
                 follows_back: null,
-                requested: null
+                requested: null,
+                online: null
             };
 
             return {

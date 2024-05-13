@@ -55,6 +55,8 @@ const NavBar: React.FC = () => {
                     <li><a href="/friends">Friends</a></li>
                     <li><a href="/chat">Chat</a></li>
                     <li><a href="/notifications">Notifications</a></li>
+                    <li><a href="/profile">Profile</a></li>
+                    <li><a href="/search">Search</a></li>
                 </NavLinks>
 
                 {/* Login Button */}

@@ -1,8 +1,6 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { Column, Main, NavBar, ProfilePic, Row, Scrollable, Page, LinkContainer } from '../../components';
+import { Column, Main, NavBar, Row, Scrollable, Page } from '../../components';
 import { ThemeContext } from '../../providers/ThemeProvider';
-import { getChatsFromUser } from '../../hooks/get-chats-from-user';
-import { getFollowed } from '../../hooks/get-followed';
 import { UserContext } from '../../providers/UserProvider';
 import { Notification } from '../../entities/Notification';
 import { getNotificationsFromUser } from '../../hooks/get-notifications-from-user';
@@ -32,7 +30,6 @@ const NotificationsPage: React.FC = () => {
                             {notifications.map((notification) => (
                                 <Row height="9%" key={notification.notificationID} color={theme.quaternaryColor}>
                                     <Border sides='bottom'>
-                                        
                                         <h5>{notification.content}</h5>
                                     </Border>
                                 </Row>

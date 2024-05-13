@@ -12,6 +12,7 @@ export interface User {
     birthday: string | null;
     affiliation: string | null;
     linked_actor_nconst: string | null;
+    hashtags: Array<string> | [];
     inviters: any | null;
     userProfilePic: string | null;
     userScore: number | null;
@@ -19,4 +20,5 @@ export interface User {
     sessionToken: string | null;
     follows_back: boolean | null;
     requested: boolean | null;
+    online: boolean | null;
 }

@@ -6,6 +6,8 @@ export const getFollowed = async (userID: number): Promise<User[]> => {
     try {
         const response = await axios.get(`${backend_url}/friends/followers/${userID}`);
 
+        console.log(response);
+
         const users: User[] = response.data.map((follower: any) => ({
             userID: follower.userID || null,
             username: follower.username || null,
@@ -23,7 +25,8 @@ export const getFollowed = async (userID: number): Promise<User[]> => {
             userVisibility: follower.userVisibility || null,
             sessionToken: follower.sessionToken || null,
             follows_back: follower.follows_back === 1 ? true : false,
-            requested: follower.requested === 1 ? true : false
+            requested: follower.requested === 1 ? true : false,
+            online: follower.online === 1 ? true : false,
         }));
         
         return users;

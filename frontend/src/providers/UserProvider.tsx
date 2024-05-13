@@ -2,16 +2,17 @@ import React, { useState } from 'react';
 import { User } from '../entities/User';
 
 const sampleUser: User = {
-    userID: 5,
-    username: "testUser12345",
+    userID: 1,
+    username: "alainTest",
     firstName: null,
     lastName: null,
     profilePic: null,
-    salted_password: null,
+    salted_password: 'testPassword123',
     emailID: null,
     actors: null,
     birthday: null,
     affiliation: null,
+    hashtags: [],
     linked_actor_nconst: null,
     inviters: null,
     userProfilePic: null,
@@ -19,9 +20,9 @@ const sampleUser: User = {
     userVisibility: null,
     sessionToken: null,
     follows_back: null,
-    requested: null
+    requested: null,
+    online: null
 };
-
 
 export const UserContext = React.createContext<{
     user: User;
