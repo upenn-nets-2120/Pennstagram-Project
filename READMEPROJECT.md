@@ -13,6 +13,7 @@
 | Anushka Levaku  | alevaku         |
 
 ## Project Description
+The project aims to create a social media platform that engages users through interactive features like chat options, notifications for follow requests and chats, creating profiles/accounts, and uploading, updating, or deleting posts they create. Upon signing up, users can add photos to their profiles and select relevant hashtags. The project would use a feed that presents posts based on their ranking through sn adsorption algorithms processed in Apache Spark and updated through Apache Kafka. Profiles can be linked to similar actor profiles using image recognition. For communication, the system includes a chat feature that supports both individual and group conversations, with options to invite friends for a chat and maintain chat history for continuity. Notifications alert users to new posts, chat invitations, and friend activities.
 
 ### Features Implemented
 - Feature 1: Chats
@@ -40,7 +41,7 @@
 - 
 
 ## Code Declaration
-I/We declare that all the code submitted in this repository was written by the members listed above, except where specified in the source files themselves.
+We declare that all the code submitted in this repository was written by the members listed above, except where specified in the source files themselves or reused from past homeworks.
 
 ## Build and Run Instructions
 
@@ -48,6 +49,10 @@ I/We declare that all the code submitted in this repository was written by the m
 - Node.js installed 
 - Apache Spark installed
 - Install react scripts
+- npm i within backend and frontend to install dependencies
 
 ### Setup Instructions
-1. Clone the repository:
+1. Clone the repository
+2. For testing backend operations, cd into backend (run npm start)
+3. cd into frontend (run npm start)
+4. For sparkjob, run mvn clean, compile, package (for .jar file), update .env for your AWS credentials
