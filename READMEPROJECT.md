@@ -16,17 +16,14 @@
 The project aims to create a social media platform that engages users through interactive features like chat options, notifications for follow requests and chats, creating profiles/accounts, and uploading, updating, or deleting posts they create. Upon signing up, users can add photos to their profiles and select relevant hashtags. The project would use a feed that presents posts based on their ranking through sn adsorption algorithms processed in Apache Spark and updated through Apache Kafka. Profiles can be linked to similar actor profiles using image recognition. For communication, the system includes a chat feature that supports both individual and group conversations, with options to invite friends for a chat and maintain chat history for continuity. Notifications alert users to new posts, chat invitations, and friend activities.
 
 ### Features Implemented
-- Feature 1: Chats
-- Feature 2: Post
-- Feature 3: Home
-- Feature 4: Registration
-- Feature 5: Login
-- Feature 6: Feed
-- Feature 7: ForgotPassword
-- Feature 8: NewPassword
-- Feature 9: Profile/Edit Profile
-- Feature 10: Verification
-- Feature 11: Friends
+- Feature 1: Chats: a page where users can have conversations with friends through direct or group chat-style features
+- Feature 2: Post: users can upload images and create posts, update posts, and delete posts on this page
+- Feature 4: Registration: this is where users can sign up for an account on the page and enter their name, email, password, birthday, and affiliations
+- Feature 5: Login: users can login into the platform on this page and access their accounts
+- Feature 6: Feed: this page displays posts and a content stream updated through Apache Kafka
+- Feature 7: ForgotPassword: users are able to initiate a password reset if they have forgotten their login credentials, which sends an email to reset their password
+- Feature 8: Profile/Edit Profile: this page also users to view their profile and make changes to their personal details like updating a profile photo
+- Feature 9: Friends: users can view their current friends, send friend requests, and accept follow requests
   
 ### Extra Credit
 - forget password
@@ -43,15 +40,13 @@ The project aims to create a social media platform that engages users through in
 ## Code Declaration
 We declare that all the code submitted in this repository was written by the members listed above, except where specified in the source files themselves or reused from past homeworks.
 
-## Build and Run Instructions
-
 ### Prerequisites
 - Node.js installed 
 - Apache Spark installed
 - Install react scripts
 - npm i within backend and frontend to install dependencies
 
-### Setup Instructions
+### Setup Instructions & Build and Run Instructions
 1. Clone the repository
 2. For testing backend operations, cd into backend (run npm start)
 3. cd into frontend (run npm start)
