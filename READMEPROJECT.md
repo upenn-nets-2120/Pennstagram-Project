@@ -35,7 +35,8 @@ The project aims to create a social media platform that engages users through in
 - making posts private, friends only, and public
 
 ## Source Files Included
-- 
+- Backend src folder includes necessary database operations (db-operations) for each of the features as well as for accessing the S3 bucket, databse setup (db-setup) for the tables used with storing information about users, posts, hashtags, etc, routes (routes) for each of the features, and utils for the face-match portion of the assignment
+- Frontend src folder includes elements like assets, reusable components, and constants, entities, hooks, pages for different features, providers for user and theme, a router for managing different paths, and utils for tasks like chats and requests
 
 ## Code Declaration
 We declare that all the code submitted in this repository was written by the members listed above, except where specified in the source files themselves or reused from past homeworks.
