@@ -1,6 +1,6 @@
 Here's a censored version of the content converted to past tense:
 
-# [Project Name] Social Media Platform
+# Pennstagram Project
 
 ## Overview
 
